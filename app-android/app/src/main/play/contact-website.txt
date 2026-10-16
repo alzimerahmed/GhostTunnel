@@ -1,1 +1,1 @@
-https://partout.io/passepartout
+https://github.com/alzimerahmed/GhostTunnel

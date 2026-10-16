@@ -24,5 +24,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Passepartout"
+rootProject.name = "GhostTunnel"
 include(":app")

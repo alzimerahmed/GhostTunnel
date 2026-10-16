@@ -1,6 +1,6 @@
 #!/bin/bash
 cwd=`dirname $0`
-name="Passepartout"
+name="GhostTunnel"
 arch="$1"
 is_template="$2"
 if [[ -z "$arch" ]]; then

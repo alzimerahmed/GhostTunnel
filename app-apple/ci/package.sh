@@ -10,9 +10,9 @@ usage() {
 Usage: ci/package.sh <target> <output-directory> [architecture]
 
 Targets:
-  appstore-ios       Export Passepartout.ipa for App Store Connect
-  appstore-macos     Export Passepartout.pkg for App Store Connect
-  appstore-tvos      Export Passepartout.ipa for App Store Connect
+  appstore-ios       Export GhostTunnel.ipa for App Store Connect
+  appstore-macos     Export GhostTunnel.pkg for App Store Connect
+  appstore-tvos      Export GhostTunnel.ipa for App Store Connect
   dmg                Export, notarize, and sign a standalone macOS DMG
 
 The dmg target requires an architecture (arm64 or x86_64) and these variables:
@@ -77,19 +77,19 @@ case $target in
         [[ -z $architecture ]] || fail "$target does not accept an architecture"
         "$script_dir/xcode-archive.sh" iOS
         "$script_dir/xcode-export.sh" iOS
-        stage_file "dist/iOS/Passepartout.ipa" "Passepartout.ipa"
+        stage_file "dist/iOS/GhostTunnel.ipa" "GhostTunnel.ipa"
         ;;
     appstore-macos)
         [[ -z $architecture ]] || fail "$target does not accept an architecture"
         "$script_dir/xcode-archive.sh" macOS
         "$script_dir/xcode-export.sh" macOS
-        stage_file "dist/macOS/Passepartout.pkg" "Passepartout.pkg"
+        stage_file "dist/macOS/GhostTunnel.pkg" "GhostTunnel.pkg"
         ;;
     appstore-tvos)
         [[ -z $architecture ]] || fail "$target does not accept an architecture"
         "$script_dir/xcode-archive.sh" tvOS
         "$script_dir/xcode-export.sh" tvOS
-        stage_file "dist/tvOS/Passepartout.ipa" "Passepartout.ipa"
+        stage_file "dist/tvOS/GhostTunnel.ipa" "GhostTunnel.ipa"
         ;;
     dmg)
         case $architecture in
@@ -118,10 +118,10 @@ case $target in
         "$script_dir/dmg-sign.sh" \
             "$architecture" "$GPG_FINGERPRINT" "$GPG_PASSPHRASE"
 
-        stage_file "Passepartout.$architecture.dmg" \
-            "Passepartout.$architecture.dmg"
-        stage_file "Passepartout.$architecture.dmg.asc" \
-            "Passepartout.$architecture.dmg.asc"
+        stage_file "GhostTunnel.$architecture.dmg" \
+            "GhostTunnel.$architecture.dmg"
+        stage_file "GhostTunnel.$architecture.dmg.asc" \
+            "GhostTunnel.$architecture.dmg.asc"
         ;;
     *)
         usage >&2

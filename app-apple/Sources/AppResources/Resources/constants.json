@@ -32,7 +32,7 @@
         "timestamp": "yyyy-MM-dd HH:mm:ss"
     },
     "tunnel": {
-        "profileTitleFormat": "Passepartout: %@",
+        "profileTitleFormat": "GhostTunnel: %@",
         "refreshInterval": 1.0,
         "dnsFallbackServers": [
             "1.1.1.1",
@@ -69,7 +69,7 @@
         "passcodeLength": 6
     },
     "log": {
-        "tag": "PassepartoutABI",
+        "tag": "GhostTunnelABI",
         "sinceLast": 86400.0,
         "options": {
             "maxLevel": 3,

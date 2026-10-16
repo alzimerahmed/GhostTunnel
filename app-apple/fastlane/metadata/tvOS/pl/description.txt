@@ -1,8 +1,8 @@
-Chroń swoją prywatność online z Passepartout, inteligentnym klientem VPN, który bezproblemowo integruje się z tvOS.
+Chroń swoją prywatność online z GhostTunnel, inteligentnym klientem VPN, który bezproblemowo integruje się z tvOS.
 
-Możesz używać aplikacji na iOS lub macOS do konfigurowania i zarządzania profilami VPN albo przesyłać profile bezpośrednio z przeglądarki internetowej przez HTTP. iOS i macOS nie są wymagane do korzystania z Passepartout na Apple TV.
+Możesz używać aplikacji na iOS lub macOS do konfigurowania i zarządzania profilami VPN albo przesyłać profile bezpośrednio z przeglądarki internetowej przez HTTP. iOS i macOS nie są wymagane do korzystania z GhostTunnel na Apple TV.
 
-JAK DZIAŁA PASSEPARTOUT NA APPLE TV
+JAK DZIAŁA GHOSTTUNNEL NA APPLE TV
 
 Podstawowa aplikacja Apple TV obejmuje połączenia z ograniczeniem czasowym. Aby usunąć limit czasu i odblokować pełne działanie na Apple TV, wymagany jest zakup w aplikacji.
 
@@ -12,7 +12,7 @@ Wszystkie zakupy obsługują Udostępnianie Rodzinne, dzięki czemu możesz udos
 
 PRYWATNOŚĆ, NA KTÓREJ MOŻESZ POLEGAĆ
 
-Passepartout zostało zaprojektowane z myślą o przejrzystości i ochronie prywatności:  
+GhostTunnel zostało zaprojektowane z myślą o przejrzystości i ochronie prywatności:  
 - Sprawdzaj dokładnie, z którymi serwerami się łączysz.  
 - Bez reklam, śledzenia ani zbędnych procesów w tle – tylko potrzebne połączenie VPN.
 
@@ -22,10 +22,10 @@ Obsługa OpenVPN obejmuje najczęściej używane opcje; kompresja nie jest obsł
 
 OPEN SOURCE I WSPIERANE PRZEZ SPOŁECZNOŚĆ
 
-Passepartout to projekt open source, który stale się rozwija dzięki pomocy społeczności. Sprawdź projekt na GitHub: https://github.com/partout-io
+GhostTunnel to projekt open source, który stale się rozwija dzięki pomocy społeczności. Sprawdź projekt na GitHub: https://github.com/alzimerahmed/GhostTunnel
 
 ~
 
 Warunki użytkowania (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 
-Polityka prywatności: https://partout.io/passepartout/privacy/
+Polityka prywatności: https://github.com/alzimerahmed/GhostTunnel

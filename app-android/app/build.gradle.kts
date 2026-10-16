@@ -34,7 +34,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.algoritmico.passepartout"
+        applicationId = "com.ghosttunnel.android.GhostTunnel"
         minSdk = 24
         targetSdk = 36
         versionCode = 4175

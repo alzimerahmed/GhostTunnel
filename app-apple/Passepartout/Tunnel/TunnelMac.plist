@@ -19,7 +19,7 @@
 	<key>NetworkExtension</key>
 	<dict>
 		<key>NEMachServiceName</key>
-		<string>$(CFG_GROUP_ID).PassepartoutTunnel</string>
+		<string>$(CFG_GROUP_ID).GhostTunnelTunnel</string>
 		<key>NEProviderClasses</key>
 		<dict>
 			<key>com.apple.networkextension.packet-tunnel</key>

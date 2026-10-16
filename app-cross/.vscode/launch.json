@@ -5,7 +5,7 @@
             "name": "CMake: Debug installed app (macOS)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/out/install/macos-clang/passepartout",
+            "program": "${workspaceFolder}/out/install/macos-clang/ghosttunnel",
             "cwd": "${workspaceFolder}/out/install/macos-clang",
             "MIMode": "lldb",
             "preLaunchTask": "CMake: Install macOS Debug"
@@ -14,7 +14,7 @@
             "name": "CMake: Debug installed app (Windows ARM64)",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/out/install/windows-arm64/passepartout.exe",
+            "program": "${workspaceFolder}/out/install/windows-arm64/ghosttunnel.exe",
             "cwd": "${workspaceFolder}/out/install/windows-arm64",
             "preLaunchTask": "CMake: Install Windows ARM64 Debug"
         },
@@ -22,7 +22,7 @@
             "name": "CMake: Debug installed app (Windows x64)",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/out/install/windows-x64/passepartout.exe",
+            "program": "${workspaceFolder}/out/install/windows-x64/ghosttunnel.exe",
             "cwd": "${workspaceFolder}/out/install/windows-x64",
             "preLaunchTask": "CMake: Install Windows x64 Debug"
         },
@@ -30,7 +30,7 @@
             "name": "CMake: Run installed app (macOS Release)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/out/install/macos-clang/passepartout",
+            "program": "${workspaceFolder}/out/install/macos-clang/ghosttunnel",
             "cwd": "${workspaceFolder}/out/install/macos-clang",
             "MIMode": "lldb",
             "preLaunchTask": "CMake: Install macOS Release"
@@ -39,7 +39,7 @@
             "name": "CMake: Run installed app (Windows ARM64 Release)",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/out/install/windows-arm64/passepartout.exe",
+            "program": "${workspaceFolder}/out/install/windows-arm64/ghosttunnel.exe",
             "cwd": "${workspaceFolder}/out/install/windows-arm64",
             "preLaunchTask": "CMake: Install Windows ARM64 Release"
         },
@@ -47,7 +47,7 @@
             "name": "CMake: Run installed app (Windows x64 Release)",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/out/install/windows-x64/passepartout.exe",
+            "program": "${workspaceFolder}/out/install/windows-x64/ghosttunnel.exe",
             "cwd": "${workspaceFolder}/out/install/windows-x64",
             "preLaunchTask": "CMake: Install Windows x64 Release"
         }

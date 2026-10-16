@@ -47,7 +47,7 @@ private extension AppDelegate {
         let path = Bundle.main.bundlePath as NSString
         var components = path.pathComponents
 
-        // Passepartout.app/Contents/Library/LoginItems/PassepartoutLoginItem.app
+        // GhostTunnel.app/Contents/Library/LoginItems/PassepartoutLoginItem.app
         components.removeLast(4)
 
         let appPath = NSString.path(withComponents: components)

@@ -1,5 +1,5 @@
 #!/bin/sh
-package=com.algoritmico.passepartout
+package=com.ghosttunnel.android.GhostTunnel
 lang=$1
 set -e
 if [[ -n "$2" ]]; then

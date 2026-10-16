@@ -1,8 +1,8 @@
-Bescherm je online privacy met Passepartout, een slimme VPN-client die naadloos is geïntegreerd met iOS, macOS, iPadOS en tvOS.
+Bescherm je online privacy met GhostTunnel, een slimme VPN-client die naadloos is geïntegreerd met iOS, macOS, iPadOS en tvOS.
 
-ZO WERKT PASSEPARTOUT
+ZO WERKT GHOSTTUNNEL
 
-Passepartout bevat basisfuncties voor importeren en verbinden. Extra functies vereisen een in-appaankoop.
+GhostTunnel bevat basisfuncties voor importeren en verbinden. Extra functies vereisen een in-appaankoop.
 
 INBEGREPEN FUNCTIES:
 
@@ -31,16 +31,16 @@ Alle aankopen ondersteunen Delen met gezin, zodat je ze kunt delen met je gezins
 
 PRIVACY WAAR JE OP KUNT VERTROUWEN
 
-Passepartout is ontworpen met transparantie en privacy in gedachten:  
+GhostTunnel is ontworpen met transparantie en privacy in gedachten:  
 - Bekijk precies met welke servers je verbinding maakt.  
 - Geen advertenties, trackers of onnodige achtergrondactiviteiten: alleen de VPN-verbinding die je nodig hebt.
 
 OPEN SOURCE EN COMMUNITY-GEDREVEN
 
-Passepartout is open source en evolueert voortdurend dankzij de hulp van de community. Bekijk het project op GitHub: https://github.com/partout-io
+GhostTunnel is open source en evolueert voortdurend dankzij de hulp van de community. Bekijk het project op GitHub: https://github.com/alzimerahmed/GhostTunnel
 
 ~
 
 Gebruiksvoorwaarden (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 
-Privacybeleid: https://partout.io/passepartout/privacy/
+Privacybeleid: https://github.com/alzimerahmed/GhostTunnel

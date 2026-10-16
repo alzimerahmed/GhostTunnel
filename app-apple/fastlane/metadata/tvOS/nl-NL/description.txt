@@ -1,8 +1,8 @@
-Bescherm je online privacy met Passepartout, een slimme VPN-client die naadloos is geïntegreerd met tvOS.
+Bescherm je online privacy met GhostTunnel, een slimme VPN-client die naadloos is geïntegreerd met tvOS.
 
-Je kunt de iOS- of macOS-app gebruiken om VPN-profielen in te stellen en te beheren, of profielen rechtstreeks vanuit een webbrowser via HTTP uploaden. iOS en macOS zijn niet nodig om Passepartout op Apple TV te gebruiken.
+Je kunt de iOS- of macOS-app gebruiken om VPN-profielen in te stellen en te beheren, of profielen rechtstreeks vanuit een webbrowser via HTTP uploaden. iOS en macOS zijn niet nodig om GhostTunnel op Apple TV te gebruiken.
 
-ZO WERKT PASSEPARTOUT OP APPLE TV
+ZO WERKT GHOSTTUNNEL OP APPLE TV
 
 De basisapp voor Apple TV bevat verbindingen met een tijdslimiet. Om die tijdslimiet te verwijderen en de volledige Apple TV-ervaring te ontgrendelen, is een in-appaankoop vereist.
 
@@ -12,7 +12,7 @@ Alle aankopen ondersteunen Delen met gezin, zodat je ze kunt delen met je gezins
 
 PRIVACY WAAR JE OP KUNT VERTROUWEN
 
-Passepartout is ontworpen met transparantie en privacy in gedachten:  
+GhostTunnel is ontworpen met transparantie en privacy in gedachten:  
 - Zie precies met welke servers je verbinding maakt.  
 - Geen advertenties, trackers of onnodige achtergrondactiviteiten – alleen de VPN-verbinding die je nodig hebt.
 
@@ -22,10 +22,10 @@ OpenVPN-ondersteuning richt zich op gangbare opties; compressie wordt niet onder
 
 OPEN SOURCE EN COMMUNITY-GEDREVEN
 
-Passepartout is open source en ontwikkelt zich voortdurend dankzij de hulp van de community. Bekijk het project op GitHub: https://github.com/partout-io
+GhostTunnel is open source en ontwikkelt zich voortdurend dankzij de hulp van de community. Bekijk het project op GitHub: https://github.com/alzimerahmed/GhostTunnel
 
 ~
 
 Gebruiksvoorwaarden (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 
-Privacybeleid: https://partout.io/passepartout/privacy/
+Privacybeleid: https://github.com/alzimerahmed/GhostTunnel

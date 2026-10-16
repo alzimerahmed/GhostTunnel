@@ -69,7 +69,7 @@ void MyApp::OnActivateApp(wxActivateEvent &) {
 }
 
 MyFrame::MyFrame()
-    : wxFrame(nullptr, wxID_ANY, "Passepartout")
+    : wxFrame(nullptr, wxID_ANY, "GhostTunnel")
 {
     wxMenuBar* menuBar = new wxMenuBar;
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 cwd=`dirname $0`
 team_id=`$cwd/team-id.sh`
-name="Passepartout"
+name="GhostTunnel"
 arch="$1"
 apple_id="$2"
 apple_password="$3"

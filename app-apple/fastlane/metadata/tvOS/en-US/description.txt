@@ -1,8 +1,8 @@
-Protect your online privacy with Passepartout, a smart VPN client seamlessly integrated with tvOS.
+Protect your online privacy with GhostTunnel, a smart VPN client seamlessly integrated with tvOS.
 
-You can use the iOS or macOS app to set up and manage VPN profiles, or upload profiles directly from a web browser over HTTP. iOS and macOS are not required to use Passepartout on Apple TV.
+You can use the iOS or macOS app to set up and manage VPN profiles, or upload profiles directly from a web browser over HTTP. iOS and macOS are not required to use GhostTunnel on Apple TV.
 
-HOW PASSEPARTOUT WORKS ON APPLE TV
+HOW GHOSTTUNNEL WORKS ON APPLE TV
 
 The base Apple TV app includes time-limited connections. To remove the time limit and unlock the full Apple TV experience, an in-app purchase is required.
 
@@ -12,7 +12,7 @@ All purchases support Family Sharing, so you can share them with your family mem
 
 PRIVACY YOU CAN TRUST
 
-Passepartout is built with transparency and privacy in mind:
+GhostTunnel is built with transparency and privacy in mind:
 - See exactly which servers you’re connecting to.
 - No ads, trackers, or unnecessary background activities—just the VPN connection you need.
 
@@ -22,10 +22,10 @@ OpenVPN support focuses on common options; compression is not supported because 
 
 OPEN SOURCE AND COMMUNITY-DRIVEN
 
-Passepartout is open source and constantly evolving with the help of its community. Check out the project on GitHub: https://github.com/partout-io
+GhostTunnel is open source and constantly evolving with the help of its community. Check out the project on GitHub: https://github.com/alzimerahmed/GhostTunnel
 
 ~
 
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 
-Privacy Policy: https://partout.io/passepartout/privacy/
+Privacy Policy: https://github.com/alzimerahmed/GhostTunnel

@@ -69,7 +69,7 @@ object Strings {
             const val logsClipLabel = "Issue logs"
         }
 
-        const val appName = "Passepartout"
+        const val appName = "GhostTunnel"
         const val appleTV = "Apple TV"
         const val authorName = "Davide De Rosa (keeshux)"
         const val beta = "Beta"

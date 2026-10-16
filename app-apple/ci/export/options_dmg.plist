@@ -10,10 +10,10 @@
     <string>CFG_TEAM_ID</string>
     <key>provisioningProfiles</key>
     <dict>
-        <key>com.algoritmico.mac.Passepartout</key>
-        <string>Passepartout DMG</string>
-        <key>com.algoritmico.mac.Passepartout.Tunnel</key>
-        <string>Passepartout DMG Tunnel</string>
+        <key>com.ghosttunnel.mac.GhostTunnel</key>
+        <string>GhostTunnel DMG</string>
+        <key>com.ghosttunnel.mac.GhostTunnel.Tunnel</key>
+        <string>GhostTunnel DMG Tunnel</string>
     </dict>
     <key>uploadSymbols</key>
     <true/>

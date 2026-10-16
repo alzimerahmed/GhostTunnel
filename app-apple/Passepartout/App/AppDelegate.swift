@@ -40,7 +40,7 @@ private extension AppDelegate {
             pspLog(.core, .error, "LocalStore: Unable to get library directory")
             return
         }
-        let docsPath = "Application Support/Passepartout"
+        let docsPath = "Application Support/GhostTunnel"
         guard let docsURL = URL(string: docsPath, relativeTo: libURL) else {
             pspLog(.core, .error, "LocalStore: Unable to get library directory")
             return

@@ -3,7 +3,7 @@ if(POLICY CMP0177)
     cmake_policy(SET CMP0177 NEW)
     set(CMAKE_POLICY_DEFAULT_CMP0177 NEW)
 endif()
-project(Passepartout LANGUAGES C CXX)
+project(GhostTunnel LANGUAGES C CXX)
 
 option(BUILD_APP "Build app executable" OFF)
 
@@ -47,25 +47,25 @@ include("files.cmake")
 
 # Define app target
 if(BUILD_APP)
-    add_executable(passepartout "")
-    set_target_properties(passepartout PROPERTIES
+    add_executable(ghosttunnel "")
+    set_target_properties(ghosttunnel PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR}
         ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR}
         RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR}
     )
-    target_sources(passepartout PRIVATE ${APP_SOURCES})
-    target_include_directories(passepartout PRIVATE
+    target_sources(ghosttunnel PRIVATE ${APP_SOURCES})
+    target_include_directories(ghosttunnel PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/app/include
     )
-    target_link_partout(passepartout)
+    target_link_partout(ghosttunnel)
 
     # wxWidgets only required to build app executable
     include("wx.cmake")
-    target_precompile_headers(passepartout PRIVATE <wx/wx.h>)
+    target_precompile_headers(ghosttunnel PRIVATE <wx/wx.h>)
 
     if(APPLE)
         # Mangle macOS @rpath
-        set_target_properties(passepartout PROPERTIES
+        set_target_properties(ghosttunnel PROPERTIES
             MACOSX_RPATH ON
             BUILD_WITH_INSTALL_RPATH TRUE
             INSTALL_RPATH "@loader_path"
@@ -73,47 +73,47 @@ if(BUILD_APP)
         )
     elseif(LINUX)
         # Mangle Linux RPATH
-        set_target_properties(passepartout PROPERTIES
+        set_target_properties(ghosttunnel PROPERTIES
             BUILD_RPATH "\$ORIGIN"
             INSTALL_RPATH "\$ORIGIN"
             SKIP_BUILD_RPATH OFF
         )
     elseif(WIN32)
         # Build WinMain app
-        set_target_properties(passepartout PROPERTIES WIN32_EXECUTABLE ON)
+        set_target_properties(ghosttunnel PROPERTIES WIN32_EXECUTABLE ON)
     endif()
 
-    install(TARGETS passepartout
+    install(TARGETS ghosttunnel
         RUNTIME DESTINATION .
     )
 endif()
 
 # Define tunnel target
-add_executable(passepartout-tunnel "")
-set_target_properties(passepartout-tunnel PROPERTIES
+add_executable(ghosttunnel-tunnel "")
+set_target_properties(ghosttunnel-tunnel PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIR}
     ARCHIVE_OUTPUT_DIRECTORY ${OUTPUT_DIR}
     RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIR}
 )
-target_sources(passepartout-tunnel PRIVATE ${TUNNEL_SOURCES})
-target_include_directories(passepartout-tunnel PRIVATE
+target_sources(ghosttunnel-tunnel PRIVATE ${TUNNEL_SOURCES})
+target_include_directories(ghosttunnel-tunnel PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/tunnel/include
 )
-target_link_partout(passepartout-tunnel)
+target_link_partout(ghosttunnel-tunnel)
 if(APPLE)
-    set_target_properties(passepartout-tunnel PROPERTIES
+    set_target_properties(ghosttunnel-tunnel PROPERTIES
         MACOSX_RPATH ON
         BUILD_WITH_INSTALL_RPATH TRUE
         INSTALL_RPATH "@loader_path"
         INSTALL_NAME_DIR "@rpath"
     )
 elseif(LINUX)
-    set_target_properties(passepartout-tunnel PROPERTIES
+    set_target_properties(ghosttunnel-tunnel PROPERTIES
         BUILD_RPATH "\$ORIGIN"
         INSTALL_RPATH "\$ORIGIN"
         SKIP_BUILD_RPATH OFF
     )
 endif()
-install(TARGETS passepartout-tunnel
+install(TARGETS ghosttunnel-tunnel
     RUNTIME DESTINATION .
 )

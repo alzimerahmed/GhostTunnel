@@ -60,7 +60,7 @@ extension Strings {
             public static let attachmentMimeType = "text/plain"
         }
 
-        public static let appName = "Passepartout"
+        public static let appName = "GhostTunnel"
 
         public static let appleTV = "Apple TV"
 

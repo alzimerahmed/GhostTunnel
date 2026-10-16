@@ -10,7 +10,7 @@ import Testing
 struct IssueTests {
     private let comment = "foobar"
 
-    private let appLine = "Passepartout 1.2.3"
+    private let appLine = "GhostTunnel 1.2.3"
 
     @Test
     func givenNothing_whenCreateIssue_thenCollectsOSAndDevice() {

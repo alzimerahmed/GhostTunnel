@@ -46,11 +46,11 @@ for platform in ios tvos macos; do
     esac
 
     for target in app tunnel; do
-        bundle_id="com.algoritmico.ios.Passepartout"
-        profile_name="Passepartout AppStore $label"
+        bundle_id="com.ghosttunnel.ios.GhostTunnel"
+        profile_name="GhostTunnel AppStore $label"
         if [[ $target == tunnel ]]; then
             bundle_id="$bundle_id.Tunnel"
-            profile_name="Passepartout AppStore Tunnel $label"
+            profile_name="GhostTunnel AppStore Tunnel $label"
         fi
 
         echo "Generating $profile_name"

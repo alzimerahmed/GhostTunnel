@@ -46,7 +46,7 @@ data class AndroidConstants(
     )
 
     data class Tags(
-        val app: String = "Passepartout", // Also for generic error handlers
+        val app: String = "GhostTunnel", // Also for generic error handlers
         val partoutApp: String = "PartoutApp",
         val service: String = "PassepartoutVpnService",
         val partoutService: String = "PartoutService"

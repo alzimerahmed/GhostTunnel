@@ -1,8 +1,8 @@
-Protect your online privacy with Passepartout, a smart VPN client for Android.
+Protect your online privacy with GhostTunnel, a smart VPN client for Android.
 
-HOW PASSEPARTOUT WORKS
+HOW GHOSTTUNNEL WORKS
 
-Passepartout for Android includes essential VPN profile import and connection features.
+GhostTunnel for Android includes essential VPN profile import and connection features.
 
 INCLUDED FEATURES:
 
@@ -14,11 +14,11 @@ OpenVPN support focuses on common options; compression is not supported because 
 
 PRIVACY YOU CAN TRUST
 
-Passepartout is built with transparency and privacy in mind:
+GhostTunnel is built with transparency and privacy in mind:
 - No ads, trackers, or unnecessary background activities—just the VPN connection you need.
 
 OPEN SOURCE AND COMMUNITY-DRIVEN
 
-Passepartout is open source and constantly evolving with the help of its community. Check out the project on GitHub: https://github.com/partout-io
+GhostTunnel is open source and constantly evolving with the help of its community. Check out the project on GitHub: https://github.com/alzimerahmed/GhostTunnel
 
-Privacy Policy: https://partout.io/passepartout/privacy/
+Privacy Policy: https://github.com/alzimerahmed/GhostTunnel/privacy/

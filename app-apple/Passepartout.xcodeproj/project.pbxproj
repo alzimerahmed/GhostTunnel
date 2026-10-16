@@ -187,7 +187,7 @@
 		0EDE56E62CABE40D0082D21C /* Intents.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Intents.plist; sourceTree = "<group>"; };
 		0EDE56E72CABE40D0082D21C /* IntentsExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntentsExtension.swift; sourceTree = "<group>"; };
 		0EDE56F02CABE42E0082D21C /* PassepartoutIntents.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = PassepartoutIntents.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		0EE662B42DC2BDDE00A4BB37 /* com.algoritmico.mac.Passepartout.Tunnel.systemextension */ = {isa = PBXFileReference; explicitFileType = "wrapper.system-extension"; includeInIndex = 0; path = com.algoritmico.mac.Passepartout.Tunnel.systemextension; sourceTree = BUILT_PRODUCTS_DIR; };
+		0EE662B42DC2BDDE00A4BB37 /* com.ghosttunnel.mac.GhostTunnel.Tunnel.systemextension */ = {isa = PBXFileReference; explicitFileType = "wrapper.system-extension"; includeInIndex = 0; path = com.ghosttunnel.mac.GhostTunnel.Tunnel.systemextension; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EE8D7E02CD112C200F6600C /* App+tvOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App+tvOS.swift"; sourceTree = "<group>"; };
 		0EF74A772E2D774600AF7614 /* test-bundle.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "test-bundle.json"; sourceTree = "<group>"; };
 		0EF9E0FF2CF4811000F4A7DA /* LocalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationTests.swift; sourceTree = "<group>"; };
@@ -283,7 +283,7 @@
 				0E757F102CD0CFFC006E13E1 /* PassepartoutLoginItem.app */,
 				0E3FF4AE2CE3AF6F00BFF640 /* PassepartoutTests.xctest */,
 				0E78FE4C2CF799F400B0C5BF /* PassepartoutUITests.xctest */,
-				0EE662B42DC2BDDE00A4BB37 /* com.algoritmico.mac.Passepartout.Tunnel.systemextension */,
+				0EE662B42DC2BDDE00A4BB37 /* com.ghosttunnel.mac.GhostTunnel.Tunnel.systemextension */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -601,7 +601,7 @@
 				0E6D8053303C86F6002C0DD8 /* PartoutRuntime */,
 			);
 			productName = Tunnel;
-			productReference = 0EE662B42DC2BDDE00A4BB37 /* com.algoritmico.mac.Passepartout.Tunnel.systemextension */;
+			productReference = 0EE662B42DC2BDDE00A4BB37 /* com.ghosttunnel.mac.GhostTunnel.Tunnel.systemextension */;
 			productType = "com.apple.product-type.system-extension";
 		};
 /* End PBXNativeTarget section */
@@ -1155,7 +1155,7 @@
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.algoritmico.ios.PassepartoutTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ghosttunnel.ios.GhostTunnelTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1165,7 +1165,7 @@
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.algoritmico.ios.PassepartoutTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ghosttunnel.ios.GhostTunnelTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -1218,7 +1218,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.algoritmico.ios.PassepartoutUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ghosttunnel.ios.GhostTunnelUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1233,7 +1233,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.algoritmico.ios.PassepartoutUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ghosttunnel.ios.GhostTunnelUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -1410,7 +1410,7 @@
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = NO;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.algoritmico.ios.PassepartoutTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ghosttunnel.ios.GhostTunnelTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = ReleaseMac;
@@ -1467,7 +1467,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.algoritmico.ios.PassepartoutUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ghosttunnel.ios.GhostTunnelUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SWIFT_EMIT_LOC_STRINGS = NO;

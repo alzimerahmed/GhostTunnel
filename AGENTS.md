@@ -24,7 +24,7 @@ GhostTunnel = open-source VPN and privacy client (fork of Passepartout, GPLv3; u
 - **Cross**: C++/CMake presets (`CMakePresets.json`), wxWidgets.
 - **Ruby tooling**: `Gemfile` (fastlane, `.ruby-version`).
 - **Commits**: Conventional Commits for our changes (`type(scope): description`); upstream history style is irrelevant — this repo has fresh history.
-- **Bundle identity**: keep upstream bundle IDs / product names for now — rebranding (GhostTunnel app name, bundle IDs) is a planned, CI-verified phase, never ad hoc.
+- **Bundle identity**: GhostTunnel branding (`com.ghosttunnel.*` bundle IDs, display name GhostTunnel) landed in Phase 3 — CI-verified; never change ad hoc. Xcode target/scheme/directory names (`Passepartout*`) and the Android Kotlin namespace remain upstream-named for stability.
 
 ## Build / Verify
 

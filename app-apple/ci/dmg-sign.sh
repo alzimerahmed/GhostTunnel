@@ -1,6 +1,6 @@
 #!/bin/bash
 cwd=`dirname $0`
-name="Passepartout"
+name="GhostTunnel"
 arch="$1"
 gpg_fingerprint="$2"
 gpg_passphrase="$3"

@@ -55,7 +55,7 @@ case $target in
         jarsigner -verify "$bundle" >/dev/null 2>&1 || \
             fail "Android App Bundle is unsigned or has an invalid signature"
 
-        cp -f "$bundle" "$output_dir/Passepartout.aab"
+        cp -f "$bundle" "$output_dir/GhostTunnel.aab"
         ;;
     *)
         usage >&2
