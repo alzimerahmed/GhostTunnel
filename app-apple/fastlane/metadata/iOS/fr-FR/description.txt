@@ -1,0 +1,46 @@
+Protégez votre vie privée en ligne avec Passepartout, un client VPN intelligent parfaitement intégré à iOS, macOS, iPadOS et tvOS.
+
+COMMENT FONCTIONNE PASSEPARTOUT ?
+
+Passepartout inclut des fonctions de base pour l'importation et la connexion. Les fonctions supplémentaires nécessitent un achat intégré.
+
+FONCTIONNALITÉS INCLUSES :
+
+- Compatibilité avec les protocoles OpenVPN et WireGuard.
+- Obfuscation OpenVPN (en utilisant --scramble).
+- Automatisation avec Raccourcis pour des opérations simplifiées.
+- Exclusion de points de terminaison pour un contrôle précis.
+
+La compatibilité OpenVPN couvre les options les plus courantes ; la compression n'est pas prise en charge, car elle n'est pas sécurisée.
+
+NÉCESSITE UN ACHAT INTÉGRÉ :
+
+- Compatibilité avec Apple TV.
+- Règles à la demande pour des connexions automatiques et intelligentes.
+- Partage iCloud pour une utilisation fluide sur plusieurs appareils.
+- DoH/DoT pour des requêtes DNS sécurisées.
+- Correspondance de domaines pour le split DNS.
+- Exporter et partager des profils.
+- Routage personnalisé pour des configurations avancées.
+- Connexion interactive avec prise en charge des mots de passe à usage unique (OTP).
+- Profils sans VPN (par exemple, configurations DNS/Proxy uniquement).
+
+PARTAGE FAMILIAL
+
+Tous les achats prennent en charge le Partage familial, afin que vous puissiez les partager avec les membres de votre famille.
+
+UNE VIE PRIVÉE FIABLE
+
+Passepartout est conçu avec la transparence et la vie privée en tête :  
+- Voyez exactement à quels serveurs vous vous connectez.  
+- Pas de publicités, de traqueurs ou d'activités en arrière-plan inutiles : juste la connexion VPN dont vous avez besoin.
+
+CODE OUVERT ET COMMUNAUTÉ ENGAGÉE
+
+Passepartout est un projet open source qui évolue constamment grâce à l'aide de sa communauté. Consultez le projet sur GitHub : https://github.com/partout-io
+
+~
+
+Conditions d'utilisation (EULA) : https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
+Politique de confidentialité : https://partout.io/passepartout/privacy/

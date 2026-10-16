@@ -1,0 +1,386 @@
+// SPDX-FileCopyrightText: 2026 Davide De Rosa
+//
+// SPDX-License-Identifier: GPL-3.0
+
+import AppAccessibility
+import AppLibrary
+import AppResources
+import CommonData
+import CommonDataPreferences
+import CommonDataProfiles
+import CommonLibrary
+import CoreData
+import Partout
+import PartoutRuntime
+
+extension AppContext {
+    static func forProduction(bundleIdentifier: String) -> AppContext {
+        let distributionTarget: ABI.DistributionTarget
+#if PP_BUILD_MAC
+        distributionTarget = .developerID
+#else
+        distributionTarget = .appStore
+#endif
+        let appConfiguration = Resources.newAppConfiguration(
+            distributionTarget: distributionTarget,
+            buildTarget: .app
+        )
+        let defaults: UserDefaults = .standard
+        let preferences = AppPreferencesStore(
+            UserDefaultsAppPreferences(defaults: defaults)
+        )
+
+        let logFormatter = appConfiguration.makeLogFormatter()
+        let ctx = pspLogRegister(
+            for: .app,
+            with: appConfiguration,
+            preferences: preferences,
+            localURL: appConfiguration.urlForAppLog,
+            localMapper: logFormatter.localMapper
+        )
+        pspLog(.core, .notice, "Partout \(PartoutRuntime.version)")
+
+        // MARK: Config (GitHub)
+
+        let betaChecker = appConfiguration.makeBetaChecker()
+#if DEBUG
+        let withTestBundle = true
+#else
+        let withTestBundle = false
+#endif
+        let configManager = appConfiguration.makeConfigManager(
+            withTestBundle: withTestBundle,
+            isBeta: {
+                await betaChecker.isBeta()
+            },
+            fetcher: {
+                try await appConfiguration.makeRequest(for: $0, cached: false)
+            }
+        )
+
+        // MARK: ABI-based Runtime
+
+        let runtime = PartoutRuntime()
+
+        // MARK: Import/Export
+
+        let appImportExport = AppImportExport(
+            configBlock: {
+                preferences.enabledFlags(of: configManager.activeFlags)
+            },
+            importModule: { text, context in
+                try runtime.importModule(from: text, context: context)
+            },
+            exportModule: { module in
+                try runtime.exportModule(module)
+            }
+        )
+
+        // MARK: Persistence (Core Data)
+
+        guard let cdRemoteModel = NSManagedObjectModel.mergedModel(from: [
+            CommonData.profilesBundle,
+            CommonData.preferencesBundle
+        ]) else {
+            fatalError("Unable to load remote model")
+        }
+        let newRemoteStore: (_ cloudKit: Bool) -> CoreDataPersistentStore = { isEnabled in
+            let cloudKitIdentifier: String?
+            if isEnabled && appConfiguration.bundle.distributionTarget.supportsCloudKit {
+                cloudKitIdentifier = appConfiguration.bundle.bundleString(for: .cloudKitId)
+            } else {
+                cloudKitIdentifier = nil
+            }
+            return CoreDataPersistentStore(
+                containerName: appConfiguration.constants.containers.remote,
+                model: cdRemoteModel,
+                cloudKitIdentifier: cloudKitIdentifier,
+                author: nil
+            )
+        }
+
+        // MARK: IAP (StoreKit)
+
+        let iapHelper: InAppHelper
+        let iapReceiptReader: UserInAppReceiptReader
+        if !AppCommandLine.contains(.fakeIAP) {
+            iapHelper = appConfiguration.makeInAppHelper()
+            iapReceiptReader = SharedReceiptReader(
+                reader: appConfiguration.makeInAppReceiptReader {
+                    // TODO: #1786, StoreKit receipt caching
+                    .uncached
+                }
+            )
+        } else {
+            let fakeHelper = FakeInAppHelper()
+            iapHelper = fakeHelper
+            iapReceiptReader = fakeHelper.receiptReader
+        }
+        let iapManager = appConfiguration.makeIAPManager(
+            inAppHelper: iapHelper,
+            receiptReader: iapReceiptReader,
+            betaChecker: betaChecker
+        )
+
+        // MARK: Profiles and Tunnel (NE)
+
+        let sysexManager = appConfiguration.makeSystemExtensionManager()
+#if targetEnvironment(simulator)
+        let tunnelStrategy = FakeTunnelStrategy()
+        let mainProfileRepository = appConfiguration.newBackupProfileRepository(
+            encoder: appImportExport,
+            model: cdRemoteModel,
+            name: appConfiguration.constants.containers.backup,
+            observingResults: true
+        )
+        let backupProfileRepository: ProfileRepository? = nil
+#else
+        let codingPair = appConfiguration.makeKeychainAndNECoder(
+            ctx,
+            bundleIdentifier: bundleIdentifier,
+            coder: appImportExport
+        )
+        let profilesBootstrap: KeychainProfileRepository.Bootstrap?
+
+        // Plan a one-off migration for Developer ID profiles
+        if distributionTarget == .developerID {
+            let tunnelIdentifier = appConfiguration.bundle.bundleString(for: .tunnelId)
+            let marker = MigrationMarker(defaults: defaults)
+            let migrator = NEManagerToKeychainMigrator(
+                tunnelBundleIdentifier: tunnelIdentifier,
+                keychain: codingPair.keychain,
+                profileCoder: appImportExport,
+                protocolCoder: codingPair.neCoder,
+                label: appConfiguration.makeKeychainTitle(),
+                isComplete: {
+                    marker.isComplete(.didMigrateDeveloperIDManagers)
+                },
+                markComplete: {
+                    marker.markComplete(.didMigrateDeveloperIDManagers)
+                }
+            )
+            profilesBootstrap = { @Sendable in
+                await migrator.run()
+            }
+        } else {
+            profilesBootstrap = nil
+        }
+
+        let mainProfileRepository = KeychainProfileRepository(
+            keychain: codingPair.keychain,
+            coder: appImportExport,
+            bootstrap: profilesBootstrap,
+            label: appConfiguration.makeKeychainTitle()
+        )
+        let tunnelStrategy = appConfiguration.makeNETunnelStrategy(
+            ctx,
+            coder: codingPair.neCoder,
+            source: mainProfileRepository.eventsPublisher
+        )
+        let backupProfileRepository = appConfiguration.newBackupProfileRepository(
+            encoder: appImportExport,
+            model: cdRemoteModel,
+            name: appConfiguration.constants.containers.backup,
+            observingResults: false
+        )
+#endif
+        let tunnelProcessor = appConfiguration.makeAppTunnelProcessor(
+            profileRepository: mainProfileRepository,
+            extensionInstaller: sysexManager
+        )
+        let profileProcessor = appConfiguration.makeAppProfileProcessor(
+            iapManager: iapManager
+        )
+        let profileManager = ProfileManager(
+            processor: profileProcessor,
+            repository: mainProfileRepository,
+            backupRepository: backupProfileRepository,
+            mirrorsRemoteRepository: false
+        )
+        let tunnel = PartoutTunnel(
+            ctx,
+            strategy: tunnelStrategy,
+            refreshInterval: Int(appConfiguration.constants.tunnel.refreshInterval * 1000.0),
+            environmentFactory: { @Sendable in
+                appConfiguration.makeAppTunnelEnvironment(strategy: tunnelStrategy, profileId: $0)
+            }
+        )
+
+        let logging = TunnelObservable.Logging(
+            maxDebugLogLevel: appConfiguration.constants.log.options.maxDebugLogLevel,
+            sinceLast: appConfiguration.constants.log.sinceLast,
+            formatter: logFormatter
+        )
+        let tunnelObservable = TunnelObservable(
+            tunnel: tunnel,
+            preferences: preferences,
+            logging: logging,
+            willInstall: tunnelProcessor.willInstall
+        )
+
+        // MARK: Preferences (Core Data)
+
+        let preferencesManager = PreferencesManager()
+
+        // MARK: Version (GitHub)
+
+        let versionChecker = appConfiguration.makeVersionChecker(
+            preferences: preferences,
+            downloadURL: {
+                switch appConfiguration.bundle.distributionTarget {
+                case .appStore:
+                    return appConfiguration.constants.websites.appStoreDownloadURL
+                case .developerID:
+                    return appConfiguration.constants.websites.macDownloadURL
+                case .enterprise:
+                    fatalError("No URL for enterprise distribution")
+                }
+            }(),
+            fetcher: {
+                try await appConfiguration.makeRequest(for: $0, cached: $1)
+            }
+        )
+
+        // MARK: Web (NIO)
+
+        let webReceiverManager: WebReceiverManager
+#if os(tvOS)
+        if let webHTMLPath = Resources.webUploaderPath {
+            webReceiverManager = appConfiguration.makeWebReceiverManager(
+                htmlPath: webHTMLPath,
+                stringsBundle: AppStrings.bundle
+            )
+        } else {
+            webReceiverManager = WebReceiverManager()
+        }
+#else
+        webReceiverManager = WebReceiverManager()
+#endif
+
+        // MARK: Sync (CloudKit)
+
+        // Remote profiles and preferences are (re)created on synchronization updates.
+        let onEligibleFeaturesBlock: @Sendable @BusinessActor (Set<ABI.AppFeature>) async -> Void = { features in
+            let isRemoteImportingEnabled = features.contains(.sharing)
+            let remoteStore = newRemoteStore(isRemoteImportingEnabled)
+
+            if appConfiguration.bundle.distributionTarget.supportsCloudKit {
+                profileManager.enableRemoteImporting(isRemoteImportingEnabled)
+
+                let isCloudKitEnabled = AppCommandLine.contains(.uiTesting) || appConfiguration.isCloudKitEnabled
+                pspLog(.core, .info, "\tRefresh remote sync (eligible=\(isRemoteImportingEnabled), CloudKit=\(isCloudKitEnabled))...")
+                pspLog(.profiles, .info, "\tRefresh remote profiles repository (sync=\(isRemoteImportingEnabled))...")
+
+                let remoteProfileRepository = CommonData.cdProfileRepositoryV3(
+                    encoder: appImportExport,
+                    context: remoteStore.context,
+                    observingResults: true,
+                    onResultError: {
+                        pspLog(.profiles, .error, "Unable to decode remote profile: \($0)")
+                        return .ignore
+                    }
+                )
+                do {
+                    try await profileManager.observeRemote(repository: remoteProfileRepository)
+                } catch {
+                    pspLog(.profiles, .error, "\tUnable to re-observe remote profiles: \(error)")
+                }
+            }
+
+            pspLog(.core, .info, "\tRefresh modules preferences repository...")
+            preferencesManager.modulesRepositoryFactory = {
+                do {
+                    return try CommonData.cdModulePreferencesRepositoryV3(
+                        context: remoteStore.context,
+                        moduleId: $0
+                    )
+                } catch {
+                    pspLog(.core, .error, "Unable to load preferences for module \($0): \(error)")
+                    throw error
+                }
+            }
+        }
+
+        let context = AppContext(
+            appConfiguration: appConfiguration,
+            appImportExport: appImportExport,
+            configManager: configManager,
+            defaults: defaults,
+            extensionInstaller: sysexManager,
+            iapManager: iapManager,
+            preferences: preferences,
+            preferencesManager: preferencesManager,
+            profileManager: profileManager,
+            tunnelObservable: tunnelObservable,
+            versionChecker: versionChecker,
+            webReceiverManager: webReceiverManager,
+            wireGuardKeyGenerator: PartoutWireGuardKeyGenerator(runtime: runtime),
+            onEligibleFeaturesBlock: onEligibleFeaturesBlock
+        )
+
+        // Ensure that all module builders can be rendered in the profile editor.
+        ModuleType.knownTypes.forEach { moduleType in
+#if !os(tvOS)
+            guard let builder = context.registryObservable.newModule(ofType: moduleType) else {
+                return
+            }
+            assert(builder is any ModuleViewProviding, "\(moduleType): is not ModuleViewProviding")
+#endif
+        }
+
+        return context
+    }
+}
+
+private extension ABI.AppConfiguration {
+    var isCloudKitEnabled: Bool {
+#if os(tvOS)
+        true
+#else
+        FileManager.default.ubiquityIdentityToken != nil
+#endif
+    }
+
+    func newBackupProfileRepository(
+        encoder: ProfileCoder,
+        model: NSManagedObjectModel,
+        name: String,
+        observingResults: Bool
+    ) -> ProfileRepository {
+        let store = CoreDataPersistentStore(
+            containerName: name,
+            model: model,
+            cloudKitIdentifier: nil,
+            author: nil
+        )
+        return CommonData.cdProfileRepositoryV3(
+            encoder: encoder,
+            context: store.context,
+            observingResults: observingResults,
+            onResultError: {
+                pspLog(.profiles, .error, "Unable to decode local profile: \($0)")
+                return .ignore
+            }
+        )
+    }
+}
+
+private struct PartoutWireGuardKeyGenerator: WireGuardKeyGenerator {
+    private let runtime: PartoutRuntime
+
+    init(runtime: PartoutRuntime) {
+        self.runtime = runtime
+    }
+
+    func newPrivateKey() -> String {
+        do {
+            return try runtime.wireGuardGeneratePrivateKey()
+        } catch {
+            fatalError("WireGuard keygen should never fail")
+        }
+    }
+
+    func publicKey(for privateKey: String) throws -> String {
+        try runtime.wireGuardDerivePublicKey(privateKey: privateKey)
+    }
+}

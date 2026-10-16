@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24902" systemVersion="25G83" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="CDExcludedEndpoint" representedClassName="CDExcludedEndpoint" syncable="YES">
+        <attribute name="endpoint" optional="YES" attributeType="String"/>
+        <relationship name="modulePreferences" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDModulePreferencesV3" inverseName="excludedEndpoints" inverseEntity="CDModulePreferencesV3"/>
+    </entity>
+    <entity name="CDFavoriteServer" representedClassName="CDFavoriteServer" syncable="YES">
+        <attribute name="serverId" optional="YES" attributeType="String"/>
+        <relationship name="providerPreferences" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDProviderPreferencesV3" inverseName="favoriteServers" inverseEntity="CDProviderPreferencesV3"/>
+    </entity>
+    <entity name="CDModulePreferencesV3" representedClassName="CDModulePreferencesV3" syncable="YES">
+        <attribute name="lastUpdate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="moduleId" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="excludedEndpoints" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDExcludedEndpoint" inverseName="modulePreferences" inverseEntity="CDExcludedEndpoint"/>
+    </entity>
+    <entity name="CDProviderPreferencesV3" representedClassName="CDProviderPreferencesV3" syncable="YES">
+        <attribute name="favoriteServerIds" optional="YES" attributeType="Binary"/>
+        <attribute name="lastUpdate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="providerId" optional="YES" attributeType="String"/>
+        <relationship name="favoriteServers" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDFavoriteServer" inverseName="providerPreferences" inverseEntity="CDFavoriteServer"/>
+    </entity>
+</model>

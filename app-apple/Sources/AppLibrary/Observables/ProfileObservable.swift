@@ -1,0 +1,189 @@
+// SPDX-FileCopyrightText: 2026 Davide De Rosa
+//
+// SPDX-License-Identifier: GPL-3.0
+
+import Combine
+import CommonLibrary
+import Dispatch
+import Observation
+
+@MainActor @Observable
+public final class ProfileObservable {
+    private let profileManager: ProfileManager
+
+    private var allHeaders: [Profile.ID: ABI.AppProfileHeader] {
+        didSet {
+            reloadHeaders(with: searchSubject.value)
+        }
+    }
+    public private(set) var filteredHeaders: [ABI.AppProfileHeader]
+    public private(set) var isReady: Bool
+    public private(set) var isRemoteImportingEnabled: Bool
+    private let searchSubject: CurrentValueSubject<String, Never>
+    private var searchSubscription: AnyCancellable?
+
+    public init(
+        profileManager: ProfileManager,
+        searchDebounce: Int = 200
+    ) {
+        self.profileManager = profileManager
+        allHeaders = [:]
+        filteredHeaders = []
+        isReady = false
+        isRemoteImportingEnabled = false
+        searchSubject = CurrentValueSubject("")
+
+        observeEvents(searchDebounce: searchDebounce)
+    }
+}
+
+// MARK: - Actions
+
+extension ProfileObservable {
+    public func save(_ profile: Profile, sharingFlag: ABI.ProfileSharingFlag? = nil) async throws {
+        var copy = profile
+        if sharingFlag == .tv {
+            var builder = copy.builder()
+            builder.attributes.isAvailableForTV = true
+            copy = try builder.build()
+        }
+        try await profileManager.save(
+            copy,
+            isLocal: true,
+            remotelyShared: sharingFlag != nil
+        )
+    }
+
+    public func saveImported(_ profile: Profile) async throws {
+        try await profileManager.save(
+            profile,
+            isLocal: true,
+            remotelyShared: nil
+        )
+    }
+
+    public func saveAll() async {
+        await profileManager.resaveAllProfiles()
+    }
+
+    public func duplicate(profileWithId profileId: Profile.ID) async throws {
+        try await profileManager.duplicate(profileWithId: profileId)
+    }
+
+    public func search(byName name: String) {
+        searchSubject.send(name)
+    }
+
+    public func remove(withId profileId: Profile.ID) async {
+        await profileManager.remove(withId: profileId)
+    }
+
+    public func remove(withIds profileIds: [Profile.ID]) async {
+        await profileManager.remove(withIds: profileIds)
+    }
+
+    public func removeRemotelyShared() async throws {
+        try await profileManager.eraseRemotelySharedProfiles()
+    }
+
+    public func removeAll() async {
+        await remove(withIds: filteredHeaders.map(\.id))
+    }
+}
+
+// MARK: - State
+
+extension ProfileObservable {
+    public var hasProfiles: Bool {
+        !filteredHeaders.isEmpty
+    }
+
+    // DO USE headers for UI to react (locally observed)
+    public func header(withId profileId: Profile.ID) -> ABI.AppProfileHeader? {
+        allHeaders[profileId]
+    }
+
+    // Use full profiles for actions (manually pulled)
+    public func profile(withId profileId: Profile.ID) -> Profile? {
+        profileManager.profile(withId: profileId)
+    }
+
+    public func firstUniqueName(from name: String) -> String {
+        let allNames = Set(allHeaders.values.map(\.name))
+        var newName = name
+        var index = 1
+        while true {
+            if !allNames.contains(newName) {
+                return newName
+            }
+            newName = [name, index.description].joined(separator: ".")
+            index += 1
+        }
+    }
+
+    public func isRemotelyShared(profileWithId profileId: Profile.ID) -> Bool {
+        allHeaders[profileId]?.sharingFlags.isEmpty == false
+    }
+
+    public func sharingFlags(for profileId: Profile.ID) -> [ABI.ProfileSharingFlag] {
+        allHeaders[profileId]?.sharingFlags ?? []
+    }
+
+    public func requiredFeatures(forProfileWithId profileId: Profile.ID) -> Set<ABI.AppFeature>? {
+        allHeaders[profileId]?.requiredFeatures
+    }
+
+    public var isSearching: Bool {
+        !searchSubject.value.isEmpty
+    }
+
+    func onUpdate(_ event: ABI.ProfileEvent) {
+        pspLog(.core, .debug, "ProfileObservable.onUpdate(): \(event)")
+        switch event {
+        case .ready:
+            isReady = true
+        case .refresh(let payload):
+            guard payload.headers != allHeaders else { return }
+            allHeaders = payload.headers
+        case .changeRemoteImporting(let payload):
+            isRemoteImportingEnabled = payload.isImporting
+        default:
+            break
+        }
+    }
+}
+
+private extension ProfileObservable {
+    func observeEvents(searchDebounce: Int) {
+        // No need for observeLocal/observeRemote, done by AppContext
+        searchSubscription = searchSubject
+            .debounce(for: .milliseconds(searchDebounce), scheduler: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.reloadHeaders(with: $0)
+            }
+    }
+
+    func reloadHeaders(with search: String) {
+        let lowerSearch = search.lowercased()
+        let newFilteredHeaders = allHeaders
+            .map(\.value)
+            .filter {
+                if !search.isEmpty {
+                    return $0.name.lowercased().contains(lowerSearch)
+                }
+                return true
+            }
+
+        // Guard against duplicated updates
+        guard Set(newFilteredHeaders) != Set(filteredHeaders) else {
+            pspLog(.profiles, .info, "No change in profiles, skip update from ProfileManager")
+            return
+        }
+
+        // Only process/sort after confirming change
+        filteredHeaders = newFilteredHeaders
+            .sorted()
+
+        pspLog(.profiles, .notice, "Filter profiles with '\(search)' (\(filteredHeaders.count)): \(filteredHeaders.map(\.name))")
+    }
+}

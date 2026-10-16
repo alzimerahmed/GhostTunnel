@@ -1,0 +1,44 @@
+require "shellwords"
+require "fastlane_core/itunes_transporter"
+require "deliver/upload_metadata"
+
+# App Info is shared across platforms and can be unavailable while another
+# platform is in review. Deliver supports a missing App Info while uploading
+# version metadata, but retries the lookup for about 20 minutes first. Avoid
+# those retries during submission so release notes can still be uploaded.
+module SubmitReviewMetadataWithoutAppInfoRetry
+    def fetch_edit_app_info(app)
+        return super unless options[:submit_for_review]
+
+        app.fetch_edit_app_info
+    end
+
+    def updating_localized_app_info?(app, app_info)
+        return super unless options[:submit_for_review] && app_info.nil?
+
+        FastlaneCore::UI.important("Editable App Info unavailable; uploading version metadata only.")
+        false
+    end
+end
+
+Deliver::UploadMetadata.prepend(SubmitReviewMetadataWithoutAppInfoRetry)
+
+class ::FastlaneCore::AltoolTransporterExecutor
+    private
+
+    # Xcode 26's altool shim rejects Fastlane's iTMSTransporter-style -assetFile flag.
+    def file_upload_option(source)
+        "-f #{source.shellescape}"
+    end
+end
+
+def xcode_major_version
+    version = `xcodebuild -version`.match(/^Xcode\s+(\d+)/)
+    version[1].to_i if version
+end
+
+if xcode_major_version.to_i >= 26
+    additional_upload_parameters = Shellwords.split(ENV["DELIVER_ALTOOL_ADDITIONAL_UPLOAD_PARAMETERS"].to_s)
+    additional_upload_parameters << "--use-old-altool"
+    ENV["DELIVER_ALTOOL_ADDITIONAL_UPLOAD_PARAMETERS"] = Shellwords.join(additional_upload_parameters.uniq)
+end

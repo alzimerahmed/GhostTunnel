@@ -1,0 +1,17 @@
+{
+  "colors" : [
+    {
+      "idiom" : "iphone"
+    },
+    {
+      "idiom" : "ipad"
+    },
+    {
+      "idiom" : "mac"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

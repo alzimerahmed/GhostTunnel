@@ -1,0 +1,46 @@
+Chroń swoją prywatność online z Passepartout, inteligentnym klientem VPN, który bezproblemowo integruje się z iOS, macOS, iPadOS i tvOS.
+
+JAK DZIAŁA PASSEPARTOUT
+
+Passepartout obejmuje podstawowe funkcje importu i połączenia. Dodatkowe funkcje wymagają zakupu w aplikacji.
+
+ZAWARTE FUNKCJE:
+
+- Obsługa protokołów OpenVPN i WireGuard.
+- Zaciemnianie OpenVPN (za pomocą --scramble).
+- Automatyzacja za pomocą Skrótów dla uproszczonych operacji.
+- Wykluczanie punktów końcowych dla precyzyjnej kontroli.
+
+Obsługa OpenVPN obejmuje najczęściej używane opcje; kompresja nie jest obsługiwana, ponieważ nie jest bezpieczna.
+
+WYMAGA ZAKUPU W APLIKACJI:
+
+- Obsługa Apple TV.
+- Reguły na żądanie dla inteligentnych, automatycznych połączeń.
+- Udostępnianie w iCloud dla płynnego korzystania na wielu urządzeniach.
+- DoH/DoT dla bezpiecznych zapytań DNS.
+- Dopasowywanie domen dla split DNS.
+- Eksportuj i udostępniaj profile.
+- Niestandardowe trasy dla zaawansowanych konfiguracji.
+- Interaktywne logowanie z obsługą jednorazowych haseł (OTP).
+- Profile inne niż VPN (np. ustawienia tylko DNS/Proxy).
+
+UDOSTĘPNIANIE RODZINNE
+
+Wszystkie zakupy obsługują Udostępnianie Rodzinne, dzięki czemu możesz udostępniać je członkom rodziny.
+
+PRYWATNOŚĆ, KTÓREJ MOŻESZ UFAĆ
+
+Passepartout zostało zaprojektowane z myślą o przejrzystości i prywatności:
+- Sprawdzaj dokładnie, z którymi serwerami się łączysz.
+- Bez reklam, trackerów czy niepotrzebnych procesów w tle – tylko połączenie VPN, którego potrzebujesz.
+
+OPEN SOURCE I WSPARCIE SPOŁECZNOŚCI
+
+Passepartout to projekt open source, który nieustannie się rozwija dzięki pomocy społeczności. Sprawdź projekt na GitHub: https://github.com/partout-io
+
+~
+
+Warunki użytkowania (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
+Polityka prywatności: https://partout.io/passepartout/privacy/

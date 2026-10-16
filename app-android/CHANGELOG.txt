@@ -1,0 +1,2 @@
+* WireGuard: Enable experimental connection via feature flags (#1958)
+* OpenVPN: Restore support for inline auth-user-pass (#1959)

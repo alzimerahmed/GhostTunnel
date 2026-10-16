@@ -1,0 +1,109 @@
+// SPDX-FileCopyrightText: 2026 Davide De Rosa
+//
+// SPDX-License-Identifier: GPL-3.0
+
+import AppResources
+import CommonLibrary
+
+extension AppContext {
+    public static let forPreviews: AppContext = {
+        let appConfiguration = Resources.newAppConfiguration(
+            distributionTarget: .appStore,
+            buildTarget: .app
+        )
+        let preferences = AppPreferencesStore()
+        let defaults = UserDefaults()
+        let appImportExport: AppImportExport = .dummy
+        let configManager = ConfigManager()
+        let iapManager = IAPManager(
+            customUserLevel: .complete,
+            inAppHelper: FakeInAppHelper(),
+            receiptReader: FakeInAppReceiptReader(),
+            betaChecker: TestFlightChecker(),
+            timeoutInterval: 5.0,
+            verificationDelayMinutesBlock: { _ in
+                2
+            },
+            productsAtBuild: { _ in
+                []
+            }
+        )
+        let processor = MockAppProcessor(iapManager: iapManager)
+        let profileManager = {
+            let profiles: [Profile] = (0..<20)
+                .reduce(into: []) { list, _ in
+                    list.append(.newMockProfile())
+                }
+            return ProfileManager(profiles: profiles)
+        }()
+        let tunnel = PartoutTunnel(
+            .global,
+            strategy: FakeTunnelStrategy(),
+            refreshInterval: 10000,
+            environmentFactory: { @Sendable _ in
+                SharedTunnelEnvironment(profileId: nil)
+            }
+        )
+        let tunnelObservable = TunnelObservable(
+            tunnel: tunnel,
+            willInstall: processor.willInstall
+        )
+        let preferencesManager = PreferencesManager()
+
+        let dummyReceiver = DummyWebReceiver(url: URL(string: "http://127.0.0.1:9000")!)
+        let webReceiverManager = WebReceiverManager(webReceiver: dummyReceiver, passcodeGenerator: { "123456" })
+        let versionChecker = VersionChecker()
+
+        Task {
+            try await profileManager.observeRemote(repository: InMemoryProfileRepository())
+        }
+
+        return AppContext(
+            appConfiguration: appConfiguration,
+            appImportExport: appImportExport,
+            configManager: configManager,
+            defaults: defaults,
+            extensionInstaller: nil,
+            iapManager: iapManager,
+            preferences: preferences,
+            preferencesManager: preferencesManager,
+            profileManager: profileManager,
+            tunnelObservable: tunnelObservable,
+            versionChecker: versionChecker,
+            webReceiverManager: webReceiverManager,
+            wireGuardKeyGenerator: FakeWireGuardKeyGenerator()
+        )
+    }()
+}
+
+// MARK: - Shortcuts
+
+extension IAPObservable {
+    public static var forPreviews: IAPObservable {
+        AppContext.forPreviews.iapObservable
+    }
+}
+
+extension ProfileObservable {
+    public static var forPreviews: ProfileObservable {
+        AppContext.forPreviews.profileObservable
+    }
+}
+
+extension RegistryObservable {
+    public static var forPreviews: RegistryObservable {
+        AppContext.forPreviews.registryObservable
+    }
+}
+
+extension TunnelObservable {
+    public static var forPreviews: TunnelObservable {
+        AppContext.forPreviews.tunnelObservable
+    }
+}
+
+extension WebReceiverObservable {
+    public static var forPreviews: WebReceiverObservable {
+        AppContext.forPreviews.webReceiverObservable
+    }
+}

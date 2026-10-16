@@ -1,0 +1,13 @@
+*.iml
+.gradle
+.idea
+.externalNativeBuild
+.cxx
+.kotlin
+build
+captures
+local.properties
+signing.properties
+*.jks
+*.keystore
+/play-publisher-credentials.json

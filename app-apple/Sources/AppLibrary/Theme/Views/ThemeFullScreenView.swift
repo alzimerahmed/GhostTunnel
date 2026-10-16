@@ -1,0 +1,38 @@
+// SPDX-FileCopyrightText: 2026 Davide De Rosa
+//
+// SPDX-License-Identifier: GPL-3.0
+
+import SwiftUI
+
+public struct ThemeFullScreenView<Icon>: View where Icon: View {
+
+    @Environment(Theme.self)
+    private var theme
+
+    @Environment(\.colorScheme)
+    private var colorScheme
+
+    @ViewBuilder
+    private let icon: () -> Icon
+
+    public init(icon: @escaping () -> Icon) {
+        self.icon = icon
+    }
+
+    public var body: some View {
+        ZStack {
+            theme.backgroundColor(colorScheme)
+                .ignoresSafeArea()
+            icon()
+        }
+        .ignoresSafeArea()
+    }
+}
+
+#Preview {
+    ThemeFullScreenView {
+        ThemeImage(.cloudOn)
+            .foregroundStyle(.white)
+    }
+    .withMockEnvironment()
+}

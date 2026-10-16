@@ -1,0 +1,21 @@
+// SPDX-FileCopyrightText: 2026 Davide De Rosa
+//
+// SPDX-License-Identifier: GPL-3.0
+
+import CommonLibrary
+import SwiftUI
+
+extension ErrorHandler {
+    public static func `default`() -> ErrorHandler {
+        ErrorHandler(
+            defaultTitle: Strings.Unlocalized.appName,
+            dismissTitle: Strings.Global.Nouns.ok,
+            errorDescription: {
+                ABI.AppError($0).localizedDescription(style: .errorHandler)
+            },
+            beforeAlert: {
+                pspLog(.core, .error, "Error handler being presented: \($0)")
+            }
+        )
+    }
+}

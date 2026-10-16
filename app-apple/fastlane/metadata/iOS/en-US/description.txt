@@ -1,0 +1,46 @@
+Protect your online privacy with Passepartout, a smart VPN client seamlessly integrated with iOS, macOS, iPadOS, and tvOS.
+
+HOW PASSEPARTOUT WORKS
+
+Passepartout includes basic import and connection features. Additional features require an in-app purchase.
+
+INCLUDED FEATURES:
+
+- Support for OpenVPN and WireGuard protocols.
+- OpenVPN obfuscation (using --scramble).
+- Shortcuts automation for streamlined operations.
+- Exclude endpoints for precise control.
+
+OpenVPN support focuses on common options; compression is not supported because it is not secure.
+
+REQUIRES AN IN-APP PURCHASE:
+
+- Support for Apple TV.
+- On-demand rules for smart, automated connections.
+- iCloud sharing for seamless multi-device use.
+- DoH/DoT for secure DNS queries.
+- Domain matching for split DNS.
+- Export and share profiles.
+- Custom routing for advanced configurations.
+- Interactive login with support for one-time passwords (OTP).
+- Non-VPN profiles (e.g. DNS/Proxy-only setups).
+
+FAMILY SHARING ENABLED
+
+All purchases support Family Sharing, so you can share them with your family members.
+
+PRIVACY YOU CAN TRUST
+
+Passepartout is built with transparency and privacy in mind:
+- See exactly which servers you’re connecting to.
+- No ads, trackers, or unnecessary background activities—just the VPN connection you need.
+
+OPEN SOURCE AND COMMUNITY-DRIVEN
+
+Passepartout is open source and constantly evolving with the help of its community. Check out the project on GitHub: https://github.com/partout-io
+
+~
+
+Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
+Privacy Policy: https://partout.io/passepartout/privacy/

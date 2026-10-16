@@ -1,0 +1,78 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+load File.expand_path("Fastfile.hacks", __dir__) if RUBY_PLATFORM.include?("darwin")
+
+desc "Push a new beta build to TestFlight"
+lane :beta do
+    preface = ENV["TESTFLIGHT_PREFACE"]
+    log = File.read(File.expand_path("../CHANGELOG.txt", __dir__))
+    changelog = preface + log
+    pilot(
+        changelog: changelog,
+        distribute_external: true,
+        notify_external_testers: false
+    )
+end
+
+desc "Distribute to Public Beta"
+lane :public_beta do
+    ENV.delete("PILOT_IPA")
+    ENV.delete("PILOT_PKG")
+    pilot(
+        distribute_only: true,
+        distribute_external: true,
+        notify_external_testers: true
+    )
+end
+
+desc "Update App Store metadata"
+lane :asc_metadata do
+    deliver(
+        skip_metadata: false,
+        skip_screenshots: true
+    )
+end
+
+desc "Update App Store screenshots"
+lane :asc_screenshots do
+    deliver(
+        skip_metadata: true,
+        skip_screenshots: false
+    )
+end
+
+desc "Create the App Store version without uploading anything"
+lane :asc_version do
+    deliver(
+        skip_binary_upload: true,
+        skip_metadata: true,
+        skip_screenshots: true
+    )
+end
+
+desc "Submit a build to App Review"
+lane :asc_review do |options|
+    deliver(
+        submit_for_review: true,
+        skip_binary_upload: true,
+        skip_metadata: false,
+        skip_screenshots: true,
+        submission_information: {
+            add_id_info_uses_idfa: false,
+            export_compliance_uses_encryption: false
+        }
+    )
+end

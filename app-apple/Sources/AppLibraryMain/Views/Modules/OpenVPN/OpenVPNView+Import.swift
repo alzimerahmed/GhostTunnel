@@ -1,0 +1,106 @@
+// SPDX-FileCopyrightText: 2026 Davide De Rosa
+//
+// SPDX-License-Identifier: GPL-3.0
+
+import CommonLibrary
+import SwiftUI
+
+extension OpenVPNView {
+    struct ImportModifier: ViewModifier {
+        @Environment(\.appImportExport)
+        private var appImportExport
+
+        @ObservedObject
+        var draft: ModuleDraft<OpenVPNModule.Builder>
+
+        @Binding
+        var isImporting: Bool
+
+        let errorHandler: ErrorHandler
+
+        @State
+        private var importURL: URL?
+
+        @State
+        private var importPassphrase: String?
+
+        @State
+        private var requiresPassphrase = false
+
+        func body(content: Content) -> some View {
+            content
+                .fileImporter(
+                    isPresented: $isImporting,
+                    allowedContentTypes: [.item],
+                    onCompletion: importConfiguration
+                )
+                .alert(
+                    draft.module.moduleType.localizedDescription,
+                    isPresented: $requiresPassphrase,
+                    presenting: importURL,
+                    actions: { url in
+                        SecureField(
+                            Strings.Placeholders.secret,
+                            text: $importPassphrase ?? ""
+                        )
+                        Button(Strings.Alerts.Import.Passphrase.ok) {
+                            importConfiguration(from: .success(url))
+                        }
+                        Button(Strings.Global.Actions.cancel, role: .cancel) {
+                            isImporting = false
+                        }
+                    },
+                    message: {
+                        Text(Strings.Alerts.Import.Passphrase.message($0.lastPathComponent))
+                    }
+                )
+        }
+    }
+}
+
+private extension OpenVPNView.ImportModifier {
+    func importConfiguration(from result: Result<URL, Error>) {
+        do {
+            let url = try result.get()
+            guard url.startAccessingSecurityScopedResource() else {
+                throw ABI.AppError.permissionDenied
+            }
+            defer {
+                url.stopAccessingSecurityScopedResource()
+                importPassphrase = nil
+            }
+            importURL = url
+
+            let parsed: Module
+            do {
+                parsed = try appImportExport.importedModule(
+                    from: .file(url),
+                    context: .OpenVPN(passphrase: importPassphrase)
+                )
+            } catch {
+                pspLog(.core, .error, "Unable to parse URL: \(error)")
+                let appError = ABI.AppError(error)
+                switch appError {
+                case .partout(let error) where error.isOpenVPNPassphraseRequired:
+                    Task {
+                        // XXX: re-present same alert after artificial delay
+                        try? await Task.sleep(for: .milliseconds(500))
+                        importPassphrase = nil
+                        requiresPassphrase = true
+                    }
+                    return
+                default:
+                    throw appError
+                }
+            }
+            guard let module = parsed as? OpenVPNModule else {
+                throw ABI.AppError.importError()
+            }
+            draft.module.configurationBuilder = module.configuration?.builder()
+            draft.module.credentials = module.credentials
+        } catch {
+            pspLog(.core, .error, "Unable to import OpenVPN configuration: \(error)")
+            errorHandler.handle(error, title: draft.module.moduleType.localizedDescription)
+        }
+    }
+}

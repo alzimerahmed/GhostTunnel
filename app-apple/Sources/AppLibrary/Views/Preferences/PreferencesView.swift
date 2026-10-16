@@ -1,0 +1,216 @@
+// SPDX-FileCopyrightText: 2026 Davide De Rosa
+//
+// SPDX-License-Identifier: GPL-3.0
+
+import CommonLibrary
+import SwiftUI
+
+#if !os(tvOS)
+
+public struct PreferencesView: View {
+    @Environment(UserPreferencesObservable.self)
+    private var userPreferences
+
+    @Environment(IAPObservable.self)
+    private var iapObservable
+
+    @Environment(ConfigObservable.self)
+    private var configObservable
+
+#if os(macOS)
+    @Environment(MacSettings.self)
+    private var settings
+#endif
+
+    @Environment(\.appConfiguration)
+    private var appConfiguration
+
+    private let profileObservable: ProfileObservable
+
+    @State
+    private var isConfirmingEraseiCloud = false
+
+    @State
+    private var isErasingiCloud = false
+
+    public init(profileObservable: ProfileObservable) {
+        self.profileObservable = profileObservable
+    }
+
+    public var body: some View {
+        Form {
+            systemAppearanceSection
+#if os(iOS)
+            lockInBackgroundSection
+#elseif os(macOS)
+            launchesOnLoginSection
+            keepsInMenuSection
+#endif
+            pinActiveProfileSection
+            dnsFallsBackSection
+            if appConfiguration.bundle.distributionTarget.supportsIAP {
+                enablesPurchasesSection
+            }
+            if iapObservable.isBeta {
+                cryptoBackendSection
+            }
+            if appConfiguration.bundle.distributionTarget.supportsCloudKit {
+                eraseCloudKitSection
+            }
+            NavigationLink(advancedTitle, destination: advancedView)
+        }
+        .themeForm()
+    }
+}
+
+private extension PreferencesView {
+    static let systemAppearances: [SystemAppearance?] = [
+        nil,
+        .light,
+        .dark
+    ]
+
+    static let cryptoBackends: [CryptoBackend] = [
+        .openssl,
+        .mbedtls,
+        .native
+    ]
+
+    var systemAppearanceSection: some View {
+        Section {
+            Picker(Strings.Views.Preferences.systemAppearance, selection: userPreferences.binding(\.systemAppearance)) {
+                ForEach(Self.systemAppearances, id: \.self) {
+                    Text($0?.localizedDescription ?? Strings.Entities.Ui.SystemAppearance.system)
+                }
+            }
+        }
+    }
+
+#if os(iOS)
+    var lockInBackgroundSection: some View {
+        Toggle(Strings.Views.Preferences.locksInBackground, isOn: userPreferences.binding(\.locksInBackground))
+            .themeContainerEntry(subtitle: Strings.Views.Preferences.LocksInBackground.footer)
+    }
+
+#elseif os(macOS)
+    var launchesOnLoginSection: some View {
+        Toggle(Strings.Views.Preferences.launchesOnLogin, isOn: settings.binding(\.launchesOnLogin))
+            .themeContainerEntry(subtitle: Strings.Views.Preferences.LaunchesOnLogin.footer)
+    }
+
+    var keepsInMenuSection: some View {
+        Toggle(Strings.Views.Preferences.keepsInMenu, isOn: userPreferences.binding(\.keepsInMenu))
+            .themeContainerEntry(subtitle: Strings.Views.Preferences.KeepsInMenu.footer)
+    }
+#endif
+
+    var pinActiveProfileSection: some View {
+        PinActiveProfileToggle()
+            .themeContainerEntry(subtitle: Strings.Views.Preferences.PinsActiveProfile.footer)
+    }
+
+    var dnsFallsBackSection: some View {
+        Toggle(Strings.Views.Preferences.dnsFallsBack, isOn: userPreferences.binding(\.dnsFallsBack))
+            .themeContainerEntry(subtitle: Strings.Views.Preferences.DnsFallsBack.footer)
+    }
+
+    var enablesPurchasesSection: some View {
+        Toggle(Strings.Views.Preferences.enablesIap, isOn: Binding {
+            iapObservable.isEnabled
+        } set: {
+            iapObservable.enable($0)
+        })
+        .themeContainerEntry(subtitle: Strings.Views.Preferences.EnablesIap.footer)
+    }
+
+    var cryptoBackendSection: some View {
+        Picker(Strings.Views.Preferences.cryptoBackend, selection: userPreferences.binding(\.cryptoBackend)) {
+            Text(Strings.Global.Nouns.default).tag(0)
+            ForEach(Self.cryptoBackends, id: \.rawValue) {
+                Text($0.localizedDescription)
+            }
+        }
+        .themeContainerEntry()
+    }
+
+    var eraseCloudKitSection: some View {
+        Button(Strings.Views.Preferences.eraseIcloud, role: .destructive) {
+            isConfirmingEraseiCloud = true
+        }
+        .themeConfirmation(
+            isPresented: $isConfirmingEraseiCloud,
+            title: Strings.Views.Preferences.eraseIcloud,
+            isDestructive: true
+        ) {
+            isErasingiCloud = true
+            Task {
+                do {
+                    pspLog(.core, .info, "Erase CloudKit profiles...")
+                    try await profileObservable.removeRemotelyShared()
+                } catch {
+                    pspLog(.core, .error, "Unable to erase CloudKit store: \(error)")
+                }
+                isErasingiCloud = false
+            }
+        }
+        .themeContainerWithSingleEntry(
+            header: Strings.Unlocalized.iCloud,
+            footer: Strings.Views.Preferences.EraseIcloud.footer,
+            isAction: true
+        )
+        .disabled(isErasingiCloud)
+    }
+
+    var advancedTitle: String {
+        Strings.Global.Nouns.advanced
+    }
+
+    func isEnabled(_ flag: ABI.ConfigFlag) -> Bool {
+        !userPreferences.experimental.ignoredConfigFlags.contains(flag) &&
+        (configObservable.isActive(flag) || userPreferences.experimental.enabledConfigFlags.contains(flag))
+    }
+
+    func advancedView() -> some View {
+        PreferencesAdvancedView(experimental: userPreferences.binding(\.experimental))
+        .navigationTitle(advancedTitle)
+    }
+}
+
+#else
+
+public struct PreferencesView: View {
+    @Environment(UserPreferencesObservable.self)
+    private var userPreferences
+
+    @Environment(ConfigObservable.self)
+    private var configObservable
+
+    @Environment(\.appConfiguration)
+    private var appConfiguration
+
+    private let profileObservable: ProfileObservable
+
+    public init(profileObservable: ProfileObservable) {
+        self.profileObservable = profileObservable
+    }
+
+    public var body: some View {
+//        if showsRelaxedVerification {
+//            Group {
+//                relaxedVerificationToggle
+//            }
+//            .themeSection(header: Strings.Global.Nouns.preferences)
+//        }
+        EmptyView()
+    }
+}
+
+#endif
+
+#Preview {
+    PreferencesView(profileObservable: .forPreviews)
+        .withMockEnvironment()
+#if os(macOS)
+        .environment(MacSettings())
+#endif
+}

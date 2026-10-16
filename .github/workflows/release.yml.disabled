@@ -1,0 +1,132 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "builds/*"
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Platform to package
+        required: true
+        type: choice
+        options:
+          - apple
+          - android
+      run_checks:
+        description: Run the initial checks
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Run checks
+    uses: ./.github/workflows/checks.yml
+    with:
+      run_checks: ${{ github.event_name == 'push' || inputs.run_checks }}
+
+  release_info:
+    name: Resolve release information
+    runs-on: ubuntu-24.04
+    needs: checks
+    timeout-minutes: 2
+    outputs:
+      version: ${{ steps.release_info.outputs.version }}
+      build: ${{ steps.release_info.outputs.build }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Read and validate app versions
+        id: release_info
+        run: |
+          apple_version=$(app-apple/ci/version-number.sh)
+          apple_build=$(app-apple/ci/build-number.sh)
+          android_version=$(sed -nE \
+            's/^[[:space:]]*versionName = "([^"]+)"[[:space:]]*$/\1/p' \
+            app-android/app/build.gradle.kts)
+          android_build=$(sed -nE \
+            's/^[[:space:]]*versionCode = ([0-9]+)[[:space:]]*$/\1/p' \
+            app-android/app/build.gradle.kts)
+
+          test -n "$android_version"
+          test -n "$android_build"
+          test "$apple_version" = "$android_version"
+          test "$apple_build" = "$android_build"
+
+          echo "version=$apple_version" >> "$GITHUB_OUTPUT"
+          echo "build=$apple_build" >> "$GITHUB_OUTPUT"
+
+  package_apple:
+    name: Package Apple apps
+    needs: release_info
+    if: ${{ github.event_name == 'push' || inputs.platform == 'apple' }}
+    uses: ./.github/workflows/package_apple.yml
+    secrets: inherit
+
+  package_android:
+    name: Package Android app
+    needs: release_info
+    if: ${{ github.event_name == 'push' || inputs.platform == 'android' }}
+    uses: ./.github/workflows/package_android.yml
+    secrets: inherit
+
+  distribute_apple:
+    name: Distribute Apple apps
+    needs: [release_info, package_apple]
+    if: ${{ github.event_name == 'push' }}
+    uses: ./.github/workflows/distribute_apple.yml
+    with:
+      version: ${{ needs.release_info.outputs.version }}
+      build: ${{ needs.release_info.outputs.build }}
+    secrets: inherit
+
+  publish_release:
+    name: Publish Release
+    runs-on: ubuntu-24.04
+    needs:
+      - release_info
+      - distribute_apple
+    if: ${{ github.event_name == 'push' }}
+    environment:
+      name: release
+    env:
+      APP_VERSION: ${{ needs.release_info.outputs.version }}
+      RELEASE_NOTES: app-apple/CHANGELOG.txt
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.ACCESS_TOKEN }}
+      - name: Download Apple DMGs
+        uses: actions/download-artifact@v8
+        with:
+          pattern: apple-dmg-*
+          path: artifacts/apple
+          merge-multiple: true
+      - name: Print workspace structure
+        run: ls -R artifacts
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v7
+        with:
+          gpg_private_key: ${{ secrets.GPG_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_tag_gpgsign: true
+          git_push_gpgsign: false
+      - name: Tag release
+        run: |
+          tag="v$APP_VERSION"
+          git tag -as "$tag" -m "$tag"
+          git push origin "$tag"
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${APP_VERSION}" artifacts/apple/*.dmg* \
+            --verify-tag \
+            --title "$APP_VERSION" \
+            --notes-file "$RELEASE_NOTES"
