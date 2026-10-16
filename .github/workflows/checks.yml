@@ -27,6 +27,10 @@ jobs:
             suite: apple
             runner: macos-26
             timeout_minutes: 10
+          - name: Apple build
+            suite: apple-build
+            runner: macos-26
+            timeout_minutes: 25
           - name: Partout tests
             suite: partout
             runner: macos-26
@@ -39,7 +43,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - uses: partout-io/action-prepare-xcode-build@master
-        if: matrix.suite == 'apple' || matrix.suite == 'partout'
+        if: matrix.suite == 'apple' || matrix.suite == 'apple-build' || matrix.suite == 'partout'
         with:
           access-token: ${{ github.token }}
           submodules: true
@@ -70,6 +74,21 @@ jobs:
       - name: Run Apple tests
         if: matrix.suite == 'apple'
         run: ci/run-apple-tests.sh
+
+      - name: Run Apple build
+        if: matrix.suite == 'apple-build'
+        run: |
+          cd app-apple
+          xcodebuild build \
+            -project Passepartout.xcodeproj \
+            -scheme Passepartout \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO | tail -50
+          xcodebuild build \
+            -project Passepartout.xcodeproj \
+            -scheme PassepartoutMac \
+            -destination 'generic/platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO | tail -50
 
       - name: Run Partout tests (Swift)
         if: matrix.suite == 'partout'
