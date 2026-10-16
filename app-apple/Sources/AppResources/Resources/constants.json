@@ -16,10 +16,10 @@
         "betaTTLFactor": 0.1
     },
     "github": {
-        "discussionsURL": "https://github.com/orgs/partout-io/discussions",
-        "issuesURL": "https://github.com/partout-io/passepartout/issues",
-        "rawURL": "https://raw.githubusercontent.com/partout-io/passepartout",
-        "latestReleaseURL": "https://api.github.com/repos/partout-io/passepartout/releases/latest"
+        "discussionsURL": "https://github.com/alzimerahmed/GhostTunnel/discussions",
+        "issuesURL": "https://github.com/alzimerahmed/GhostTunnel/issues",
+        "rawURL": "https://raw.githubusercontent.com/alzimerahmed/GhostTunnel",
+        "latestReleaseURL": "https://api.github.com/repos/alzimerahmed/GhostTunnel/releases/latest"
     },
     "emails": {
         "domain": "passepartoutvpn.app",

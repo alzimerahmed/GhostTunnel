@@ -39,6 +39,10 @@ jobs:
             suite: cross
             runner: ubuntu-latest
             timeout_minutes: 2
+          - name: Config checks
+            suite: config
+            runner: ubuntu-latest
+            timeout_minutes: 2
     steps:
       - uses: actions/checkout@v6
 
@@ -66,6 +70,10 @@ jobs:
             git status --short
             exit 1
           fi
+
+      - name: Validate hosted config
+        if: matrix.suite == 'config'
+        run: bash scripts/validate-config.sh config/example.json
 
       - name: Validate translations
         if: matrix.suite == 'apple'

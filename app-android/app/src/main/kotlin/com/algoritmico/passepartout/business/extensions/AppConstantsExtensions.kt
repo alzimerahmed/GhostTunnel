@@ -17,8 +17,18 @@ val AppConstantsWebsites.blogURL: String
 val AppConstantsWebsites.donateURL: String
     get() = partoutURL.appendingPath("donate")
 
+// GhostTunnel-owned hosted config (GitHub raw). Replaces upstream
+// partout.io "passepartout-config" hosting (Phase 4 — config ownership).
+// Layout: v1/bundle.json (stable) / v1/bundle-beta.json (beta channel);
+// schema documented in config/schema.md at the GhostTunnel repo root.
+private const val CONFIG_BASE_URL =
+    "https://raw.githubusercontent.com/alzimerahmed84/ghosttunnel-config"
+
 val AppConstantsWebsites.configURL: String
-    get() = partoutURL.appendingPath("passepartout-config/v1/bundle.json")
+    get() = "$CONFIG_BASE_URL/main/v1/bundle.json"
+
+val AppConstantsWebsites.betaConfigURL: String
+    get() = "$CONFIG_BASE_URL/main/v1/bundle-beta.json"
 
 //endregion
 

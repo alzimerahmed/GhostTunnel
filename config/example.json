@@ -1,0 +1,30 @@
+{
+  "appNotWorking": {
+    "rate": 100,
+    "platforms": ["apple"],
+    "minBuild": 1,
+    "data": {
+      "reason": "Example flag: marks builds with a known critical issue"
+    }
+  },
+  "experimentalDaemon_202610": {
+    "rate": 100,
+    "minBuild": 500
+  },
+  "ghosttunnelBlocklistMetadata": {
+    "rate": 100,
+    "platforms": ["apple"],
+    "data": {
+      "schema": "ghosttunnel-blocklist-v1",
+      "name": "GhostTunnel Basic",
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/alzimerahmed84/ghosttunnel-config/main/blocklists/basic.txt",
+          "format": "hosts",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "dohEndpoints": []
+    }
+  }
+}

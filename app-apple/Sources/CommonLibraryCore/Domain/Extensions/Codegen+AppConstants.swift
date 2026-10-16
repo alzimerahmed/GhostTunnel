@@ -18,12 +18,20 @@ extension OpenAPIAppConstantsWebsites {
         partoutURL.appending(path: "passepartout-api")
     }
 
+    // GhostTunnel-owned hosted config (GitHub raw). Replaces upstream
+    // partout.io "passepartout-config" hosting (Phase 4 — config ownership).
+    // Layout: v1/bundle.json (stable) / v1/bundle-beta.json (beta channel);
+    // schema documented in config/schema.md at the GhostTunnel repo root.
+    private var configBaseURL: URL {
+        URL(string: "https://raw.githubusercontent.com/alzimerahmed84/ghosttunnel-config")!
+    }
+
     public var configURL: URL {
-        partoutURL.appending(path: "passepartout-config/v1/bundle.json")
+        configBaseURL.appending(path: "main/v1/bundle.json")
     }
 
     public var betaConfigURL: URL {
-        partoutURL.appending(path: "passepartout-config/v1/bundle-beta.json")
+        configBaseURL.appending(path: "main/v1/bundle-beta.json")
     }
 }
 
