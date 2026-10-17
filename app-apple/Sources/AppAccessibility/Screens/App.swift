@@ -16,6 +16,10 @@ extension AccessibilityInfo {
             public static let profile = AccessibilityInfo("app.profileList.profile", .button)
         }
 
+        public enum ProfileDetail {
+            public static let profile = AccessibilityInfo("app.profileDetail.profile", .button)
+        }
+
         public static let profilesHeader = AccessibilityInfo("app.profilesHeader", .text)
 
         public static let profileToggle = AccessibilityInfo("app.profileToggle", .toggle)

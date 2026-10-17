@@ -176,8 +176,11 @@ private extension DetailView {
                 flow: flow
             )
         } else {
-            Text(Strings.Views.Tv.Profiles.Detail.profiles)
-                .themeEmptyMessage()
+            Text(AppLibraryTVLocalization.string(
+                "views.tv.profiles.detail.unavailable",
+                fallback: "Profile no longer available"
+            ))
+            .themeEmptyMessage()
         }
     }
 }
@@ -207,14 +210,13 @@ private struct ProfileDetailView: View {
 
             ConnectionStatusText(tunnel: tunnel, profileId: header.id)
                 .font(.title3)
-                .brightness(0.2)
 
             TunnelToggle(
                 tunnel: tunnel,
                 header: header,
                 errorHandler: errorHandler,
                 flow: flow
-            ) { isOn, canInteract in
+            ) { isOn, _ in
                 Button(!isOn.wrappedValue ? Strings.Global.Actions.connect : Strings.Global.Actions.disconnect) {
                     isOn.wrappedValue.toggle()
                 }
@@ -230,7 +232,7 @@ private struct ProfileDetailView: View {
             }
         }
         .padding(.horizontal, 100)
-        .uiAccessibility(.App.ProfileList.profile)
+        .uiAccessibility(.App.ProfileDetail.profile)
     }
 }
 

@@ -6,6 +6,7 @@ package com.algoritmico.passepartout.ui.app
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,8 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.Role
 import com.algoritmico.passepartout.R
 import com.algoritmico.passepartout.models.AppProfileHeader
 import com.algoritmico.passepartout.models.AppProfileStatus
@@ -47,6 +47,7 @@ fun ProfileRow(
     lastErrorCode: String?,
     isSelected: Boolean,
     isOnDemandEnabled: Boolean = false,
+    showsOnDemandToggle: Boolean = true,
     onProfileSelected: (String) -> Unit,
     onProfileToggle: (String, Boolean) -> Unit,
     onProfileContextualAction: (String) -> Unit,
@@ -132,11 +133,13 @@ fun ProfileRow(
             )
         }
 
-        OnDemandToggleRow(
-            profileId = header.id,
-            isEnabled = isOnDemandEnabled,
-            onProfileOnDemandToggle = onProfileOnDemandToggle
-        )
+        if (showsOnDemandToggle) {
+            OnDemandToggleRow(
+                profileId = header.id,
+                isEnabled = isOnDemandEnabled,
+                onProfileOnDemandToggle = onProfileOnDemandToggle
+            )
+        }
     }
 }
 
@@ -147,10 +150,18 @@ private fun OnDemandToggleRow(
     onProfileOnDemandToggle: (String, Boolean) -> Unit
 ) {
     val theme = LocalTheme.current
+    val label = stringResource(R.string.global_nouns_on_demand)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .toggleable(
+                value = isEnabled,
+                role = Role.Switch,
+                onValueChange = { isEnabled ->
+                    onProfileOnDemandToggle(profileId, isEnabled)
+                }
+            )
             .padding(
                 horizontal = theme.spacing.large,
                 vertical = theme.spacing.xSmall
@@ -158,19 +169,13 @@ private fun OnDemandToggleRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = stringResource(R.string.global_nouns_on_demand),
+            text = label,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.weight(1f)
         )
-        val onDemandLabel = stringResource(R.string.global_nouns_on_demand)
         Switch(
             checked = isEnabled,
-            onCheckedChange = { isEnabled ->
-                onProfileOnDemandToggle(profileId, isEnabled)
-            },
-            modifier = Modifier.semantics {
-                contentDescription = onDemandLabel
-            }
+            onCheckedChange = null
         )
     }
 }

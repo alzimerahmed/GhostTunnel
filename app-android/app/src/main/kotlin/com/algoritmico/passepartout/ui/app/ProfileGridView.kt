@@ -61,6 +61,7 @@ fun ProfileGridView(
                 lastErrorCode = state.profileLastErrorCode(header.id),
                 isSelected = state.contextualSelection.isActive && state.contextualSelection.contains(header.id),
                 isOnDemandEnabled = state.isProfileOnDemand(header.id),
+                showsOnDemandToggle = false,
                 onProfileSelected = actions.onProfileSelected,
                 onProfileToggle = actions.onProfileToggle,
                 onProfileContextualAction = actions.onProfileContextualAction,

@@ -92,8 +92,17 @@ final class TopShelfProvider: TVTopShelfContentProvider {
         }
         let url = URL(fileURLWithPath: NSTemporaryDirectory())
             .appendingPathComponent("\(assetName).png")
+        // Write once: the shelf refreshes repeatedly and the PNG never
+        // changes for a given asset.
+        if FileManager.default.fileExists(atPath: url.path) {
+            return url
+        }
+        guard let data = image.pngData() else {
+            pspLog(.core, .error, "Top Shelf: unable to encode image: \(assetName)")
+            return nil
+        }
         do {
-            try image.pngData()?.write(to: url)
+            try data.write(to: url)
         } catch {
             pspLog(.core, .error, "Top Shelf: unable to write image: \(error)")
             return nil
