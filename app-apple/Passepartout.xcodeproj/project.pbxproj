@@ -1849,6 +1849,28 @@
 			};
 			name = Release;
 		};
+		C0DE11A00000000000000054 /* ReleaseMac */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0E8D852F2C328CA1005493DE /* Config.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Passepartout/TopShelf/TopShelf.entitlements;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Passepartout/TopShelf/TopShelf.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(TARGET_NAME)";
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arm64;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(CFG_TOPSHELF_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = ReleaseMac;
+		};
 		0EE662C12DC2BDDF00A4BB37 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0ECD96172DC2738B009BD9F8 /* Config.mac.xcconfig */;
@@ -1991,6 +2013,7 @@
 			buildConfigurations = (
 				C0DE11A00000000000000052 /* Debug */,
 				C0DE11A00000000000000053 /* Release */,
+				C0DE11A00000000000000054 /* ReleaseMac */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

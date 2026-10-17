@@ -21,6 +21,10 @@ import UIKit
 /// Looked up via `NSExtensionPrincipalClass` as
 /// `$(PRODUCT_MODULE_NAME).TopShelfProvider` (no `@objc` rename, so the
 /// module-qualified Swift name resolves).
+///
+/// `@MainActor`: `QuickConnectContext` and its members are main-actor
+/// isolated; the extension's work is trivial and main-thread-bound.
+@MainActor
 final class TopShelfProvider: TVTopShelfContentProvider {
 
     override func loadTopShelfContent(completionHandler: @escaping (TVTopShelfContent?) -> Void) {
@@ -39,13 +43,9 @@ final class TopShelfProvider: TVTopShelfContentProvider {
             let headers = profiles.map {
                 $0.abiHeaderWithBogusFlagsAndRequirements()
             }
-            let state = TunnelWidgetStatusStore(
-                defaults: ctx.appConfiguration.makeTunnelDefaults()
-            ).load()
             let models = TopShelfContentBuilder.items(
                 headers: headers,
-                lastUsedProfileId: ctx.preferences[\.lastUsedProfileId],
-                tunnelState: state
+                lastUsedProfileId: ctx.preferences[\.lastUsedProfileId]
             )
             guard !models.isEmpty else {
                 return nil
@@ -74,8 +74,10 @@ final class TopShelfProvider: TVTopShelfContentProvider {
             item.displayAction = TVTopShelfAction(url: url)
         }
         if let imageURL = topShelfImageURL(named: "TopShelfImageWide") {
+            // Single PNG for both scales: the catalog's @2x asset is not
+            // emitted separately, so claiming the 2x trait would upscale
+            // the same file anyway (review M6).
             item.setImageURL(imageURL, for: .screenScale1x)
-            item.setImageURL(imageURL, for: .screenScale2x)
         }
         return item
     }

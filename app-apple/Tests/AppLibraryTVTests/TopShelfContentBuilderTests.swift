@@ -39,10 +39,9 @@ struct TopShelfContentBuilderTests {
             header("apple", uuid: uuidB),
             header("Mango", uuid: uuidC)
         ]
-        let items = TopShelfContentBuilder.items(headers: headers, lastUsedProfileId: nil, tunnelState: nil)
+        let items = TopShelfContentBuilder.items(headers: headers, lastUsedProfileId: nil)
 
         #expect(items.map(\.title) == ["apple", "Mango", "Zebra"])
-        #expect(items.first?.subtitle == nil)
     }
 
     @Test
@@ -54,7 +53,7 @@ struct TopShelfContentBuilderTests {
         let items = TopShelfContentBuilder.items(
             headers: headers,
             lastUsedProfileId: Profile.ID(uuidString: uuidA),
-            tunnelState: nil
+
         )
 
         #expect(items.map(\.title) == ["Zebra", "apple"])
@@ -66,7 +65,7 @@ struct TopShelfContentBuilderTests {
         let items = TopShelfContentBuilder.items(
             headers: headers,
             lastUsedProfileId: Profile.ID(uuidString: uuidC),
-            tunnelState: nil
+
         )
 
         #expect(items.map(\.title) == ["apple"])
@@ -77,45 +76,16 @@ struct TopShelfContentBuilderTests {
         let headers = (0..<12).map {
             header("Profile \($0)", uuid: String(format: "00000000-0000-0000-0000-%012d", $0))
         }
-        let items = TopShelfContentBuilder.items(headers: headers, lastUsedProfileId: nil, tunnelState: nil)
+        let items = TopShelfContentBuilder.items(headers: headers, lastUsedProfileId: nil)
 
         #expect(items.count == TopShelfContentBuilder.maxItems)
     }
 
-    // MARK: Status subtitle
-
-    @Test
-    func givenConnectedStateForFeatured_whenBuildingItems_thenSubtitleIsConnected() {
-        let headers = [header("apple", uuid: uuidB)]
-        let state = TunnelWidgetState(
-            kind: .connected,
-            profileId: uuidB,
-            profileName: "apple"
-        )
-        let items = TopShelfContentBuilder.items(headers: headers, lastUsedProfileId: nil, tunnelState: state)
-
-        #expect(items.first?.subtitle == "Connected")
-    }
-
-    @Test
-    func givenConnectedStateForOtherProfile_whenBuildingItems_thenNoSubtitle() {
-        let headers = [
-            header("apple", uuid: uuidB),
-            header("Zebra", uuid: uuidA)
-        ]
-        let state = TunnelWidgetState(
-            kind: .connected,
-            profileId: uuidA,
-            profileName: "Zebra"
-        )
-        let items = TopShelfContentBuilder.items(headers: headers, lastUsedProfileId: nil, tunnelState: state)
-
-        #expect(items.first { $0.title == "apple" }?.subtitle == nil)
-    }
+    // MARK: No profiles
 
     @Test
     func givenNoProfiles_whenBuildingItems_thenEmpty() {
-        let items = TopShelfContentBuilder.items(headers: [], lastUsedProfileId: nil, tunnelState: nil)
+        let items = TopShelfContentBuilder.items(headers: [], lastUsedProfileId: nil)
 
         #expect(items.isEmpty)
     }
@@ -125,7 +95,7 @@ struct TopShelfContentBuilderTests {
     @Test
     func whenBuildingItems_thenIdentifiersAndURLsMatchProfileIds() throws {
         let headers = [header("apple", uuid: uuidB)]
-        let items = TopShelfContentBuilder.items(headers: headers, lastUsedProfileId: nil, tunnelState: nil)
+        let items = TopShelfContentBuilder.items(headers: headers, lastUsedProfileId: nil)
 
         let item = try #require(items.first)
         #expect(item.identifier == "profile:\(uuidB)")
@@ -148,7 +118,8 @@ struct TopShelfContentBuilderTests {
             URL(string: "https://connect/\(uuidB)"),
             URL(string: "ghosttunnel://other/\(uuidB)"),
             URL(string: "ghosttunnel://connect/not-a-uuid"),
-            URL(string: "ghosttunnel://connect")
+            URL(string: "ghosttunnel://connect"),
+            URL(string: "ghosttunnel://connect/\(uuidB)/junk")
         ]
         for url in urls.compactMap({ $0 }) {
             #expect(TopShelfContentBuilder.profileId(fromDeepLink: url) == nil)

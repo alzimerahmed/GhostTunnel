@@ -175,9 +175,6 @@
 "views.tv.web_receiver.qr" = "Scan the QR with your camera to open a web page where to upload your profile. Make sure that you are connected to the same network.";
 
 "views.tv.topshelf.section.profiles" = "Profiles";
-"views.tv.topshelf.status.connected" = "Connected";
-"views.tv.topshelf.status.connecting" = "Connecting…";
-"views.tv.topshelf.status.disconnecting" = "Disconnecting…";
 
 "web_uploader.title" = "Upload to Apple TV";
 "web_uploader.passcode.prompt" = "Enter the passcode displayed on your TV";
