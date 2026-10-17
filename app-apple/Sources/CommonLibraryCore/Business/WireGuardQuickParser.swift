@@ -14,12 +14,29 @@ import Partout
 /// wg-quick configuration.
 ///
 /// Parsing is strict about secret material (keys must be 32-byte base64) and
-/// lenient about unrecognized keys/sections, which are ignored.
+/// lenient about unrecognized keys/sections, which are reported as warnings
+/// (Phase 10: full wg-quick superset — Table, FwMark, SaveConfig, Pre/Post
+/// Up/Down hooks and ListenPort are recognized and ignored with a warning
+/// instead of silently dropped).
 public struct WireGuardQuickParser: Sendable {
     public init() {
     }
 
     // MARK: API
+
+    /// Parse result with the non-fatal warnings collected along the way
+    /// (unsupported wg-quick directives, unrecognized keys).
+    public struct ParseOutcome: Sendable {
+        public let builder: WireGuard.Configuration.Builder
+
+        public let warnings: [String]
+    }
+
+    public func parseOutcome(fromContents contents: String) throws -> ParseOutcome {
+        var warnings: [String] = []
+        let builder = try configurationBuilder(fromContents: contents, warnings: &warnings)
+        return ParseOutcome(builder: builder, warnings: warnings)
+    }
 
     public func module(fromContents contents: String) throws -> WireGuardModule {
         let builder = try configurationBuilder(fromContents: contents)
@@ -27,6 +44,14 @@ public struct WireGuardQuickParser: Sendable {
     }
 
     public func configurationBuilder(fromContents contents: String) throws -> WireGuard.Configuration.Builder {
+        var warnings: [String] = []
+        return try configurationBuilder(fromContents: contents, warnings: &warnings)
+    }
+
+    private func configurationBuilder(
+        fromContents contents: String,
+        warnings: inout [String]
+    ) throws -> WireGuard.Configuration.Builder {
         var privateKey = ""
         var addresses: [String] = []
         var dns: DNSModule.Builder?
@@ -55,7 +80,10 @@ public struct WireGuardQuickParser: Sendable {
         }
 
         for rawLine in contents.lines {
+            // Strip a UTF-8 BOM that may lead the first line.
             let line = rawLine.trimmingCharacters(in: .whitespaces)
+                .trimmingPrefix("\u{feff}")
+                .trimmingCharacters(in: .whitespaces)
             if line.isEmpty || line.hasPrefix("#") || line.hasPrefix(";") {
                 continue
             }
@@ -118,8 +146,17 @@ public struct WireGuardQuickParser: Sendable {
                         throw ABI.AppError.importError(message: Strings.invalidMTU)
                     }
                     mtu = parsedMTU
+                case "table", "fwmark", "saveconfig":
+                    // Recognized wg-quick directives with no counterpart in
+                    // the profile model: ignore with a warning.
+                    warnings.append(Strings.unsupportedDirective(key))
+                case "preup", "postup", "predown", "postdown":
+                    warnings.append(Strings.unsupportedHooks)
+                case "listenport":
+                    // Client profiles bind an ephemeral local port.
+                    warnings.append(Strings.unsupportedListenPort)
                 default:
-                    // ListenPort and unrecognized keys are ignored.
+                    warnings.append(Strings.unrecognizedKey(key, section: "Interface"))
                     break
                 }
 
@@ -157,6 +194,7 @@ public struct WireGuardQuickParser: Sendable {
                     }
 
                 default:
+                    warnings.append(Strings.unrecognizedKey(key, section: "Peer"))
                     break
                 }
             }
@@ -214,6 +252,14 @@ private extension WireGuardQuickParser {
         static let invalidKeepAlive = "Invalid persistent keepalive"
         static let missingPrivateKey = "Missing interface private key"
         static let emptyPeers = "No peers defined"
+        static func unsupportedDirective(_ key: String) -> String {
+            "Unsupported wg-quick directive '\(key)' was ignored"
+        }
+        static let unsupportedHooks = "PreUp/PostUp/PreDown/PostDown hook commands are not supported and were ignored"
+        static let unsupportedListenPort = "ListenPort is not configurable for client profiles and was ignored"
+        static func unrecognizedKey(_ key: String, section: String) -> String {
+            "Unrecognized option '\(key)' in [\(section)] was ignored"
+        }
     }
 
     func parsedList(_ value: String) -> [String] {

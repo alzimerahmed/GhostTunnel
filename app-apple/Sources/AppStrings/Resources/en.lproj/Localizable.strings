@@ -601,3 +601,17 @@
 // MARK: Phase 8 — Quick Connect Surfaces (widgets, Control Center, menu bar)
 
 "appmenu.quick_connect" = "Quick Connect";
+
+// MARK: Phase 10 — Migration Surface (competitor import)
+
+"views.import.results.title" = "Import";
+"views.import.results.footer" = "Warnings describe configuration options that were recognized but ignored.";
+"views.import.results.done" = "Done";
+"views.import.status.imported" = "Imported";
+"views.import.format.partout" = "GhostTunnel profile";
+"views.import.format.wireguard" = "WireGuard";
+"views.import.format.openvpn" = "OpenVPN";
+"views.import.format.tunnelblick" = "Tunnelblick";
+"views.import.format.tailscale" = "Tailscale";
+"views.import.format.backup" = "Backup archive";
+"views.import.format.unknown" = "Unknown";

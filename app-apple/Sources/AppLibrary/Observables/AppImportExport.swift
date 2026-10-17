@@ -48,6 +48,211 @@ extension AppImportExport {
         exportModule: { _ in "" }
     )
 
+    // MARK: Phase 10 — unified migration import with format detection
+
+    /// Result of importing one file through the unified migration surface.
+    public struct FileImportResult: Sendable, Equatable {
+        public enum Status: Sendable, Equatable {
+            /// Profile imported; warnings are non-fatal parse notes.
+            case imported(warnings: [String])
+
+            /// File recognized but not importable (e.g. Tailscale config).
+            case skipped(message: String)
+
+            /// Parsing failed.
+            case failed(message: String)
+        }
+
+        public let filename: String
+
+        public let format: ImportFormat
+
+        public let status: Status
+
+        /// The imported profile, when `status` is `.imported`.
+        public let profile: Profile?
+
+        public init(
+            filename: String,
+            format: ImportFormat,
+            status: Status,
+            profile: Profile? = nil
+        ) {
+            self.filename = filename
+            self.format = format
+            self.status = status
+            self.profile = profile
+        }
+    }
+
+    /// Import one file with content-sniffed format detection. Unlike
+    /// `importedProfile`, this does not throw for a parse failure — it
+    /// returns a per-file result so the UI can show a batch report. OpenVPN
+    /// passphrase-required errors are still rethrown so the existing
+    /// passphrase flow can re-queue the file.
+    public func importedFile(from input: ABI.ProfileImporterInput, passphrase: String?) throws -> FileImportResult {
+        let (name, data) = try rawData(from: input)
+        let format = ImportFormatDetector().detect(data: data, filename: name)
+
+        do {
+            switch format {
+            case .partoutProfile, .unknown:
+                // Full profile JSON, or an unrecognized text file: run the
+                // legacy fallback chain (profile JSON → wg-quick → module).
+                let profile = try importedProfile(from: input, passphrase: passphrase)
+                return FileImportResult(
+                    filename: name,
+                    format: format,
+                    status: .imported(warnings: []),
+                    profile: profile
+                )
+
+            case .wireGuardQuick:
+                let outcome = try WireGuardQuickParser().parseOutcome(
+                    fromContents: String(decoding: data, as: UTF8.self)
+                )
+                let profile = try Profile(
+                    withName: name,
+                    singleModule: try WireGuardModule.Builder(
+                        configurationBuilder: outcome.builder
+                    ).build()
+                )
+                return FileImportResult(
+                    filename: name,
+                    format: .wireGuardQuick,
+                    status: .imported(warnings: outcome.warnings),
+                    profile: profile
+                )
+
+            case .openVPN:
+                let context: ModuleImportContext?
+                if let passphrase {
+                    context = .OpenVPN(passphrase: passphrase)
+                } else {
+                    context = nil
+                }
+                let module = try importModule(String(decoding: data, as: UTF8.self), context)
+                let profile = try Profile(withName: name, singleModule: module)
+                return FileImportResult(
+                    filename: name,
+                    format: .openVPN,
+                    status: .imported(warnings: []),
+                    profile: profile
+                )
+
+            case .tunnelblick:
+                return try importedTunnelblick(
+                    name: name,
+                    data: data,
+                    input: input,
+                    passphrase: passphrase
+                )
+
+            case .tailscale:
+                let result = try TailscaleConfigParser().parse(data: data)
+                return FileImportResult(
+                    filename: name,
+                    format: .tailscale,
+                    status: .skipped(message: result.notes.joined(separator: " · "))
+                )
+
+            case .backupArchive:
+                return FileImportResult(
+                    filename: name,
+                    format: .backupArchive,
+                    status: .skipped(message: Strings.backupHint)
+                )
+            }
+        } catch {
+            // Let the passphrase flow handle OpenVPN credentials.
+            let appError = ABI.AppError(error)
+            if case .partout(let partoutError) = appError, partoutError.isOpenVPNPassphraseRequired {
+                throw appError
+            }
+            return FileImportResult(
+                filename: name,
+                format: format,
+                status: .failed(message: Self.failureMessage(appError))
+            )
+        }
+    }
+
+    private func importedTunnelblick(
+        name: String,
+        data: Data,
+        input: ABI.ProfileImporterInput,
+        passphrase: String?
+    ) throws -> FileImportResult {
+        let importer = TunnelblickImporter()
+        let contents: TunnelblickImporter.Contents
+        if case .file(let url) = input, isDirectoryPackage(url) {
+            contents = try importer.readDirectory(at: url)
+        } else {
+            contents = try importer.readArchive(data: data)
+        }
+
+        var warnings = contents.warnings
+        let configText = contents.mainConfig
+        let profile: Profile
+        if ImportFormatDetector().detect(text: configText) == .wireGuardQuick {
+            let outcome = try WireGuardQuickParser().parseOutcome(fromContents: configText)
+            warnings.append(contentsOf: outcome.warnings)
+            profile = try Profile(
+                withName: name,
+                singleModule: try WireGuardModule.Builder(
+                    configurationBuilder: outcome.builder
+                ).build()
+            )
+        } else {
+            let context: ModuleImportContext?
+            if let passphrase {
+                context = .OpenVPN(passphrase: passphrase)
+            } else {
+                context = nil
+            }
+            let module = try importModule(configText, context)
+            let profile = try Profile(withName: name, singleModule: module)
+        }
+        return FileImportResult(
+            filename: name,
+            format: .tunnelblick,
+            status: .imported(warnings: warnings),
+            profile: profile
+        )
+    }
+
+    private func rawData(from input: ABI.ProfileImporterInput) throws -> (name: String, data: Data) {
+        switch input {
+        case .contents(let filename, let data):
+            return (filename, Data(data.utf8))
+        case .file(let url):
+            let didStartAccess = url.startAccessingSecurityScopedResource()
+            defer {
+                if didStartAccess {
+                    url.stopAccessingSecurityScopedResource()
+                }
+            }
+            return (url.lastPathComponent, try Data(contentsOf: url))
+        }
+    }
+
+    private enum Strings {
+        static let backupHint = "This is a GhostTunnel backup archive — use Settings → Backup & Restore to import it"
+    }
+
+    private static func failureMessage(_ appError: ABI.AppError) -> String {
+        if case .importError(let message) = appError, let message {
+            return message
+        }
+        return String(describing: appError)
+    }
+
+    /// True when the URL points at a directory package (e.g. a `.tblk`
+    /// folder handed out by the macOS file importer).
+    private func isDirectoryPackage(_ url: URL) -> Bool {
+        (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true
+    }
+
     public func importedProfile(from input: ABI.ProfileImporterInput, passphrase: String?) throws -> Profile {
         let (name, contents) = try input.decodedPair()
 

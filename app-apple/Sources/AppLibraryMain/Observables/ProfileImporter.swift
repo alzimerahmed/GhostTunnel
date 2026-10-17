@@ -2,16 +2,23 @@
 //
 // SPDX-License-Identifier: GPL-3.0
 
+import AppLibrary
 import CommonLibrary
 import Foundation
 
 @MainActor @Observable
 final class ProfileImporter {
-    typealias ImportBlock = @Sendable (URL, String?) async throws -> Void
+    typealias ImportBlock = @Sendable (URL, String?) async throws -> AppImportExport.FileImportResult
 
     var isPresentingPassphrase = false
 
     var currentPassphrase = ""
+
+    // MARK: Phase 10 — per-file results report
+
+    private(set) var results: [AppImportExport.FileImportResult] = []
+
+    var isPresentingResults = false
 
     private(set) var urlsRequiringPassphrase: [URL] = []
 
@@ -24,14 +31,16 @@ final class ProfileImporter {
         block: @escaping ImportBlock
     ) async throws {
         var withPassphrase: [URL] = []
+        var newResults: [AppImportExport.FileImportResult] = []
 
         for url in urls {
             do {
-                try await importURL(
+                let result = try await importURL(
                     url,
                     withPassphrase: nil,
                     block: block
                 )
+                newResults.append(result)
             } catch {
                 let appError = ABI.AppError(error)
                 switch appError {
@@ -39,13 +48,20 @@ final class ProfileImporter {
                     withPassphrase.append(url)
                     continue
                 default:
+                    // Phase 10: a parse failure is a per-file result, not a
+                    // batch abort — the report shows what failed and why.
                     pspLog(.core, .fault, "Unable to import URL: \(error)")
-                    throw appError
+                    newResults.append(.init(
+                        filename: url.lastPathComponent,
+                        format: .unknown,
+                        status: .failed(message: String(describing: appError))
+                    ))
                 }
             }
         }
 
         urlsRequiringPassphrase = withPassphrase
+        appendResults(newResults)
         if !urlsRequiringPassphrase.isEmpty {
             scheduleNextImport()
         }
@@ -56,12 +72,13 @@ final class ProfileImporter {
         block: @escaping ImportBlock
     ) async throws {
         do {
-            try await importURL(
+            let result = try await importURL(
                 url,
                 withPassphrase: currentPassphrase,
                 block: block
             )
             urlsRequiringPassphrase.removeFirst()
+            appendResults([result])
             scheduleNextImport()
         } catch {
             scheduleNextImport()
@@ -73,9 +90,29 @@ final class ProfileImporter {
         urlsRequiringPassphrase.removeFirst()
         scheduleNextImport()
     }
+
+    func dismissResults() {
+        results = []
+        isPresentingResults = false
+    }
 }
 
 private extension ProfileImporter {
+    func appendResults(_ newResults: [AppImportExport.FileImportResult]) {
+        results.append(contentsOf: newResults)
+        let needsReport = newResults.contains { result in
+            switch result.status {
+            case .imported(let warnings):
+                return !warnings.isEmpty
+            case .skipped, .failed:
+                return true
+            }
+        }
+        if needsReport {
+            isPresentingResults = true
+        }
+    }
+
     func scheduleNextImport() {
         guard !urlsRequiringPassphrase.isEmpty else {
             return
@@ -92,13 +129,13 @@ private extension ProfileImporter {
         _ url: URL,
         withPassphrase passphrase: String?,
         block: @escaping ImportBlock
-    ) async throws {
+    ) async throws -> AppImportExport.FileImportResult {
         let didStartAccess = url.startAccessingSecurityScopedResource()
         defer {
             if didStartAccess {
                 url.stopAccessingSecurityScopedResource()
             }
         }
-        try await block(url, passphrase)
+        return try await block(url, passphrase)
     }
 }

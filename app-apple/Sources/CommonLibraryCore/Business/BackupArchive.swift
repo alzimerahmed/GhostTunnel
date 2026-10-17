@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0
 
+import Compression
 import Foundation
 
 /// A single named file inside a backup archive.
@@ -30,9 +31,21 @@ public protocol BackupArchiveCoding: Sendable {
 /// implemented by hand to avoid a third-party dependency. Confidentiality is
 /// NOT provided by this coder: encrypted backups wrap the output of
 /// `encode(_:)` in `BackupCrypto` (AES-GCM), see `BackupManager`.
+///
+/// Decoding also accepts "deflate" (method 8) entries via the system
+/// Compression framework — Phase 10 needs this to read real-world Tunnelblick
+/// `.tblk` packages, which are deflated ZIPs. Decompression is bounded
+/// (incremental, capped at `maxEntrySize`) so a hostile archive cannot
+/// trigger an unbounded allocation (zip bomb).
 public struct ZipBackupArchiveCoder: BackupArchiveCoding {
-    public init() {
+    /// Upper bound for a single decoded entry, also the decompression cap.
+    public let maxEntrySize: Int
+
+    public init(maxEntrySize: Int = Self.defaultMaxEntrySize) {
+        self.maxEntrySize = maxEntrySize
     }
+
+    public static let defaultMaxEntrySize = 64 * 1_024 * 1_024
 
     // MARK: Coding
 
@@ -141,7 +154,7 @@ public struct ZipBackupArchiveCoder: BackupArchiveCoding {
                 throw BackupError.corruptedArchive
             }
 
-            let content = try storedContent(
+            let content = try entryContent(
                 in: data,
                 at: localOffset,
                 crc: crc,
@@ -177,7 +190,7 @@ private extension ZipBackupArchiveCoder {
         throw BackupError.corruptedArchive
     }
 
-    func storedContent(
+    func entryContent(
         in data: Data,
         at localOffset: Int,
         crc: UInt32,
@@ -191,14 +204,98 @@ private extension ZipBackupArchiveCoder {
         let nameLength = Int(data.u16LE(at: localOffset + 26))
         let extraLength = Int(data.u16LE(at: localOffset + 28))
         let dataStart = localOffset + 30 + nameLength + extraLength
-        guard method == 0, size >= 0, dataStart + size <= data.count else {
+        guard size >= 0, dataStart + size <= data.count else {
             throw BackupError.corruptedArchive
         }
-        let content = data.subdata(in: dataStart..<(dataStart + size))
+        let raw = data.subdata(in: dataStart..<(dataStart + size))
+        let content: Data
+        switch method {
+        case 0:
+            content = raw
+        case 8:
+            content = try DeflateDecoder.inflate(raw, maxOutputSize: maxEntrySize)
+        default:
+            throw BackupError.corruptedArchive
+        }
         guard CRC32.checksum(of: content) == crc else {
             throw BackupError.corruptedArchive
         }
         return content
+    }
+}
+
+// MARK: - Raw-deflate decoding (ZIP method 8) via the Compression framework
+
+/// Incremental raw-deflate decoder. ZIP "deflate" entries are raw DEFLATE
+/// streams (no zlib header), which is exactly Apple's `COMPRESSION_ZLIB`.
+/// Output is produced in bounded chunks and capped, so a lying header or a
+/// decompression bomb cannot exhaust memory.
+enum DeflateDecoder {
+    static func inflate(_ input: Data, maxOutputSize: Int) throws -> Data {
+        guard !input.isEmpty, maxOutputSize > 0 else {
+            throw BackupError.corruptedArchive
+        }
+        var stream = compression_stream(dst_size: 0, dst_ptr: nil, src_size: 0, src_ptr: nil, state: nil)
+        let status = compression_stream_init(
+            &stream,
+            COMPRESSION_STREAM_DECODE,
+            COMPRESSION_ZLIB
+        )
+        guard status.rawValue == COMPRESSION_STATUS_OK.rawValue else {
+            throw BackupError.corruptedArchive
+        }
+        defer {
+            compression_stream_destroy(&stream)
+        }
+
+        var output = Data()
+        let chunkSize = 64 * 1_024
+        let dstBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: chunkSize)
+        defer {
+            dstBuffer.deallocate()
+        }
+
+        try input.withUnsafeBytes { (srcRaw: UnsafeRawBufferPointer) in
+            guard let srcBase = srcRaw.baseAddress else {
+                throw BackupError.corruptedArchive
+            }
+            stream.src_ptr = srcBase.assumingMemoryBound(to: UInt8.self)
+            stream.src_size = input.count
+
+            var reachedEnd = false
+            while !reachedEnd {
+                stream.dst_ptr = dstBuffer
+                stream.dst_size = chunkSize
+                let flags = Int32(COMPRESSION_STREAM_FINALIZE.rawValue)
+                let result = compression_stream_process(&stream, flags)
+                switch result.rawValue {
+                case COMPRESSION_STATUS_OK.rawValue, COMPRESSION_STATUS_END.rawValue:
+                    let produced = chunkSize - stream.dst_size
+                    let isEnd = result.rawValue == COMPRESSION_STATUS_END.rawValue
+                    guard produced > 0 || isEnd else {
+                        // No forward progress without end-of-stream.
+                        throw BackupError.corruptedArchive
+                    }
+                    if produced > 0 {
+                        guard output.count + produced <= maxOutputSize else {
+                            throw BackupError.corruptedArchive
+                        }
+                        output.append(dstBuffer, count: produced)
+                    }
+                    if isEnd {
+                        reachedEnd = true
+                    }
+                    if stream.src_size == 0 && !isEnd && produced < chunkSize {
+                        // Input exhausted but stream not finalized: with
+                        // FINALIZE this means a truncated stream.
+                        throw BackupError.corruptedArchive
+                    }
+                default:
+                    throw BackupError.corruptedArchive
+                }
+            }
+        }
+        return output
     }
 }
 

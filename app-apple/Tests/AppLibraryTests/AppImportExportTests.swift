@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 @testable import AppLibrary
+@testable import CommonLibraryCore
 import CommonLibrary
 import Foundation
 import Testing
@@ -283,5 +284,113 @@ extension AppImportExportTests {
         )
 
         #expect(profile.modules.first?.moduleType == .WireGuard)
+    }
+}
+
+// MARK: - Phase 10: unified migration import (format detection + routing)
+
+extension AppImportExportTests {
+    private static let wgQuickContents = """
+    [Interface]
+    PrivateKey = \(Data((0..<32).map { _ in UInt8(0x11) }).base64EncodedString())
+    Address = 10.0.0.2/32
+
+    [Peer]
+    PublicKey = \(Data((0..<32).map { _ in UInt8(0x22) }).base64EncodedString())
+    Endpoint = vpn.example.com:51820
+    """
+
+    @Test
+    func givenWGQuickFile_whenImportedFile_thenDetectedAndImported() throws {
+        let result = try AppImportExport.dummy.importedFile(
+            from: .contents(filename: "tunnel.conf", data: Data(Self.wgQuickContents.utf8)),
+            passphrase: nil
+        )
+        #expect(result.format == .wireGuardQuick)
+        guard case .imported = result.status else {
+            Issue.record("Expected imported, got \(result.status)")
+            return
+        }
+        #expect(result.profile?.modules.first?.moduleType == .WireGuard)
+    }
+
+    @Test
+    func givenTailscaleFile_whenImportedFile_thenSkippedWithNotes() throws {
+        let json = #"{"hostname": "node1", "acls": []}"#
+        let result = try AppImportExport.dummy.importedFile(
+            from: .contents(filename: "tailscaled.conf", data: Data(json.utf8)),
+            passphrase: nil
+        )
+        #expect(result.format == .tailscale)
+        #expect(result.profile == nil)
+        guard case .skipped(let message) = result.status else {
+            Issue.record("Expected skipped, got \(result.status)")
+            return
+        }
+        #expect(message.contains("coordination server"))
+    }
+
+    @Test
+    func givenBackupArchiveFile_whenImportedFile_thenSkippedWithHint() throws {
+        let zip = Data([0x50, 0x4b, 0x03, 0x04]) + Data(repeating: 0, count: 32)
+        let result = try AppImportExport.dummy.importedFile(
+            from: .contents(filename: "profiles.gtbk", data: zip),
+            passphrase: nil
+        )
+        #expect(result.format == .backupArchive)
+        guard case .skipped(let message) = result.status else {
+            Issue.record("Expected skipped, got \(result.status)")
+            return
+        }
+        #expect(message.contains("Backup"))
+    }
+
+    @Test
+    func givenGarbageFile_whenImportedFile_thenFailedResultNotThrow() throws {
+        let result = try AppImportExport.dummy.importedFile(
+            from: .contents(filename: "garbage.txt", data: Data("!!garbage!!".utf8)),
+            passphrase: nil
+        )
+        guard case .failed = result.status else {
+            Issue.record("Expected failed, got \(result.status)")
+            return
+        }
+        #expect(result.profile == nil)
+    }
+
+    @Test
+    func givenTunnelblickWGPackage_whenImportedFile_thenImported() throws {
+        let entries = [
+            BackupEntry(name: "config.tblk/tunnel.conf", data: Data(Self.wgQuickContents.utf8))
+        ]
+        let zipData = try ZipBackupArchiveCoder().encode(entries)
+        let result = try AppImportExport.dummy.importedFile(
+            from: .contents(filename: "config.tblk", data: zipData),
+            passphrase: nil
+        )
+        #expect(result.format == .tunnelblick)
+        guard case .imported = result.status else {
+            Issue.record("Expected imported, got \(result.status)")
+            return
+        }
+        #expect(result.profile?.modules.first?.moduleType == .WireGuard)
+    }
+
+    @Test
+    func givenHostileTunnelblickPackage_whenImportedFile_thenFailedResultNotThrow() throws {
+        // Zip-slip entry: must surface as a failed result, never a crash.
+        let entries = [
+            BackupEntry(name: "../evil.conf", data: Data("client\ndev tun\n".utf8))
+        ]
+        let zipData = try ZipBackupArchiveCoder().encode(entries)
+        let result = try AppImportExport.dummy.importedFile(
+            from: .contents(filename: "evil.tblk", data: zipData),
+            passphrase: nil
+        )
+        #expect(result.format == .tunnelblick)
+        guard case .failed = result.status else {
+            Issue.record("Expected failed, got \(result.status)")
+            return
+        }
     }
 }

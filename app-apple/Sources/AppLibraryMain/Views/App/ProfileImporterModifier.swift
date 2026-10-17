@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0
 
+import AppLibrary
 import CommonLibrary
 import SwiftUI
 
@@ -37,6 +38,11 @@ struct ProfileImporterModifier: ViewModifier {
                 actions: actions,
                 message: message
             )
+            .sheet(isPresented: $importer.isPresentingResults) {
+                ImportResultsView(results: importer.results) {
+                    importer.dismissResults()
+                }
+            }
     }
 }
 
@@ -61,12 +67,15 @@ private extension ProfileImporterModifier {
         Text(Strings.Alerts.Import.Passphrase.message(url.lastPathComponent))
     }
 
-    func doImport(url: URL, passphrase: String?) async throws {
-        let profile = try appImportExport.importedProfile(
+    func doImport(url: URL, passphrase: String?) async throws -> AppImportExport.FileImportResult {
+        let result = try appImportExport.importedFile(
             from: .file(url),
             passphrase: passphrase
         )
-        try await profileObservable.saveImported(profile)
+        if let profile = result.profile {
+            try await profileObservable.saveImported(profile)
+        }
+        return result
     }
 
     func handleResult(_ result: Result<[URL], Error>) {
