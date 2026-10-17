@@ -24,11 +24,13 @@ val TaggedProfile.isOnDemandEnabled: Boolean
     get() = onDemandModule() != null
 
 fun TaggedProfile.onDemandModule(): OnDemandModule? {
-    return modules.firstOrNull { tagged ->
-        tagged is TaggedModuleOnDemand && tagged.moduleId in activeModulesIds
-    }?.let {
-        (it as TaggedModuleOnDemand).value
-    }
+    // Safe call on moduleId: whether TaggedModule.moduleId is nullable
+    // depends on the pinned core; `?.let` compiles either way.
+    return modules
+        .filterIsInstance<TaggedModuleOnDemand>()
+        .firstOrNull { tagged ->
+            tagged.moduleId?.let { it in activeModulesIds } == true
+        }?.value
 }
 
 fun TaggedProfile.withOnDemandEnabled(newModuleId: String = UUID.randomUUID().toString()): TaggedProfile {

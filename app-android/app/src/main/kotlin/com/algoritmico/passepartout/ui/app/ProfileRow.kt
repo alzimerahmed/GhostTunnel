@@ -24,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.algoritmico.passepartout.R
 import com.algoritmico.passepartout.models.AppProfileHeader
 import com.algoritmico.passepartout.models.AppProfileStatus
@@ -160,10 +162,14 @@ private fun OnDemandToggleRow(
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.weight(1f)
         )
+        val onDemandLabel = stringResource(R.string.global_nouns_on_demand)
         Switch(
             checked = isEnabled,
             onCheckedChange = { isEnabled ->
                 onProfileOnDemandToggle(profileId, isEnabled)
+            },
+            modifier = Modifier.semantics {
+                contentDescription = onDemandLabel
             }
         )
     }

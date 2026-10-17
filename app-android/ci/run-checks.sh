@@ -15,6 +15,6 @@ cd "$app_dir"
 # runnable in the CI environment.
 chmod +x gradlew
 
-./gradlew --no-daemon \
+./gradlew --no-daemon --stacktrace \
     :app:assembleDebug \
     :app:testDebugUnitTest
