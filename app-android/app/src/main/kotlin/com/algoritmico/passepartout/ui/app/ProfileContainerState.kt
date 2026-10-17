@@ -38,10 +38,15 @@ class ProfileContainerState(
     private val enabledProfileIds: Set<String> = emptySet(),
     private val statuses: Map<String, AppProfileStatus> = emptyMap(),
     private val transfers: Map<String, ProfileTransfer> = emptyMap(),
-    private val lastErrorCodes: Map<String, String> = emptyMap()
+    private val lastErrorCodes: Map<String, String> = emptyMap(),
+    private val onDemandProfileIds: Set<String> = emptySet()
 ) {
     fun isProfileEnabled(profileId: String): Boolean {
         return profileId in enabledProfileIds
+    }
+
+    fun isProfileOnDemand(profileId: String): Boolean {
+        return profileId in onDemandProfileIds
     }
 
     fun profileStatus(profileId: String): AppProfileStatus {
@@ -61,5 +66,6 @@ class ProfileContainerState(
 class ProfileContainerActions(
     val onProfileSelected: (String) -> Unit = {},
     val onProfileToggle: (String, Boolean) -> Unit = { _, _ -> },
-    val onProfileContextualAction: (String) -> Unit = {}
+    val onProfileContextualAction: (String) -> Unit = {},
+    val onProfileOnDemandToggle: (String, Boolean) -> Unit = { _, _ -> }
 )

@@ -71,6 +71,22 @@ class ProfileManager(
         publishProfiles()
     }
 
+    suspend fun save(profile: TaggedProfile) {
+        val previous = profiles[profile.id]
+        if (previous == null) {
+            throw ProfileManagerException.NotFound(profile.id)
+        }
+        repository.saveProfile(profile)
+        profiles = profiles + (profile.id to profile)
+        _events.emit(
+            ProfileEventSave(
+                profile = profile,
+                previous = previous
+            )
+        )
+        publishProfiles()
+    }
+
     suspend fun remove(profileId: String) {
         remove(listOf(profileId))
     }

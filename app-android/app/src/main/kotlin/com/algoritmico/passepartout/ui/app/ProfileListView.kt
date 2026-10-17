@@ -55,9 +55,11 @@ fun ProfileListView(
                 transfer = state.profileTransfer(header.id),
                 lastErrorCode = state.profileLastErrorCode(header.id),
                 isSelected = state.contextualSelection.isActive && state.contextualSelection.contains(header.id),
+                isOnDemandEnabled = state.isProfileOnDemand(header.id),
                 onProfileSelected = actions.onProfileSelected,
                 onProfileToggle = actions.onProfileToggle,
-                onProfileContextualAction = actions.onProfileContextualAction
+                onProfileContextualAction = actions.onProfileContextualAction,
+                onProfileOnDemandToggle = actions.onProfileOnDemandToggle
             )
         }
     }
