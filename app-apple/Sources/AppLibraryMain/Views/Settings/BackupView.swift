@@ -6,6 +6,16 @@ import CommonLibrary
 import SwiftUI
 import UniformTypeIdentifiers
 
+/// UTType for the `GTBK` backup container (`BackupCrypto.wrap`). Declared
+/// as an exported type so the `.gtbk` extension round-trips through
+/// `fileExporter`/`fileImporter`.
+extension UTType {
+    static let ghostTunnelBackup = UTType(
+        exportedAs: "com.ghosttunnel.backup",
+        conformingTo: .data
+    )
+}
+
 /// Export/import all profiles to/from a portable backup archive
 /// (`BackupManager`). Export is optionally encrypted with a passphrase;
 /// unencrypted exports have their secrets redacted.
@@ -43,13 +53,13 @@ struct BackupView: View {
         .fileExporter(
             isPresented: $isExporting,
             document: archiveData.map(BackupFile.init),
-            contentType: .zip,
+            contentType: .ghostTunnelBackup,
             defaultFilename: defaultFilename,
             onCompletion: { _ in }
         )
         .fileImporter(
             isPresented: $isImporting,
-            allowedContentTypes: [.zip, .data]
+            allowedContentTypes: [.ghostTunnelBackup, .zip, .data]
         ) { result in
             Task {
                 await importBackup(from: result)
@@ -91,7 +101,7 @@ private extension BackupView {
         } header: {
             Text(AppLibraryMainLocalization.string("settings.backup.import.header", fallback: "Import profiles"))
         } footer: {
-            Text(AppLibraryMainLocalization.string("settings.backup.import.footer", fallback: "Import profiles from a GhostTunnel backup archive (.zip). Enter the passphrase first if the archive is encrypted."))
+            Text(AppLibraryMainLocalization.string("settings.backup.import.footer", fallback: "Import profiles from a GhostTunnel backup archive (.gtbk). Enter the passphrase first if the archive is encrypted."))
         }
     }
 
@@ -189,9 +199,9 @@ private extension BackupView {
 // MARK: - FileDocument
 
 private struct BackupFile: FileDocument {
-    static let readableContentTypes: [UTType] = [.zip, .data]
+    static let readableContentTypes: [UTType] = [.ghostTunnelBackup, .zip, .data]
 
-    static let writableContentTypes: [UTType] = [.zip]
+    static let writableContentTypes: [UTType] = [.ghostTunnelBackup]
 
     let data: Data
 

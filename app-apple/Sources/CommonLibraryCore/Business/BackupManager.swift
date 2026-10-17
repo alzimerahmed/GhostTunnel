@@ -143,19 +143,25 @@ extension BackupManager {
     /// Redact secret material from a profile for unencrypted exports:
     /// WireGuard private/preshared keys and OpenVPN passwords. The resulting
     /// profile is still importable, the user just needs to re-enter secrets.
+    ///
+    /// Rebuilt modules keep their original `id` and interactivity so that
+    /// `Profile.Builder` does not deactivate them when `modules` is set.
     static func redactedSecrets(of profile: Profile) throws -> Profile {
         var builder = profile.builder()
         builder.modules = try builder.modules.map { module in
             if let wg = module as? WireGuardModule {
                 var configuration = wg.configuration?.builder()
-                    ?? WireGuard.Configuration.Builder(privateKey: "")
-                configuration.interface.privateKey = ""
+                    ?? WireGuard.Configuration.Builder(privateKey: Self.redactedKey)
+                configuration.interface.privateKey = Self.redactedKey
                 configuration.peers = configuration.peers.map { peer in
                     var peer = peer
                     peer.preSharedKey = nil
                     return peer
                 }
-                return try WireGuardModule.Builder(configurationBuilder: configuration).build()
+                return try WireGuardModule.Builder(
+                    id: wg.id,
+                    configurationBuilder: configuration
+                ).build()
             }
             if let ovpn = module as? OpenVPNModule {
                 guard let credentials = ovpn.credentials else {
@@ -164,9 +170,11 @@ extension BackupManager {
                 var credentialsBuilder = credentials.builder()
                 credentialsBuilder.password = ""
                 let newModule = try OpenVPNModule.Builder(
+                    id: ovpn.id,
                     configurationBuilder: ovpn.configuration?.builder()
                         ?? OpenVPN.Configuration.Builder(),
-                    credentials: credentialsBuilder.build()
+                    credentials: credentialsBuilder.build(),
+                    isInteractive: ovpn.requiresInteractiveCredentials ?? false
                 ).build()
                 return newModule
             }
@@ -174,6 +182,11 @@ extension BackupManager {
         }
         return try builder.build()
     }
+
+    /// A syntactically valid (but inert) 32-byte key used in place of real
+    /// secret material: an empty string would fail `WireGuard.Key`
+    /// validation and make the redacted profile unbuildable.
+    static let redactedKey = Data(repeating: 0, count: 32).base64EncodedString()
 
     static func sanitizedFilename(from name: String) -> String {
         let invalid = CharacterSet(charactersIn: "/\\:")

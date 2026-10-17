@@ -49,6 +49,33 @@ struct BackupManagerTests {
     }
 
     @Test
+    func givenMalformedCentralDirectory_whenDecodeZip_thenThrowsInsteadOfCrashing() throws {
+        let coder = ZipBackupArchiveCoder()
+        let entries = [BackupEntry(name: "a.json", data: Data("hello".utf8))]
+        let encoded = try coder.encode(entries)
+        // Patch the central-directory entry's name length to claim more
+        // bytes than the archive contains.
+        var malformed = encoded
+        let cdOffset = Int(encoded.u32LE(at: encoded.count - 22 + 16))
+        malformed[cdOffset + 28] = 0xff
+        malformed[cdOffset + 29] = 0xff
+        #expect(throws: BackupError.corruptedArchive) {
+            try coder.decode(malformed)
+        }
+    }
+
+    @Test
+    func givenCorruptEOC_whenDecodeZip_thenThrows() {
+        let coder = ZipBackupArchiveCoder()
+        var data = Data([0x50, 0x4b, 0x05, 0x06]) // EOCD signature
+        data.append(Data(repeating: 0, count: 18))
+        data.append(contentsOf: [0xff, 0xff, 0xff, 0xff]) // huge central size
+        #expect(throws: BackupError.corruptedArchive) {
+            try coder.decode(data)
+        }
+    }
+
+    @Test
     func givenEncryptedExport_whenRoundTrip_thenPreservesProfiles() async throws {
         let sut = BackupManager()
         let profile = try wireGuardProfile()
@@ -98,11 +125,21 @@ struct BackupManagerTests {
         for secret in [Self.privateKey, Self.peerKey, Self.presharedKey] {
             #expect(archive.firstRange(of: Data(secret.utf8)) == nil)
         }
-        // Redacted profile is still importable, without secrets.
+        // Redacted profile is still importable, with a placeholder key.
         let imported = try await sut.importArchive(archive, passphrase: nil)
         #expect(imported.count == 1)
         let wgModule = try #require(imported[0].modules.first as? WireGuardModule)
-        #expect(wgModule.configuration?.builder()?.interface.privateKey == "")
+        #expect(wgModule.configuration?.builder()?.interface.privateKey == BackupManager.redactedKey)
+    }
+
+    @Test
+    func givenUnencryptedExport_whenImport_thenModulesStayActive() async throws {
+        let sut = BackupManager()
+        let profile = try wireGuardProfile()
+        let archive = try await sut.exportArchive(from: [profile], passphrase: nil)
+        let imported = try await sut.importArchive(archive, passphrase: nil)
+        let wgModule = try #require(imported[0].modules.first as? WireGuardModule)
+        #expect(imported[0].activeModulesIds.contains(wgModule.id))
     }
 
     @Test

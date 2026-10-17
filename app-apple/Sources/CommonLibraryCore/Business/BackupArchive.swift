@@ -131,6 +131,9 @@ public struct ZipBackupArchiveCoder: BackupArchiveCoding {
             let extraLength = Int(data.u16LE(at: cursor + 30))
             let commentLength = Int(data.u16LE(at: cursor + 32))
             let localOffset = Int(data.u32LE(at: cursor + 42))
+            guard cursor + 46 + nameLength <= data.count else {
+                throw BackupError.corruptedArchive
+            }
             guard let name = String(
                 data: data.subdata(in: (cursor + 46)..<(cursor + 46 + nameLength)),
                 encoding: .utf8
@@ -148,7 +151,11 @@ public struct ZipBackupArchiveCoder: BackupArchiveCoding {
                 throw BackupError.corruptedArchive
             }
             entries.append(BackupEntry(name: name, data: content))
-            cursor += 46 + nameLength + extraLength + commentLength
+            let stride = 46 + nameLength + extraLength + commentLength
+            guard cursor + stride <= data.count else {
+                throw BackupError.corruptedArchive
+            }
+            cursor += stride
         }
         return entries
     }
@@ -198,7 +205,7 @@ private extension ZipBackupArchiveCoder {
 // MARK: - CRC-32 (IEEE 802.3, as required by the ZIP format)
 
 enum CRC32 {
-    static func checksum(of data: Data) -> UInt32 {
+    private static let table: [UInt32] = {
         var table: [UInt32] = []
         table.reserveCapacity(256)
         for i in 0..<256 {
@@ -212,7 +219,10 @@ enum CRC32 {
             }
             table.append(value)
         }
+        return table
+    }()
 
+    static func checksum(of data: Data) -> UInt32 {
         var checksum: UInt32 = 0xffff_ffff
         for byte in data {
             checksum = table[Int((checksum ^ UInt32(byte)) & 0xff)] ^ (checksum >> 8)

@@ -140,6 +140,82 @@ struct WireGuardQuickParserTests {
     }
 
     @Test
+    func givenFieldsBeforePublicKey_whenParse_thenFieldsAttachToTheirPeer() throws {
+        let contents = """
+        [Interface]
+        PrivateKey = \(Self.privateKey)
+
+        [Peer]
+        AllowedIPs = 10.0.0.0/24
+        Endpoint = first.example.com:51820
+        PublicKey = \(Self.peerKey)
+        PresharedKey = \(Self.presharedKey)
+        PersistentKeepalive = 25
+        """
+        let builder = try sut.configurationBuilder(fromContents: contents)
+        #expect(builder.peers.count == 1)
+        let peer = try #require(builder.peers.first)
+        #expect(peer.publicKey == Self.peerKey)
+        #expect(peer.preSharedKey == Self.presharedKey)
+        #expect(peer.allowedIPs == ["10.0.0.0/24"])
+        #expect(peer.endpoint == "first.example.com:51820")
+        #expect(peer.keepAlive == 25)
+    }
+
+    @Test
+    func givenMultiplePeersWithTrailingFields_whenParse_thenFieldsAttachToCorrectPeer() throws {
+        let otherKey = base64Key(0x44)
+        let contents = """
+        [Interface]
+        PrivateKey = \(Self.privateKey)
+
+        [Peer]
+        PublicKey = \(Self.peerKey)
+        Endpoint = first.example.com:51820
+
+        [Peer]
+        PublicKey = \(otherKey)
+        Endpoint = second.example.com:51820
+        """
+        let builder = try sut.configurationBuilder(fromContents: contents)
+        #expect(builder.peers.count == 2)
+        #expect(builder.peers[0].endpoint == "first.example.com:51820")
+        #expect(builder.peers[1].endpoint == "second.example.com:51820")
+    }
+
+    @Test
+    func givenDomainOnlyDNS_whenParse_thenUsesFallbackServers() throws {
+        let contents = """
+        [Interface]
+        PrivateKey = \(Self.privateKey)
+        DNS = example.com, other.example.org
+
+        [Peer]
+        PublicKey = \(Self.peerKey)
+        """
+        let builder = try sut.configurationBuilder(fromContents: contents)
+        let dns = try #require(builder.interface.dns)
+        #expect(!dns.servers.isEmpty)
+        #expect(dns.domains == ["example.com", "other.example.org"])
+    }
+
+    @Test
+    func givenHexLikeDomain_whenParse_thenTreatedAsDomain() throws {
+        let contents = """
+        [Interface]
+        PrivateKey = \(Self.privateKey)
+        DNS = cafe.de
+
+        [Peer]
+        PublicKey = \(Self.peerKey)
+        """
+        let builder = try sut.configurationBuilder(fromContents: contents)
+        let dns = try #require(builder.interface.dns)
+        #expect(dns.servers == ["1.1.1.1", "8.8.8.8"])
+        #expect(dns.domains == ["cafe.de"])
+    }
+
+    @Test
     func givenNoPeers_whenParse_thenThrows() {
         let contents = """
         [Interface]

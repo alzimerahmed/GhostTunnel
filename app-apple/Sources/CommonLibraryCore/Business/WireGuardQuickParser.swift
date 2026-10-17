@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import Foundation
+import Partout
 
 /// Parses a wg-quick configuration (the INI text typically encoded in
 /// WireGuard QR codes) into a Partout `WireGuardModule`.
@@ -34,6 +35,24 @@ public struct WireGuardQuickParser: Sendable {
         var peers: [WireGuard.RemoteInterface.Builder] = []
         var peerKeys = Set<String>()
         var section: Section?
+        // Peer fields buffered until they can be attributed to a peer:
+        // merged when `PublicKey` arrives (fields before it) or when the
+        // section ends (fields after it), so field order does not matter.
+        var pendingPeer = PendingPeer()
+        var hasPendingPeer = false
+        var peerSeenInCurrentSection = false
+
+        func flushPendingPeer() {
+            guard hasPendingPeer else {
+                return
+            }
+            if peerSeenInCurrentSection, !peers.isEmpty {
+                peers[peers.count - 1].merge(pendingPeer)
+            }
+            pendingPeer = PendingPeer()
+            hasPendingPeer = false
+            peerSeenInCurrentSection = false
+        }
 
         for rawLine in contents.lines {
             let line = rawLine.trimmingCharacters(in: .whitespaces)
@@ -46,11 +65,14 @@ public struct WireGuardQuickParser: Sendable {
                     guard !hasInterface else {
                         throw ABI.AppError.importError(message: Strings.multipleInterfaces)
                     }
+                    flushPendingPeer()
                     hasInterface = true
                     section = .interface
                 case "peer":
+                    flushPendingPeer()
                     section = .peer
                 default:
+                    flushPendingPeer()
                     section = nil
                 }
                 continue
@@ -79,8 +101,14 @@ public struct WireGuardQuickParser: Sendable {
                     addresses = parsedList(value)
                 case "dns":
                     let entries = parsedList(value)
-                    let servers = entries.filter(Self.isIPAddressLike)
-                    let domains = entries.filter { !Self.isIPAddressLike($0) }
+                    var servers = entries.filter(Self.isIPAddress)
+                    let domains = entries.filter { !Self.isIPAddress($0) }
+                    // A domain-only DNS line would make `DNSModule.build()`
+                    // throw `emptyServers`; fall back to public resolvers
+                    // while keeping the search domains.
+                    if servers.isEmpty, !domains.isEmpty {
+                        servers = Self.defaultDNSServers
+                    }
                     dns = DNSModule.Builder(
                         servers: servers,
                         domains: domains.nilIfEmpty
@@ -102,40 +130,38 @@ public struct WireGuardQuickParser: Sendable {
                     guard peerKeys.insert(value).inserted else {
                         throw ABI.AppError.importError(message: Strings.duplicatedPublicKey)
                     }
-                    peers.append(WireGuard.RemoteInterface.Builder(publicKey: value))
+                    var peer = WireGuard.RemoteInterface.Builder(publicKey: value)
+                    peer.merge(pendingPeer)
+                    peers.append(peer)
+                    pendingPeer = PendingPeer()
+                    hasPendingPeer = false
+                    peerSeenInCurrentSection = true
 
                 case "presharedkey", "allowedips", "endpoint", "persistentkeepalive":
-                    guard !peers.isEmpty else {
-                        // Key before any PublicKey: ignore the stray line.
-                        break
-                    }
-                    var lastPeer = peers.removeLast()
+                    hasPendingPeer = true
                     switch key {
                     case "presharedkey":
                         try validateBase64Key(value, message: Strings.invalidPresharedKey)
-                        lastPeer.preSharedKey = value
+                        pendingPeer.preSharedKey = value
                     case "allowedips":
-                        lastPeer.allowedIPs = parsedList(value)
+                        pendingPeer.allowedIPs = parsedList(value)
                     case "endpoint":
-                        lastPeer.endpoint = value
+                        pendingPeer.endpoint = value
                     case "persistentkeepalive":
                         guard let keepAlive = UInt16(value) else {
                             throw ABI.AppError.importError(message: Strings.invalidKeepAlive)
                         }
-                        lastPeer.keepAlive = keepAlive
+                        pendingPeer.keepAlive = keepAlive
                     default:
                         break
                     }
-                    peers.append(lastPeer)
 
                 default:
                     break
                 }
-
-            case .none:
-                break
             }
         }
+        flushPendingPeer()
 
         guard hasInterface else {
             throw ABI.AppError.importError(message: Strings.noInterface)
@@ -164,6 +190,17 @@ private extension WireGuardQuickParser {
         case interface
 
         case peer
+    }
+
+    /// Per-peer fields buffered until the peer's `PublicKey` line arrives.
+    struct PendingPeer {
+        var preSharedKey: String?
+
+        var endpoint: String?
+
+        var allowedIPs: [String] = []
+
+        var keepAlive: UInt16?
     }
 
     enum Strings {
@@ -196,15 +233,24 @@ private extension WireGuardQuickParser {
         }
     }
 
-    /// Heuristic IP check: an IP literal only contains hex digits and
-    /// separators. Domain names with hex-only labels ("cafe.com") are a
-    /// known misclassification edge case, mitigated by the fact that
-    /// `DNSModule` tolerates hostname servers.
-    static func isIPAddressLike(_ entry: String) -> Bool {
-        let allowed = CharacterSet(charactersIn: "0123456789abcdefABCDEF.:")
-        guard !entry.isEmpty, entry.unicodeScalars.allSatisfy({ allowed.contains($0) }) else {
+    /// Real IP-literal check via Partout's `Address` parser, so that
+    /// domain names like "cafe.de" are never misclassified as IPs.
+    static func isIPAddress(_ entry: String) -> Bool {
+        guard let address = Address(rawValue: entry) else {
             return false
         }
-        return entry.contains(".") || entry.contains(":")
+        return address.isIPAddress
+    }
+
+    /// Fallback resolvers for domain-only `DNS =` lines.
+    static let defaultDNSServers = ["1.1.1.1", "8.8.8.8"]
+}
+
+private extension WireGuard.RemoteInterface.Builder {
+    mutating func merge(_ pending: WireGuardQuickParser.PendingPeer) {
+        preSharedKey = pending.preSharedKey
+        endpoint = pending.endpoint
+        allowedIPs = pending.allowedIPs
+        keepAlive = pending.keepAlive
     }
 }
