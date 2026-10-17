@@ -201,7 +201,7 @@ private extension AppContext {
     func dispatch(_ event: ABI.Event) {
         switch event {
         case .config(let event):
-            configObservable.onUpdate(event)
+            configObservable.onUpdate(event, blocklistMetadata: configManager.blocklistMetadata)
         case .iap(let event):
             iapObservable.onUpdate(event)
         case .mixed:

@@ -51,13 +51,7 @@ struct GitHubConfigStrategyTests {
             "data": {
               "schema": "ghosttunnel-blocklist-v1",
               "name": "GhostTunnel Basic",
-              "sources": [
-                {
-                  "url": "https://raw.githubusercontent.com/alzimerahmed84/ghosttunnel-config/main/blocklists/basic.txt",
-                  "format": "hosts",
-                  "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
-                }
-              ],
+              "sources": [],
               "dohEndpoints": []
             }
           }

@@ -20,6 +20,10 @@ extension ABI.ConfigEvent {
     public struct Refresh: ABI.EventProtocol {
         public let flags: Set<ABI.ConfigFlag>
         public let data: [ABI.ConfigFlag: JSON]
+        public init(flags: Set<ABI.ConfigFlag>, data: [ABI.ConfigFlag: JSON]) {
+            self.flags = flags
+            self.data = data
+        }
         public func encode(to encoder: Encoder) throws {
             var container = encoder.singleValueContainer()
             try container.encode(OpenAPIConfigEventRefresh(

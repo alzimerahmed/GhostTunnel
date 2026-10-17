@@ -20,6 +20,8 @@ public final class ConfigManager {
                 synchronousActiveFlags = Set(ABI.ConfigFlag.allCases.filter {
                     isActive($0)
                 })
+                synchronousBlocklistMetadata = bundle?.blocklistMetadata?.isActive(withBuild: buildNumber) == true
+                    ? bundle?.blocklistMetadata?.data : nil
                 let data = bundle?.map
                     .filter { synchronousActiveFlags.contains($0.key) }
                     .compactMapValues(\.data) ?? [:]
@@ -33,6 +35,9 @@ public final class ConfigManager {
 
     nonisolated(unsafe)
     private var synchronousActiveFlags: Set<ABI.ConfigFlag> = []
+
+    nonisolated(unsafe)
+    private var synchronousBlocklistMetadata: JSON?
 
     private var isPending = false
 
@@ -88,6 +93,10 @@ public final class ConfigManager {
         queue.sync {
             synchronousActiveFlags
         }
+    }
+
+    public nonisolated var blocklistMetadata: JSON? {
+        queue.sync { synchronousBlocklistMetadata }
     }
 }
 

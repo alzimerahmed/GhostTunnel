@@ -10,10 +10,12 @@ import Observation
 public final class ConfigObservable {
     public private(set) var activeFlags: Set<ABI.ConfigFlag>
     public private(set) var allData: [ABI.ConfigFlag: JSON]
+    public private(set) var blocklistCatalog: BlocklistCatalog?
 
     public init() {
         activeFlags = []
         allData = [:]
+        blocklistCatalog = nil
     }
 
     public func isActive(_ flag: ABI.ConfigFlag) -> Bool {
@@ -24,12 +26,13 @@ public final class ConfigObservable {
         allData[flag]
     }
 
-    func onUpdate(_ event: ABI.ConfigEvent) {
+    func onUpdate(_ event: ABI.ConfigEvent, blocklistMetadata: JSON? = nil) {
         pspLog(.core, .debug, "ConfigObservable.onUpdate(): \(event)")
         switch event {
         case .refresh(let payload):
             activeFlags = payload.flags
             allData = payload.data
+            blocklistCatalog = BlocklistCatalog.decode(blocklistMetadata)
         }
     }
 }

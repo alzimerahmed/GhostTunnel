@@ -52,6 +52,50 @@ extension ProfileEditorTests {
     }
 
     @Test
+    func givenProfileEditor_whenEnforcingTunnel_thenPropagatesIncludesAllNetworks() throws {
+        var wg = WireGuardModule.Builder(configurationBuilder: .default)
+        wg.configurationBuilder?.peers = [.init(publicKey: "")]
+        let onDemand = OnDemandModule.Builder()
+        var behavior = ProfileBehavior()
+        behavior.disconnectsOnSleep = true
+        let profile = try Profile.Builder(
+            name: "Enforced tunnel",
+            modules: [try wg.build(), onDemand.build()],
+            activeModulesIds: [wg.id, onDemand.id],
+            behavior: behavior
+        ).build()
+        let sut = ProfileEditor(profile: profile)
+
+        sut.enforceTunnel = true
+        #expect(sut.profile.includesAllNetworks)
+        let builtProfile = try sut.build(with: nil, updating: false)
+        #expect(builtProfile.includesAllNetworks)
+        #expect(builtProfile.disconnectsOnSleep)
+        #expect(builtProfile.modules.contains { $0 is WireGuardModule })
+        #expect(builtProfile.modules.contains { $0 is OnDemandModule })
+        #expect(builtProfile.activeModulesIds == [wg.id, onDemand.id])
+
+        sut.enforceTunnel = false
+        #expect(!sut.profile.includesAllNetworks)
+        let builtProfileWithoutEnforcement = try sut.build(with: nil, updating: false)
+        #expect(!builtProfileWithoutEnforcement.includesAllNetworks)
+        #expect(builtProfileWithoutEnforcement.disconnectsOnSleep)
+        #expect(builtProfileWithoutEnforcement.modules.contains { $0 is WireGuardModule })
+        #expect(builtProfileWithoutEnforcement.modules.contains { $0 is OnDemandModule })
+        #expect(builtProfileWithoutEnforcement.activeModulesIds == [wg.id, onDemand.id])
+    }
+
+    @Test
+    func givenProfileWithoutBehavior_whenEnforcingTunnel_thenCreatesBehavior() {
+        let sut = ProfileEditor()
+        #expect(sut.profile.behavior == nil)
+
+        sut.enforceTunnel = true
+
+        #expect(sut.profile.behavior?.includesAllNetworks == true)
+    }
+
+    @Test
     func givenProfileWithModules_thenExcludesModuleTypes() {
         let sut = ProfileEditor(modules: [
             DNSModule.Builder(),

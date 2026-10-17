@@ -52,23 +52,26 @@ private extension OnDemandView {
         policySection
         if draft.module.policy != .any {
             networkSection
+            trustedWiFiExplanation
             wifiSection
         }
     }
 
     var policySection: some View {
-        Picker(selection: $draft.module.policy) {
-            ForEach(allPolicies, id: \.self) {
-                Text($0.localizedDescription)
-            }
-        } label: {
-            HStack {
+        HStack {
+            Picker(selection: $draft.module.policy) {
+                ForEach(allPolicies, id: \.self) {
+                    Text($0.localizedDescription)
+                }
+            } label: {
                 Text(Strings.Modules.OnDemand.policy)
-                PurchaseRequiredView(
-                    for: draft.module,
-                    reason: $paywallReason
-                )
             }
+            .accessibilityLabel(Strings.Modules.OnDemand.policy)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            PurchaseRequiredView(
+                for: draft.module,
+                reason: $paywallReason
+            )
         }
         .themeContainerWithSingleEntry(footer: policyFooterDescription)
     }
@@ -105,7 +108,7 @@ private extension OnDemandView {
 
     var wifiSection: some View {
         theme.listSection(
-            Strings.Unlocalized.wifi,
+            wifiSectionTitle,
             addTitle: Strings.Modules.OnDemand.Ssid.add,
             originalItems: allSSIDs,
             emptyValue: {
@@ -117,25 +120,92 @@ private extension OnDemandView {
             },
             itemLabel: { isEditing, binding in
                 if isEditing {
-                    Text(binding.wrappedValue)
+                    Text(trimmedSSID(binding.wrappedValue).isEmpty
+                        ? AppLibraryMainLocalization.string("modules.on_demand.trusted_wifi.empty_ssid", fallback: "Wi-Fi network")
+                        : binding.wrappedValue
+                    )
                 } else {
                     HStack {
                         ThemeTextField("", text: binding, placeholder: Strings.Placeholders.OnDemand.ssid)
                             .frame(maxWidth: .infinity)
+                            .accessibilityLabel(AppLibraryMainLocalization.string(
+                                "modules.on_demand.trusted_wifi.ssid_name",
+                                fallback: "Wi-Fi network name"
+                            ))
                         Spacer()
                         Toggle("", isOn: isSSIDOn(binding.wrappedValue))
+                            .disabled(trimmedSSID(binding.wrappedValue).isEmpty)
+                            .accessibilityLabel(trimmedSSID(binding.wrappedValue).isEmpty
+                                ? AppLibraryMainLocalization.string("modules.on_demand.trusted_wifi.empty_ssid", fallback: "Wi-Fi network")
+                                : binding.wrappedValue
+                            )
+                            .accessibilityHint(trimmedSSID(binding.wrappedValue).isEmpty
+                                ? AppLibraryMainLocalization.string(
+                                    "modules.on_demand.trusted_wifi.empty_ssid_hint",
+                                    fallback: "Enter a Wi-Fi network name before setting its rule."
+                                )
+                                : wifiToggleHint
+                            )
                     }
                     .labelsHidden()
                 }
             }
         )
     }
+
+    var trustedWiFiExplanation: some View {
+        Text(AppLibraryMainLocalization.string("modules.on_demand.trusted_wifi.explanation", fallback: "With “Including,” the VPN connects only on enabled Wi-Fi, mobile, or Ethernet networks. With “Excluding,” it connects everywhere except enabled Wi-Fi, mobile, or Ethernet networks."))
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+    }
+
+    func trimmedSSID(_ value: String) -> String {
+        value.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var wifiSectionTitle: String {
+        switch draft.module.policy {
+        case .excluding:
+            return AppLibraryMainLocalization.string("modules.on_demand.trusted_wifi.title", fallback: "Trusted Wi-Fi networks")
+        case .including:
+            return AppLibraryMainLocalization.string("modules.on_demand.trusted_wifi.included_title", fallback: "VPN-enabled Wi-Fi networks")
+        case .any:
+            return Strings.Unlocalized.wifi
+        @unknown default:
+            return Strings.Unlocalized.wifi
+        }
+    }
+
+    var wifiToggleHint: String {
+        switch draft.module.policy {
+        case .excluding:
+            return AppLibraryMainLocalization.string(
+                "modules.on_demand.trusted_wifi.excluded_hint",
+                fallback: "Selected networks are trusted and excluded from the VPN. The VPN connects on other networks."
+            )
+        case .including:
+            return AppLibraryMainLocalization.string(
+                "modules.on_demand.trusted_wifi.included_hint",
+                fallback: "The VPN connects on selected networks and disconnects elsewhere."
+            )
+        case .any:
+            return AppLibraryMainLocalization.string(
+                "modules.on_demand.trusted_wifi.toggle_hint",
+                fallback: "Choose whether this Wi-Fi network is included in the on-demand rule."
+            )
+        @unknown default:
+            return AppLibraryMainLocalization.string(
+                "modules.on_demand.trusted_wifi.toggle_hint",
+                fallback: "Choose whether this Wi-Fi network is included in the on-demand rule."
+            )
+        }
+    }
 }
 
 private extension OnDemandView {
     var allSSIDs: Binding<[String]> {
         .init {
-            Array(draft.module.withSSIDs.keys)
+            draft.module.withSSIDs.keys.sorted()
         } set: { newValue in
             draft.module.withSSIDs.forEach {
                 guard newValue.contains($0.key) else {

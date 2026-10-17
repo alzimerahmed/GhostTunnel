@@ -45,25 +45,55 @@ JSON before the enum catches up — the app ignores unknown keys.
 Activation rule (mirrors `ConfigBundle.isActive(withBuild:)`):
 `rate == 100 && (minBuild absent || build >= minBuild) && (platforms absent || contains platform)`.
 
-## `data` payload — future blocklist metadata (Phase 6)
+## `data` payload — blocklist metadata (Phase 6)
 
-`data` is the extension point for flag-scoped payloads. Phase 6 (DNS filtering)
-will distribute blocklist metadata through it, e.g.:
+The `ghosttunnelBlocklistMetadata` flag carries the DNS-filtering blocklist
+catalog in its `data` payload. The flag uses the standard `ConfigBundle.Config`
+fields (`rate`, `platforms`, `minBuild`) and is only surfaced to the app when
+the flag is active per the activation rule above. Its `data` object is decoded
+and validated by `BlocklistCatalog`
+(`app-apple/Sources/AppLibrary/Observables/BlocklistCatalog.swift`); any
+violation of the rules below causes the whole payload to be rejected (the app
+behaves as if no catalog were configured).
 
 ```json
-"data": {
-  "schema": "ghosttunnel-blocklist-v1",
-  "name": "GhostTunnel Basic",
-  "sources": [
-    { "url": "https://raw.githubusercontent.com/alzimerahmed84/ghosttunnel-config/main/blocklists/basic.txt", "format": "hosts", "sha256": "..." }
-  ],
-  "dohEndpoints": []
+"ghosttunnelBlocklistMetadata": {
+  "rate": 100,
+  "platforms": ["apple"],
+  "data": {
+    "schema": "ghosttunnel-blocklist-v1",
+    "name": "GhostTunnel Basic",
+    "sources": [],
+    "dohEndpoints": []
+  }
 }
 ```
 
-Blocklist payloads are metadata (URLs, hashes, names) — the lists themselves
-are fetched separately and are untrusted input. No telemetry: the app must
-fetch blocklists only when the user enables DNS filtering.
+### `data` fields
+
+| Field | Type | Required | Validation |
+|---|---|---|---|
+| `schema` | string | yes | Must be exactly `ghosttunnel-blocklist-v1`. |
+| `name` | string | yes | Non-empty after trimming whitespace. Display name for the catalog. |
+| `sources` | array of objects | yes | May be empty. Each entry: `url` (HTTPS URL with a host, no userinfo — no embedded username/password), `format` (must be `"hosts"`), `sha256` (exactly 64 hexadecimal characters — the expected digest of the hosts file). |
+| `dohEndpoints` | array of objects | yes | May be empty (means no filtering endpoint is offered). Each entry: `name` (non-empty after trimming whitespace — shown in the DNS settings picker), `url` (HTTPS URL with a host, no userinfo). Endpoint URLs must be unique. |
+
+### Current behavior and caveats
+
+- **Metadata only.** The app does not yet download hosts files or enforce
+  local DNS filtering from `sources[]`; the entries are validated so the
+  catalog format is stable, but no blocklist content is fetched or applied.
+- **DoH is explicit opt-in.** Configured `dohEndpoints` are listed as
+  selectable resolvers in the DNS module settings. DNS queries are sent to a
+  configured resolver only when the user explicitly selects it; until then the
+  VPN-provided DNS is used. Selecting a resolver sends that provider the
+  device's DNS queries — only list endpoints you trust.
+- **Do not configure a live third-party endpoint by default.** The shipped
+  sample (`config/example.json`) keeps `dohEndpoints` empty; any real endpoint
+  is an operational decision, not a default.
+- `scripts/validate-config.sh` enforces the same rules (schema value,
+  non-empty names, HTTPS/no-userinfo URLs, `format: hosts`, 64-hex `sha256`)
+  on any bundle containing `ghosttunnelBlocklistMetadata`.
 
 ## Validation
 

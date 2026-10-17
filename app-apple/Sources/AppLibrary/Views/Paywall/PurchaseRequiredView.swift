@@ -110,6 +110,7 @@ public struct PurchaseRequiredButton: View {
         }
         .buttonStyle(.plain)
         .cursor(.hand)
+        .accessibilityLabel(Strings.Views.Ui.PurchaseRequired.Purchase.help)
     }
 }
 
@@ -121,6 +122,7 @@ public struct PurchaseRequiredImage: View {
         ThemeImage(.upgrade)
             .foregroundStyle(theme.upgradeColor)
             .help(Strings.Views.Ui.PurchaseRequired.Purchase.help)
+            .accessibilityLabel(Strings.Views.Ui.PurchaseRequired.Purchase.help)
             .imageScale(.large)
 #if os(iOS)
             .padding(.leading, 4)
