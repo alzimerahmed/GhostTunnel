@@ -23,6 +23,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import com.algoritmico.passepartout.R
 import com.algoritmico.passepartout.models.AppProfileHeader
 import com.algoritmico.passepartout.models.AppProfileStatus
 import com.algoritmico.passepartout.models.ProfileTransfer
@@ -42,9 +46,11 @@ fun ProfileRow(
     transfer: ProfileTransfer?,
     lastErrorCode: String?,
     isSelected: Boolean,
+    isOnDemandEnabled: Boolean = false,
     onProfileSelected: (String) -> Unit,
     onProfileToggle: (String, Boolean) -> Unit,
-    onProfileContextualAction: (String) -> Unit
+    onProfileContextualAction: (String) -> Unit,
+    onProfileOnDemandToggle: (String, Boolean) -> Unit = { _, _ -> }
 ) {
     val theme = LocalTheme.current
     val showsTransfer = lastErrorCode == null && status == AppProfileStatus.connected && transfer != null
@@ -125,6 +131,47 @@ fun ProfileRow(
                 }
             )
         }
+
+        OnDemandToggleRow(
+            profileId = header.id,
+            isEnabled = isOnDemandEnabled,
+            onProfileOnDemandToggle = onProfileOnDemandToggle
+        )
+    }
+}
+
+@Composable
+private fun OnDemandToggleRow(
+    profileId: String,
+    isEnabled: Boolean,
+    onProfileOnDemandToggle: (String, Boolean) -> Unit
+) {
+    val theme = LocalTheme.current
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = theme.spacing.large,
+                vertical = theme.spacing.xSmall
+            ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.global_nouns_on_demand),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(1f)
+        )
+        val onDemandLabel = stringResource(R.string.global_nouns_on_demand)
+        Switch(
+            checked = isEnabled,
+            onCheckedChange = { isEnabled ->
+                onProfileOnDemandToggle(profileId, isEnabled)
+            },
+            modifier = Modifier.semantics {
+                contentDescription = onDemandLabel
+            }
+        )
     }
 }
 

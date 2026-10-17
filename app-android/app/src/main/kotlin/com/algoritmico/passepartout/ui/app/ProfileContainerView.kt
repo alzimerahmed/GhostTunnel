@@ -31,7 +31,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.algoritmico.passepartout.R
+import com.algoritmico.passepartout.business.extensions.isOnDemandEnabled
 import com.algoritmico.passepartout.business.extensions.runCatchingNonFatal
+import com.algoritmico.passepartout.business.extensions.withOnDemandDisabled
+import com.algoritmico.passepartout.business.extensions.withOnDemandEnabled
+import com.algoritmico.passepartout.business.managers.ProfileManagerException
 import com.algoritmico.passepartout.models.AppProfileStatus
 import com.algoritmico.passepartout.models.AppTunnelInfo
 import com.algoritmico.passepartout.models.ProfileTransfer
@@ -101,6 +105,27 @@ fun ProfileContainerView(
 
     fun profileLastErrorCode(profileId: String): String? {
         return activeProfiles[profileId]?.lastErrorCode
+    }
+
+    fun isProfileOnDemand(profileId: String): Boolean {
+        return profileObservable.profile(profileId)?.isOnDemandEnabled ?: false
+    }
+
+    fun setProfileOnDemand(profileId: String, isEnabled: Boolean) {
+        coroutineScope.launch {
+            runCatchingNonFatal {
+                val profile = profileObservable.profile(profileId)
+                    ?: throw ProfileManagerException.NotFound(profileId)
+                val updatedProfile = if (isEnabled) {
+                    profile.withOnDemandEnabled()
+                } else {
+                    profile.withOnDemandDisabled()
+                }
+                profileObservable.save(updatedProfile)
+            }.onFailure {
+                errorHandler.report(it)
+            }
+        }
     }
 
     fun requestProfileConnection(
@@ -250,14 +275,21 @@ fun ProfileContainerView(
                 profileLastErrorCode(it.id)?.let { lastErrorCode ->
                     it.id to lastErrorCode
                 }
-            }.toMap()
+            }.toMap(),
+            onDemandProfileIds = headers
+                .map { it.id }
+                .filter(::isProfileOnDemand)
+                .toSet()
         ),
         actions = ProfileContainerActions(
             onProfileSelected = onProfileSelected,
             onProfileToggle = { profileId, enabled ->
                 requestProfileConnection(profileId, enabled)
             },
-            onProfileContextualAction = onProfileContextualAction
+            onProfileContextualAction = onProfileContextualAction,
+            onProfileOnDemandToggle = { profileId, isEnabled ->
+                setProfileOnDemand(profileId, isEnabled)
+            }
         )
     )
 }

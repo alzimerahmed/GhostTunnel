@@ -100,6 +100,10 @@ class ProfileObservable(
         manager.importText(text, filename)
     }
 
+    suspend fun save(profile: TaggedProfile) {
+        manager.save(profile)
+    }
+
     suspend fun remove(profileId: String) {
         manager.remove(profileId)
     }

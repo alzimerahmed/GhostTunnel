@@ -39,12 +39,18 @@ jobs:
             suite: cross
             runner: ubuntu-latest
             timeout_minutes: 2
+          - name: Android checks
+            suite: android
+            runner: ubuntu-latest
+            timeout_minutes: 45
           - name: Config checks
             suite: config
             runner: ubuntu-latest
             timeout_minutes: 2
     steps:
       - uses: actions/checkout@v6
+        with:
+          submodules: recursive
 
       - uses: partout-io/action-prepare-xcode-build@master
         if: matrix.suite == 'apple' || matrix.suite == 'apple-build' || matrix.suite == 'partout'
@@ -53,7 +59,42 @@ jobs:
           submodules: true
 
       - uses: partout-io/setup-zig@main
-        if: matrix.suite == 'partout'
+        if: matrix.suite == 'partout' || matrix.suite == 'android'
+
+      - uses: actions/setup-go@v7
+        if: matrix.suite == 'android'
+        with:
+          go-version: 1.24
+          # cache: false — a cache-dependency-path glob that resolves to
+          # zero files hard-fails setup-go; whether partout/src has go.sum
+          # on the pinned commit is not verifiable statically.
+          cache: false
+
+      - uses: actions/setup-java@v6
+        if: matrix.suite == 'android'
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - uses: android-actions/setup-android@v4
+        if: matrix.suite == 'android'
+        with:
+          packages: platform-tools
+
+      - name: Install Android SDK components
+        if: matrix.suite == 'android'
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager \
+            "platforms;android-36" \
+            "build-tools;36.0.0" \
+            "cmake;4.1.2" \
+            "ndk;29.0.14206865"
+
+      - name: Run Android checks
+        if: matrix.suite == 'android'
+        run: bash app-android/ci/run-checks.sh
 
       - uses: actions/setup-node@v6
         if: matrix.suite == 'api'
