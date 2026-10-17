@@ -134,6 +134,13 @@ extension SettingsCoordinator {
         }
     }
 
+    var speedTestProfile: Profile? {
+        guard let activeProfileId = tunnel.activeProfile?.id else {
+            return nil
+        }
+        return profileObservable.profile(withId: activeProfileId)
+    }
+
     @ViewBuilder
     func pushDestination(for item: DiagnosticsRoute?) -> some View {
         switch item {
@@ -164,6 +171,25 @@ extension SettingsCoordinator {
                 )
                 .navigationTitle(title)
             }
+
+        case .leakTest:
+            LeakTestView()
+                .navigationTitle(AppLibraryMainLocalization.string(
+                    "views.diagnostics.leak_test.title",
+                    fallback: "Leak test"
+                ))
+
+        case .speedTest:
+            SpeedTestView(
+                profile: speedTestProfile,
+                onSave: { profile in
+                    try await profileObservable.save(profile)
+                }
+            )
+            .navigationTitle(AppLibraryMainLocalization.string(
+                "views.diagnostics.speed_test.title",
+                fallback: "Speed test"
+            ))
 
         default:
             Text(Strings.Global.Nouns.noSelection)

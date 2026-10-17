@@ -10,4 +10,8 @@ enum DiagnosticsRoute: Hashable {
     case profile(ABI.AppProfileHeader)
 
     case tunnelLog(title: String, url: URL?)
+
+    case leakTest
+
+    case speedTest
 }

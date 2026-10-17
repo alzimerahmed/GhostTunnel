@@ -37,12 +37,21 @@ struct DiagnosticsView: View {
     @State
     var isPresentingUnableToEmail = false
 
+    @State
+    private var isExportingDebugBundle = false
+
+    @State
+    private var debugBundleURL: URL?
+
     var body: some View {
         Form {
             if iapObservable.isBeta {
                 BetaSection()
             }
             liveLogSection
+            leakTestSection
+            speedTestSection
+            debugBundleSection
             togglesSection
             profilesSection
             if appConfiguration.bundle.distributionTarget.supportsAppGroups {
@@ -87,6 +96,96 @@ private extension DiagnosticsView {
             LogsPrivateDataToggle()
         }
         .themeContainer()
+    }
+
+    var leakTestSection: some View {
+        NavigationLink(
+            localizedString("views.diagnostics.leak_test.title", fallback: "Leak test"),
+            value: DiagnosticsRoute.leakTest
+        )
+        .themeSection(header: localizedString(
+            "views.diagnostics.sections.leak_test",
+            fallback: "Leak test"
+        ))
+    }
+
+    var speedTestSection: some View {
+        NavigationLink(
+            localizedString("views.diagnostics.speed_test.title", fallback: "Speed test"),
+            value: DiagnosticsRoute.speedTest
+        )
+        .themeSection(header: localizedString(
+            "views.diagnostics.sections.speed_test",
+            fallback: "Speed test"
+        ))
+    }
+
+    var debugBundleSection: some View {
+        Group {
+            if let debugBundleURL {
+#if !os(tvOS)
+                ShareLink(item: debugBundleURL) {
+                    Label {
+                        Text(localizedString(
+                            "views.diagnostics.debug_bundle.export",
+                            fallback: "Export debug bundle"
+                        ))
+                    } icon: {
+                        ThemeImage(.share)
+                    }
+                }
+#endif
+            } else {
+                Button {
+                    exportDebugBundle()
+                } label: {
+                    Text(localizedString(
+                        "views.diagnostics.debug_bundle.export",
+                        fallback: "Export debug bundle"
+                    ))
+                }
+                .disabled(isExportingDebugBundle)
+            }
+            Text(localizedString(
+                "views.diagnostics.debug_bundle.subtitle",
+                fallback: "Sanitized logs and tunnel state. Key material is redacted; nothing is sent anywhere unless you share the file."
+            ))
+            .font(.footnote)
+            .foregroundStyle(theme.valueColor)
+        }
+        .themeSection(
+            header: localizedString("views.diagnostics.sections.debug_bundle", fallback: "Debug bundle")
+        )
+    }
+
+    func localizedString(_ key: String, fallback: String) -> String {
+        AppLibraryMainLocalization.string(key, fallback: fallback)
+    }
+
+    func exportDebugBundle() {
+        isExportingDebugBundle = true
+        Task {
+            defer {
+                isExportingDebugBundle = false
+            }
+            var sections: [DebugBundleSection] = []
+            let appLogLines = pspLogCurrent(appConfiguration.constants.log)
+            sections.append(DebugBundleSection(name: "App log", lines: appLogLines))
+            let tunnelLogLines = await tunnel.currentLog()
+            sections.append(DebugBundleSection(name: "Tunnel log (current)", lines: tunnelLogLines))
+            sections.append(DebugBundleSection(name: "Tunnel state", lines: tunnelStateLines))
+            debugBundleURL = try? DebugBundleBuilder.write(sections: sections)
+        }
+    }
+
+    var tunnelStateLines: [String] {
+        tunnel.activeProfiles.values.map { info in
+            var line = "profile=\(info.id) status=\(info.status.rawValue) onDemand=\(info.onDemand)"
+            if let transfer = info.transfer {
+                line += " received=\(transfer.received) sent=\(transfer.sent)"
+            }
+            return line
+        }
     }
 
     var profilesSection: some View {

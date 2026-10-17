@@ -51,6 +51,22 @@
 "views.diagnostics.report_issue.title" = "Report issue";
 "views.diagnostics.alerts.report_issue.email" = "The device is not configured to send e-mails.";
 
+"views.diagnostics.sections.leak_test" = "Leak test";
+"views.diagnostics.sections.speed_test" = "Speed test";
+"views.diagnostics.sections.debug_bundle" = "Debug bundle";
+"views.diagnostics.leak_test.title" = "Leak test";
+"views.diagnostics.leak_test.subtitle" = "Checks your public IP and DNS resolution from this device only. Results are never stored or sent anywhere.";
+"views.diagnostics.leak_test.run" = "Run leak test";
+"views.diagnostics.leak_test.public_ip" = "Public IP";
+"views.diagnostics.speed_test.title" = "Speed test";
+"views.diagnostics.speed_test.subtitle" = "Measures the latency of each endpoint in the active profile. Probes connect to the endpoints themselves and send no other data.";
+"views.diagnostics.speed_test.run" = "Run speed test";
+"views.diagnostics.speed_test.apply" = "Use fastest server";
+"views.diagnostics.speed_test.no_endpoints" = "The active profile has no multi-server endpoints to test.";
+"views.diagnostics.speed_test.error.title" = "Unable to apply";
+"views.diagnostics.debug_bundle.export" = "Export debug bundle";
+"views.diagnostics.debug_bundle.subtitle" = "Sanitized logs and tunnel state. Key material is redacted; nothing is sent anywhere unless you share the file.";
+
 "views.donate.title" = "Make a donation";
 "views.donate.sections.main.footer" = "If you want to display gratitude for my work, here are a couple of amounts you can donate instantly. You will only be charged once per donation, and you can donate multiple times.";
 "views.donate.alerts.thank_you.message" = "This means a lot to me and I really hope you keep using and promoting this app.";
