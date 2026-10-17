@@ -184,13 +184,67 @@ struct SpeedTestManagerTests {
             try ExtendedEndpoint("9.9.9.9", .init(.udp, 53))
         ]
         let results = [
-            ProbeResult(target: ProbeTarget(id: "5.6.7.8:443", host: "5.6.7.8", port: 443, usesTCP: true), latency: 0.05),
-            ProbeResult(target: ProbeTarget(id: "9.9.9.9:53", host: "9.9.9.9", port: 53, usesTCP: false), latency: 0.2),
-            ProbeResult(target: ProbeTarget(id: "1.2.3.4:1194", host: "1.2.3.4", port: 1194, usesTCP: false), latency: nil, error: "timeout")
+            ProbeResult(target: remotes[1].probeTarget, latency: 0.05),
+            ProbeResult(target: remotes[2].probeTarget, latency: 0.2),
+            ProbeResult(target: remotes[0].probeTarget, latency: nil, error: "timeout")
         ]
         let reordered = ExtendedEndpoint.reorderedByLatency(remotes, results: results)
         #expect(reordered[0].address.rawValue == "5.6.7.8")
         #expect(reordered[1].address.rawValue == "9.9.9.9")
         #expect(reordered[2].address.rawValue == "1.2.3.4")
+    }
+
+    // MARK: probeKey
+
+    @Test
+    func givenSameHostPortWithDifferentSocketTypes_whenProbeKey_thenKeysDiffer() throws {
+        let udp = try ExtendedEndpoint("1.2.3.4", .init(.udp, 1194))
+        let tcp = try ExtendedEndpoint("1.2.3.4", .init(.tcp, 1194))
+        // Regression: same host:port over udp and tcp must be two distinct
+        // probe targets, not one colliding key.
+        #expect(udp.probeKey != tcp.probeKey)
+        #expect(udp.probeTarget.id != tcp.probeTarget.id)
+        #expect(udp.probeTarget.usesTCP == false)
+        #expect(tcp.probeTarget.usesTCP == true)
+    }
+
+    // MARK: Re-entrancy
+
+    @Test
+    func givenRunningTest_whenTestRunsAgain_thenOnlyLatestResultsArePublished() async {
+        let slowScheduler = ProbeScheduler(probe: MockProbe(delay: 0.5), maxConcurrent: 1, timeout: 5)
+        let fastScheduler = ProbeScheduler(probe: MockProbe(delay: 0.01), maxConcurrent: 1, timeout: 5)
+        let manager = SpeedTestManager()
+        let firstTask = Task {
+            await manager.test([target("slow")], scheduler: slowScheduler)
+        }
+        // Give the first run a head start, then supersede it.
+        try? await Task.sleep(for: .seconds(0.05))
+        await manager.test([target("fast")], scheduler: fastScheduler)
+        _ = await firstTask.result
+        #expect(!manager.isRunning)
+        #expect(manager.results.count == 1)
+        #expect(manager.results.first?.target.id == "fast")
+    }
+
+    // MARK: Timeout bounds the wall clock
+
+    @Test
+    func givenHungProbe_whenSchedulerTimeoutElapses_thenRunReturnsBounded() async {
+        // A probe that ignores cancellation (like getaddrinfo on a detached
+        // task): the old task-group-based timeout would hang on it.
+        struct UninterruptibleProbe: LatencyProbe {
+            func probe(host: String, port: UInt16, usesTCP: Bool) async throws -> TimeInterval {
+                try? await Task.sleep(for: .seconds(30))
+                return 0.1
+            }
+        }
+        let scheduler = ProbeScheduler(probe: UninterruptibleProbe(), timeout: 0.2)
+        let start = Date()
+        let results = await scheduler.run([target("hung")])
+        let elapsed = Date().timeIntervalSince(start)
+        #expect(!results[0].isSuccess)
+        #expect(results[0].error != nil)
+        #expect(elapsed < 5)
     }
 }

@@ -61,6 +61,36 @@ struct DiagnosticsManagerTests {
     }
 
     @Test
+    func givenAuthorizationHeaders_whenSanitized_thenValuesAreRedacted() {
+        let lines = [
+            "request header authorization: Bearer abc123def456",
+            "response authorization=Bearer xyz789",
+            "auth_user_pass = myuser:mypass"
+        ]
+        let sanitized = LogSanitizer.sanitize(lines).joined(separator: "\n")
+        #expect(!sanitized.contains("abc123def456"))
+        #expect(!sanitized.contains("xyz789"))
+        #expect(!sanitized.contains("myuser:mypass"))
+        #expect(sanitized.contains("[REDACTED]"))
+    }
+
+    @Test
+    func givenAuthUserPassMarker_whenSanitized_thenFollowingLineIsRedacted() {
+        let lines = [
+            "parsing options",
+            "--auth-user-pass",
+            "myuser",
+            "mypass",
+            "next option"
+        ]
+        let sanitized = LogSanitizer.sanitize(lines)
+        #expect(sanitized[1] == "--auth-user-pass")
+        #expect(sanitized[2] == "[REDACTED CREDENTIALS]")
+        #expect(sanitized[3] != "[REDACTED CREDENTIALS]")
+        #expect(sanitized[4] == "next option")
+    }
+
+    @Test
     func givenOrdinaryLogLines_whenSanitized_thenUnchanged() {
         let lines = [
             "Connect to profile ABC-123...",
@@ -168,5 +198,44 @@ struct DiagnosticsManagerTests {
         }
         #expect(checks.allSatisfy { !$0.isSuccess })
         #expect(checks.allSatisfy { $0.error != nil })
+    }
+
+    @Test
+    func givenAllChecksFail_whenRun_thenStateIsFailed() async {
+        struct Boom: Error {}
+        let manager = LeakTestManager(checker: MockChecker(
+            ip: nil,
+            addresses: nil,
+            ipError: Boom(),
+            resolveError: Boom()
+        ))
+        await manager.run()
+        guard case .failed(let message) = manager.state else {
+            Issue.record("Expected .failed state")
+            return
+        }
+        #expect(!message.isEmpty)
+    }
+
+    @Test
+    func givenSlowChecker_whenCheckTimeoutElapses_thenChecksCarryTimeoutErrors() async {
+        struct SlowChecker: LeakTestChecking {
+            func publicIP() async throws -> String {
+                try await Task.sleep(for: .seconds(10))
+                return "203.0.113.7"
+            }
+
+            func resolve(host: String) async throws -> [String] {
+                try await Task.sleep(for: .seconds(10))
+                return ["1.2.3.4"]
+            }
+        }
+        let manager = LeakTestManager(checker: SlowChecker(), checkTimeout: 0.2)
+        await manager.run()
+        guard case .failed(let message) = manager.state else {
+            Issue.record("Expected .failed state (all checks timed out)")
+            return
+        }
+        #expect(message.contains("timed out"))
     }
 }

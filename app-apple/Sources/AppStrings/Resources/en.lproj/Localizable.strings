@@ -66,6 +66,8 @@
 "views.diagnostics.speed_test.error.title" = "Unable to apply";
 "views.diagnostics.debug_bundle.export" = "Export debug bundle";
 "views.diagnostics.debug_bundle.subtitle" = "Sanitized logs and tunnel state. Key material is redacted; nothing is sent anywhere unless you share the file.";
+"views.diagnostics.debug_bundle.unavailable" = "Debug bundle export is not available on this device.";
+"views.diagnostics.alerts.export_error.title" = "Unable to export";
 
 "views.donate.title" = "Make a donation";
 "views.donate.sections.main.footer" = "If you want to display gratitude for my work, here are a couple of amounts you can donate instantly. You will only be charged once per donation, and you can donate multiple times.";

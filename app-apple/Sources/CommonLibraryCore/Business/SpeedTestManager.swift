@@ -105,29 +105,11 @@ public actor ProbeScheduler {
             return ProbeResult(target: target, latency: latency)
         } catch is CancellationError {
             return ProbeResult(target: target, latency: nil, error: "cancelled")
+        } catch is TaskTimeoutError {
+            return ProbeResult(target: target, latency: nil, error: "The connection attempt timed out.")
         } catch {
             return ProbeResult(target: target, latency: nil, error: error.localizedDescription)
         }
-    }
-}
-
-private func withTimeout<T: Sendable>(
-    _ timeout: TimeInterval,
-    _ block: @escaping @Sendable () async throws -> T
-) async throws -> T {
-    try await withThrowingTaskGroup(of: T.self) { group in
-        group.addTask {
-            try await block()
-        }
-        group.addTask {
-            try await Task.sleep(for: .seconds(timeout))
-            throw TaskTimeoutError()
-        }
-        guard let first = try await group.next() else {
-            throw TaskTimeoutError()
-        }
-        group.cancelAll()
-        return first
     }
 }
 
@@ -144,7 +126,7 @@ public final class SpeedTestManager {
     }
 
     /// Probes all targets and stores the results. Re-running cancels the
-    /// previous run.
+    /// previous run; a superseded run never writes its (stale) results.
     public func test(_ targets: [ProbeTarget], scheduler: ProbeScheduler? = nil) async {
         task?.cancel()
         let effectiveScheduler = scheduler ?? ProbeScheduler(probe: NWLatencyProbe())
@@ -153,10 +135,14 @@ public final class SpeedTestManager {
         }
         self.task = task
         isRunning = true
-        defer {
-            isRunning = false
+        let results = await task.value
+        // Task identity check: only the latest run may publish results or
+        // clear `isRunning` (a superseded run must not clobber the newer one).
+        guard self.task === task else {
+            return
         }
-        results = await task.value
+        self.results = results
+        isRunning = false
     }
 
     public func cancel() {
@@ -165,11 +151,14 @@ public final class SpeedTestManager {
 
     /// The fastest successful probe, if any.
     public static func fastest(in results: [ProbeResult]) -> ProbeResult? {
-        results
-            .filter(\.isSuccess)
-            .min {
-                ($0.latency ?? .infinity) < ($1.latency ?? .infinity)
-            }
+        let successes = results.filter(\.isSuccess)
+        guard !successes.isEmpty else {
+            return nil
+        }
+        // `isSuccess` guarantees a non-nil latency.
+        return successes.min {
+            $0.latency! < $1.latency!
+        }
     }
 
     /// Pure reordering logic: given keys (one per item, same order) and probe
@@ -186,7 +175,7 @@ public final class SpeedTestManager {
         return keys
             .enumerated()
             .map {
-                (index: $0.offset, key: $0.element, latency: latencies[$0.element] ?? nil)
+                (index: $0.offset, key: $0.element, latency: latencies[$0.element])
             }
             .sorted {
                 switch ($0.latency, $1.latency) {
@@ -211,7 +200,9 @@ public final class SpeedTestManager {
 
 extension ExtendedEndpoint {
     var probeKey: String {
-        "\(address.rawValue):\(proto.port)"
+        // Socket type is part of the key: the same host:port may be listed
+        // twice (udp + tcp) and must yield two distinct probe targets.
+        "\(address.rawValue):\(proto.port):\(proto.socketType.rawValue)"
     }
 
     var probeTarget: ProbeTarget {

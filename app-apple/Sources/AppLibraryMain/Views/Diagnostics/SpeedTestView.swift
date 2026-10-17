@@ -15,7 +15,11 @@ struct SpeedTestView: View {
     @Environment(Theme.self)
     private var theme
 
-    let profile: Profile?
+    /// ID of the profile under test; the current profile is re-read through
+    /// `loadProfile` so a stale snapshot is never saved over.
+    let profileId: Profile.ID?
+
+    let loadProfile: (Profile.ID) -> Profile?
 
     let onSave: (Profile) async throws -> Void
 
@@ -27,6 +31,10 @@ struct SpeedTestView: View {
 
     @State
     private var saveError: String?
+
+    private var profile: Profile? {
+        profileId.flatMap(loadProfile)
+    }
 
     private var targets: [ProbeTarget] {
         guard let profile else {
@@ -56,6 +64,10 @@ struct SpeedTestView: View {
             Button(Strings.Global.Nouns.ok, role: .cancel) {}
         } message: {
             Text(saveError ?? "")
+        }
+        .onDisappear {
+            // Don't keep probing after navigating back.
+            manager.cancel()
         }
     }
 }
@@ -112,6 +124,8 @@ private extension SpeedTestView {
             .foregroundStyle(theme.emptyMessageColor)
             .themeEmptyMessage(fullScreen: false)
         } else if !manager.results.isEmpty {
+            // Hoisted: computed once, not per row.
+            let fastestId = SpeedTestManager.fastest(in: manager.results)?.target.id
             ForEach(manager.results, id: \.target.id) { result in
                 HStack {
                     Text(result.target.id)
@@ -122,7 +136,11 @@ private extension SpeedTestView {
                     if let latency = result.latency {
                         Text(AppFormatter.localizedLatency(latency))
                             .font(.subheadline)
-                            .foregroundStyle(isFastest(result) ? theme.activeColor : theme.valueColor)
+                            .foregroundStyle(result.target.id == fastestId ? theme.activeColor : theme.valueColor)
+                        if result.target.id == fastestId {
+                            // Not color-only: fastest row also gets a checkmark.
+                            ThemeImage(.marked)
+                        }
                     } else {
                         Text(result.error ?? Strings.Global.Nouns.error)
                             .font(.footnote)
@@ -137,10 +155,6 @@ private extension SpeedTestView {
         }
     }
 
-    func isFastest(_ result: ProbeResult) -> Bool {
-        SpeedTestManager.fastest(in: manager.results)?.target.id == result.target.id
-    }
-
     func applyFastest(_ fastest: ProbeResult, to profile: Profile) {
         isSaving = true
         Task {
@@ -148,7 +162,12 @@ private extension SpeedTestView {
                 isSaving = false
             }
             do {
-                var builder = profile.builder()
+                // Re-read the profile by ID: the captured snapshot may be
+                // stale relative to concurrent edits.
+                guard let current = profileId.flatMap(loadProfile) else {
+                    throw ABI.AppError.notFound
+                }
+                var builder = current.builder()
                 try builder.modules.forEach {
                     guard var moduleBuilder = $0.moduleBuilder() as? OpenVPNModule.Builder else {
                         return
@@ -164,16 +183,6 @@ private extension SpeedTestView {
             } catch {
                 saveError = error.localizedDescription
             }
-        }
-    }
-}
-
-extension AppFormatter {
-    static func localizedLatency(_ latency: TimeInterval) -> String {
-        if latency < 1.0 {
-            String(format: "%.0f ms", latency * 1000)
-        } else {
-            String(format: "%.2f s", latency)
         }
     }
 }

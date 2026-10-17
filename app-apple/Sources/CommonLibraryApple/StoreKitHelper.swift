@@ -57,7 +57,7 @@ extension StoreKitHelper {
     }
 
     public func fetchProducts(timeout: TimeInterval) async throws -> [ABI.AppProduct: ABI.StoreProduct] {
-        let skProducts = try await performTask(withTimeout: timeout) {
+        let skProducts = try await withTimeout(timeout) {
             try await Product.products(for: self.products.map(self.inAppIdentifier))
         }
         return skProducts.reduce(into: [:]) {

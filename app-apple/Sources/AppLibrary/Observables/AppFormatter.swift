@@ -19,3 +19,15 @@ public final class AppFormatter {
         dateFormatter.string(from: date)
     }
 }
+
+extension AppFormatter {
+    /// Formats a probe latency for display, using the current locale's
+    /// decimal separator.
+    public static func localizedLatency(_ latency: TimeInterval) -> String {
+        if latency < 1.0 {
+            String.localizedStringWithFormat("%.0f ms", latency * 1000)
+        } else {
+            String.localizedStringWithFormat("%.2f s", latency)
+        }
+    }
+}

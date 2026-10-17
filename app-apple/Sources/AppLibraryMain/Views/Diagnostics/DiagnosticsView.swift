@@ -43,6 +43,9 @@ struct DiagnosticsView: View {
     @State
     private var debugBundleURL: URL?
 
+    @State
+    private var exportError: String?
+
     var body: some View {
         Form {
             if iapObservable.isBeta {
@@ -71,6 +74,20 @@ struct DiagnosticsView: View {
             }
         } message: {
             Text(Strings.Views.Diagnostics.Alerts.ReportIssue.email)
+        }
+        .alert(
+            localizedString(
+                "views.diagnostics.alerts.export_error.title",
+                fallback: "Unable to export"
+            ),
+            isPresented: .init(
+                get: { exportError != nil },
+                set: { if !$0 { exportError = nil } }
+            )
+        ) {
+            Button(Strings.Global.Nouns.ok, role: .cancel) {}
+        } message: {
+            Text(exportError ?? "")
         }
     }
 }
@@ -122,8 +139,15 @@ private extension DiagnosticsView {
 
     var debugBundleSection: some View {
         Group {
+#if os(tvOS)
+            Text(localizedString(
+                "views.diagnostics.debug_bundle.unavailable",
+                fallback: "Debug bundle export is not available on this device."
+            ))
+            .font(.footnote)
+            .foregroundStyle(theme.valueColor)
+#else
             if let debugBundleURL {
-#if !os(tvOS)
                 ShareLink(item: debugBundleURL) {
                     Label {
                         Text(localizedString(
@@ -134,7 +158,6 @@ private extension DiagnosticsView {
                         ThemeImage(.share)
                     }
                 }
-#endif
             } else {
                 Button {
                     exportDebugBundle()
@@ -152,6 +175,7 @@ private extension DiagnosticsView {
             ))
             .font(.footnote)
             .foregroundStyle(theme.valueColor)
+#endif
         }
         .themeSection(
             header: localizedString("views.diagnostics.sections.debug_bundle", fallback: "Debug bundle")
@@ -174,7 +198,16 @@ private extension DiagnosticsView {
             let tunnelLogLines = await tunnel.currentLog()
             sections.append(DebugBundleSection(name: "Tunnel log (current)", lines: tunnelLogLines))
             sections.append(DebugBundleSection(name: "Tunnel state", lines: tunnelStateLines))
-            debugBundleURL = try? DebugBundleBuilder.write(sections: sections)
+            do {
+                // Delete the previous bundle before writing a new one, so
+                // stale files don't accumulate (or get shared twice).
+                if let previousURL = debugBundleURL {
+                    try? FileManager.default.removeItem(at: previousURL)
+                }
+                debugBundleURL = try DebugBundleBuilder.write(sections: sections)
+            } catch {
+                exportError = error.localizedDescription
+            }
         }
     }
 

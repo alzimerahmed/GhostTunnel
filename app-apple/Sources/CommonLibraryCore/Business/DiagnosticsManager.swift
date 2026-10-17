@@ -14,7 +14,11 @@ public enum LogSanitizer {
     private static let pemEnd = "-----END"
 
     /// `key = value` / `key: value` where the key names a secret.
-    private static let secretAssignment = /(?i)\b(private[_-]?key|public[_-]?key|password|passphrase|secret|auth[-_]?token|token|psk|pre[-_]?shared[_-]?key|static[_-]?key|cookie)\b\s*([=:])\s*\S+/
+    private static let secretAssignment = /(?i)\b(private[_-]?key|public[_-]?key|password|passphrase|secret|authorization|auth[-_]?token|auth[-_]?user[-_]?pass|token|psk|pre[-_]?shared[_-]?key|static[_-]?key|cookie)\b\s*([=:])\s*\S+/
+
+    /// An `auth-user-pass` directive line: the credentials follow on the
+    /// next line (inline credentials block).
+    private static let authUserPassMarker = /(?i)\bauth[-_]?user[-_]?pass\b/
 
     /// Base64-encoded 256-bit keys (WireGuard format: 44 chars ending in `=`).
     private static let base64Key = /[A-Za-z0-9+/]{43}=/
@@ -24,6 +28,7 @@ public enum LogSanitizer {
 
     public static func sanitize(_ lines: [String]) -> [String] {
         var isInsidePEM = false
+        var redactNextLine = false
         return lines.map { line in
             if line.contains(pemBegin) {
                 isInsidePEM = !line.contains(pemEnd)
@@ -34,6 +39,14 @@ public enum LogSanitizer {
                     isInsidePEM = false
                 }
                 return "[REDACTED PEM BLOCK]"
+            }
+            defer {
+                // The line after an `auth-user-pass` marker carries the
+                // inline credentials.
+                redactNextLine = line.firstMatch(of: authUserPassMarker) != nil
+            }
+            if redactNextLine {
+                return "[REDACTED CREDENTIALS]"
             }
             var sanitized = line
                 .replacing(secretAssignment) { match in
@@ -94,10 +107,12 @@ public enum DebugBundleBuilder {
     }
 
     /// Writes the bundle to a temporary file and returns its URL for sharing.
+    /// The file name includes sub-second precision so two exports in the same
+    /// second never overwrite each other.
     public static func write(sections: [DebugBundleSection]) throws -> URL {
         let content = build(sections: sections)
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyyMMdd-HHmmss"
+        formatter.dateFormat = "yyyyMMdd-HHmmss.SSS"
         formatter.locale = Locale(identifier: "en_US_POSIX")
         let stamp = formatter.string(from: Date())
         let url = FileManager.default.temporaryDirectory
@@ -162,21 +177,32 @@ public final class LeakTestManager {
 
     public private(set) var state: State = .idle
 
+    /// Wall-clock bound for each check (DNS resolution is uninterruptible).
+    public static let defaultCheckTimeout: TimeInterval = 10
+
     /// Hosts checked for DNS resolution. A stable, well-known anycast host is
     /// used so the user can eyeball whether answers look like VPN-side DNS.
     public static let dnsCheckHosts = ["one.one.one.one", "www.cloudflare.com"]
 
     private let checker: any LeakTestChecking
 
-    public init(checker: any LeakTestChecking = URLSessionLeakTestChecker()) {
+    private let checkTimeout: TimeInterval
+
+    public init(
+        checker: any LeakTestChecking = URLSessionLeakTestChecker(),
+        checkTimeout: TimeInterval = LeakTestManager.defaultCheckTimeout
+    ) {
         self.checker = checker
+        self.checkTimeout = checkTimeout
     }
 
     public func run() async {
         state = .running
         var checks: [LeakTestCheck] = []
         do {
-            let ip = try await checker.publicIP()
+            let ip = try await withTimeout(checkTimeout) {
+                try await checker.publicIP()
+            }
             checks.append(LeakTestCheck(
                 kind: .publicIP,
                 label: "Public IP",
@@ -187,12 +213,14 @@ public final class LeakTestManager {
                 kind: .publicIP,
                 label: "Public IP",
                 value: nil,
-                error: error.localizedDescription
+                error: Self.describe(error)
             ))
         }
         for host in Self.dnsCheckHosts {
             do {
-                let addresses = try await checker.resolve(host: host)
+                let addresses = try await withTimeout(checkTimeout) {
+                    try await checker.resolve(host: host)
+                }
                 checks.append(LeakTestCheck(
                     kind: .dnsResolution,
                     label: host,
@@ -203,11 +231,26 @@ public final class LeakTestManager {
                     kind: .dnsResolution,
                     label: host,
                     value: nil,
-                    error: error.localizedDescription
+                    error: Self.describe(error)
                 ))
             }
         }
+        // Every check failed: surface a failure state rather than a list of
+        // errors (e.g. no network at all).
+        if checks.allSatisfy({ !$0.isSuccess }) {
+            state = .failed(
+                checks.compactMap(\.error).first ?? "All leak test checks failed."
+            )
+            return
+        }
         state = .done(checks)
+    }
+
+    private static func describe(_ error: Error) -> String {
+        if error is TaskTimeoutError {
+            return "The check timed out."
+        }
+        return error.localizedDescription
     }
 }
 
@@ -229,20 +272,23 @@ public struct URLSessionLeakTestChecker: LeakTestChecking {
         var lastError: Error?
         for endpoint in Self.ipEndpoints {
             do {
-                var request = URLRequest(url: URL(string: endpoint)!)
+                guard let url = URL(string: endpoint) else {
+                    throw URLError(.badURL)
+                }
+                var request = URLRequest(url: url)
                 request.timeoutInterval = 10
                 let (data, _) = try await URLSession.shared.data(for: request)
                 let ip = String(data: data, encoding: .utf8)?
                     .trimmingCharacters(in: .whitespacesAndNewlines)
                 guard let ip, !ip.isEmpty, ip.count <= 45 else {
-                    throw LatencyProbeError.resolutionFailed(0)
+                    throw URLError(.badServerResponse)
                 }
                 return ip
             } catch {
                 lastError = error
             }
         }
-        throw lastError ?? LatencyProbeError.resolutionFailed(0)
+        throw lastError ?? URLError(.cannotConnectToHost)
     }
 
     public func resolve(host: String) async throws -> [String] {

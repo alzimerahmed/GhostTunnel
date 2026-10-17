@@ -134,13 +134,6 @@ extension SettingsCoordinator {
         }
     }
 
-    var speedTestProfile: Profile? {
-        guard let activeProfileId = tunnel.activeProfile?.id else {
-            return nil
-        }
-        return profileObservable.profile(withId: activeProfileId)
-    }
-
     @ViewBuilder
     func pushDestination(for item: DiagnosticsRoute?) -> some View {
         switch item {
@@ -181,7 +174,10 @@ extension SettingsCoordinator {
 
         case .speedTest:
             SpeedTestView(
-                profile: speedTestProfile,
+                profileId: tunnel.activeProfile?.id,
+                loadProfile: {
+                    profileObservable.profile(withId: $0)
+                },
                 onSave: { profile in
                     try await profileObservable.save(profile)
                 }
