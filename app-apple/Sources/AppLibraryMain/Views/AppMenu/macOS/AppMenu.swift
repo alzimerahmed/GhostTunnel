@@ -35,6 +35,7 @@ public struct AppMenu: View {
         loginToggle
         keepToggle
         Divider()
+        quickConnectButton
         Group {
             reconnectButton
             disconnectButton
@@ -71,6 +72,11 @@ private extension AppMenu {
 
     var keepToggle: some View {
         Toggle(Strings.Views.Preferences.keepsInMenu, isOn: userPreferences.binding(\.keepsInMenu))
+    }
+
+    var quickConnectButton: some View {
+        Button(AppLibraryMainLocalization.string("appmenu.quick_connect", fallback: "Quick Connect"), action: quickConnect)
+            .disabled(!isQuickConnectAvailable)
     }
 
     var reconnectButton: some View {
@@ -111,6 +117,33 @@ private extension AppMenu {
     var isTunnelActionable: Bool {
         // TODO: #218, must be per-tunnel
         [.connecting, .connected].contains(status)
+    }
+
+    var isQuickConnectAvailable: Bool {
+        !isTunnelActionable && quickConnectTargetId != nil
+    }
+
+    var quickConnectTargetId: Profile.ID? {
+        let lastUsed = userPreferences.lastUsedProfileId
+        let headers = profileObservable.filteredHeaders
+        if let lastUsed, headers.contains(where: { $0.id == lastUsed }) {
+            return lastUsed
+        }
+        return headers.first?.id
+    }
+
+    func quickConnect() {
+        guard let targetId = quickConnectTargetId,
+            let profile = profileObservable.profile(withId: targetId) else {
+            return
+        }
+        Task {
+            do {
+                try await tunnel.connect(to: profile)
+            } catch {
+                pspLog(.core, .error, "Unable to quick-connect to profile \(profile.id) from menu: \(error)")
+            }
+        }
     }
 
     func showApp(completion: (() -> Void)? = nil) {

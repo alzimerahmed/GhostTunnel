@@ -34,6 +34,12 @@ public final class TunnelObservable {
 
     private let willInstall: WillInstallBlock?
 
+    /// Notified whenever the active-profile statuses change (e.g. to update
+    /// widget timelines). Called on the main actor.
+    public typealias StatusNotifier = ([Profile.ID: ABI.AppTunnelInfo]) -> Void
+
+    private let statusNotifier: StatusNotifier?
+
     public private(set) var activeProfiles: [Profile.ID: ABI.AppTunnelInfo]
 
     private var subscriptions: [Task<Void, Never>]
@@ -45,12 +51,14 @@ public final class TunnelObservable {
         tunnel: PartoutTunnel,
         preferences: AppPreferencesStore? = nil,
         logging: Logging? = nil,
-        willInstall: WillInstallBlock? = nil
+        willInstall: WillInstallBlock? = nil,
+        statusNotifier: StatusNotifier? = nil
     ) {
         self.tunnel = tunnel
         self.preferences = preferences
         self.logging = logging
         self.willInstall = willInstall
+        self.statusNotifier = statusNotifier
         activeProfiles = [:]
         subscriptions = []
         pendingTasks = [:]
@@ -186,6 +194,7 @@ extension TunnelObservable {
                 // Publish compound info
                 if newActiveProfiles != activeProfiles {
                     activeProfiles = newActiveProfiles
+                    statusNotifier?(newActiveProfiles)
                 }
             }
             pspLog(.core, .debug, "Tunnel snapshots subscription terminated")

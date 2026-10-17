@@ -101,6 +101,12 @@ public final class UserPreferencesObservable {
         }
     }
 
+    // Read-only pass-through: last-used profile is owned by the tunnel
+    // (TunnelObservable), never written from the UI.
+    public var lastUsedProfileId: Profile.ID? {
+        preferences[\.lastUsedProfileId]
+    }
+
     public var onboardingStep: OnboardingStep? {
         didSet {
             ui.set(onboardingStep?.rawValue, forUIPreference: .onboardingStep)

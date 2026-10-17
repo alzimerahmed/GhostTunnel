@@ -19,6 +19,10 @@ let package = Package(
             targets: ["AppAccessibility"]
         ),
         .library(
+            name: "AppIntentsLibrary",
+            targets: ["AppIntentsLibrary"]
+        ),
+        .library(
             name: "AppLibrary",
             targets: ["AppLibrary"]
         ),
@@ -38,6 +42,15 @@ let package = Package(
     targets: [
         .target(
             name: "AppAccessibility"
+        ),
+        .target(
+            name: "AppIntentsLibrary",
+            dependencies: [
+                "AppLibrary",
+                "AppResources",
+                "CommonLibrary",
+                .product(name: "PartoutRuntime", package: "partout")
+            ]
         ),
         .target(
             name: "AppLibrary",
@@ -88,6 +101,10 @@ let package = Package(
                 "AppResources",
                 .product(name: "partout", package: "partout")
             ]
+        ),
+        .testTarget(
+            name: "AppIntentsLibraryTests",
+            dependencies: ["AppIntentsLibrary"]
         ),
         .testTarget(
             name: "AppLibraryTests",

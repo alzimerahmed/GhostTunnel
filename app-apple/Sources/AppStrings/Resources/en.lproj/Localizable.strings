@@ -579,3 +579,7 @@
 "settings.backup.errors.decryption" = "Wrong passphrase.";
 "settings.backup.errors.corrupted" = "Not a valid GhostTunnel backup archive.";
 "settings.backup.errors.empty" = "There are no profiles to export.";
+
+// MARK: Phase 8 — Quick Connect Surfaces (widgets, Control Center, menu bar)
+
+"appmenu.quick_connect" = "Quick Connect";

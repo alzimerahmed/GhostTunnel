@@ -12,6 +12,9 @@ import CommonLibrary
 import CoreData
 import Partout
 import PartoutRuntime
+#if canImport(WidgetKit)
+import WidgetKit
+#endif
 
 extension AppContext {
     static func forProduction(bundleIdentifier: String) -> AppContext {
@@ -215,7 +218,14 @@ extension AppContext {
             tunnel: tunnel,
             preferences: preferences,
             logging: logging,
-            willInstall: tunnelProcessor.willInstall
+            willInstall: tunnelProcessor.willInstall,
+            statusNotifier: { profiles in
+                let store = TunnelWidgetStatusStore(defaults: appConfiguration.makeTunnelDefaults())
+                store.save(TunnelWidgetState(profiles: profiles))
+#if canImport(WidgetKit)
+                WidgetCenter.shared.reloadAllTimelines()
+#endif
+            }
         )
 
         // MARK: Preferences (Core Data)
