@@ -70,6 +70,7 @@ private extension SettingsContentView {
             .themeSection(header: Strings.Global.Nouns.about)
 
             Group {
+                linkContent(.backup)
                 ExternalLink(Strings.Unlocalized.faq, url: appConfiguration.constants.websites.faqURL)
                 if appConfiguration.bundle.distributionTarget == .developerID {
                     linkContent(.systemExtension)

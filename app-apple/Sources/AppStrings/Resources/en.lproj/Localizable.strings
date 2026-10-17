@@ -563,3 +563,19 @@
 "android.profiles.layout.grid.content_description" = "Grid profiles";
 
 "android.errors.profile_importer.empty" = "Unable to read profile content.";
+
+// MARK: Phase 7 — Backup & Restore (Settings)
+
+"settings.backup.title" = "Backup & Restore";
+"settings.backup.passphrase" = "Passphrase";
+"settings.backup.passphrase.placeholder" = "optional";
+"settings.backup.export.header" = "Export profiles";
+"settings.backup.export.button" = "Export Archive";
+"settings.backup.export.footer" = "Export all profiles to a portable archive. Without a passphrase, secrets (private keys, passwords) are removed from the export. With a passphrase, the archive is encrypted with AES-GCM.";
+"settings.backup.import.header" = "Import profiles";
+"settings.backup.import.button" = "Import Archive";
+"settings.backup.import.footer" = "Import profiles from a GhostTunnel backup archive (.zip). Enter the passphrase first if the archive is encrypted.";
+"settings.backup.errors.empty_passphrase" = "This archive is encrypted. Enter its passphrase first.";
+"settings.backup.errors.decryption" = "Wrong passphrase.";
+"settings.backup.errors.corrupted" = "Not a valid GhostTunnel backup archive.";
+"settings.backup.errors.empty" = "There are no profiles to export.";

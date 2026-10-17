@@ -59,6 +59,7 @@ private extension SettingsContentView {
             ExternalLink(Strings.Unlocalized.faq, url: appConfiguration.constants.websites.faqURL)
                 .themeSection(header: Strings.Global.Nouns.troubleshooting)
             Group {
+                linkContent(.backup)
                 linkContent(.diagnostics)
                 if appConfiguration.bundle.distributionTarget.supportsIAP {
                     linkContent(.purchased)

@@ -259,3 +259,29 @@ private extension AppImportExportTests {
         ]
     }
 }
+
+// MARK: - Phase 7: WireGuard QR payload import
+
+extension AppImportExportTests {
+    @Test
+    func givenWgQuickContents_whenImportedProfile_thenParsesWireGuardModule() throws {
+        let privateKey = Data((0..<32).map { _ in UInt8(0x11) }).base64EncodedString()
+        let peerKey = Data((0..<32).map { _ in UInt8(0x22) }).base64EncodedString()
+        let contents = """
+        [Interface]
+        PrivateKey = \(privateKey)
+        Address = 10.0.0.2/32
+
+        [Peer]
+        PublicKey = \(peerKey)
+        Endpoint = vpn.example.com:51820
+        """
+
+        let profile = try AppImportExport.dummy.importedProfile(
+            from: .contents(filename: "qr.txt", data: Data(contents.utf8)),
+            passphrase: nil
+        )
+
+        #expect(profile.modules.first?.moduleType == .WireGuard)
+    }
+}

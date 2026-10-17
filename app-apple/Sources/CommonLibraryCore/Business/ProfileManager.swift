@@ -221,6 +221,10 @@ extension ProfileManager {
     public func profile(withId profileId: Profile.ID) -> Profile? {
         allProfiles[profileId]
     }
+
+    public func allProfiles() async -> [Profile] {
+        Array(allProfiles.values)
+    }
 }
 
 // MARK: - Observation

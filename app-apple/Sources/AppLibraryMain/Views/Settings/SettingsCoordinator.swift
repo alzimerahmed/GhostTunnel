@@ -47,6 +47,8 @@ extension SettingsCoordinator {
 
     func title(for route: SettingsCoordinatorRoute) -> String {
         switch route {
+        case .backup:
+            AppLibraryMainLocalization.string("settings.backup.title", fallback: "Backup & Restore")
         case .changelog:
             Strings.Unlocalized.changelog
         case .credits:
@@ -85,6 +87,10 @@ extension SettingsCoordinator {
     @ViewBuilder
     func pushDestination(for item: SettingsCoordinatorRoute?) -> some View {
         switch item {
+        case .backup:
+            BackupView(profileObservable: profileObservable)
+                .navigationTitle(title(for: .backup))
+
         case .changelog:
             ChangelogView()
                 .navigationTitle(title(for: .changelog))

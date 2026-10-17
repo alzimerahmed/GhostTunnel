@@ -108,6 +108,10 @@ extension ProfileObservable {
         profileManager.profile(withId: profileId)
     }
 
+    public func allProfiles() async -> [Profile] {
+        await profileManager.allProfiles()
+    }
+
     public func firstUniqueName(from name: String) -> String {
         let allNames = Set(allHeaders.values.map(\.name))
         var newName = name

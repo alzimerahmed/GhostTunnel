@@ -5,6 +5,8 @@
 import Foundation
 
 enum SettingsCoordinatorRoute: Hashable {
+    case backup
+
     case changelog
 
     case credits

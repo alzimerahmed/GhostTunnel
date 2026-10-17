@@ -58,6 +58,14 @@ extension AppImportExport {
             pspLog(.core, .debug, "Unable to decode profile for import: \(error)")
         }
 
+        // Fall back to parsing a wg-quick configuration (e.g. QR payload)
+        do {
+            let wgModule = try WireGuardQuickParser().module(fromContents: contents)
+            return try Profile(withName: name, singleModule: wgModule)
+        } catch {
+            pspLog(.core, .debug, "Not a wg-quick configuration: \(error)")
+        }
+
         // Fall back to parsing a single module
         do {
             let context: ModuleImportContext?
