@@ -38,7 +38,12 @@ struct ProfileImporterModifier: ViewModifier {
                 actions: actions,
                 message: message
             )
-            .sheet(isPresented: $importer.isPresentingResults) {
+            .sheet(isPresented: Binding(
+                // Single-presentation rule: only present the results sheet
+                // once the file importer has dismissed (Phase 10 review).
+                get: { !isPresented && importer.isPresentingResults },
+                set: { importer.isPresentingResults = $0 }
+            )) {
                 ImportResultsView(results: importer.results) {
                     importer.dismissResults()
                 }

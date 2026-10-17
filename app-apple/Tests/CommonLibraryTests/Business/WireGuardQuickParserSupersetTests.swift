@@ -17,6 +17,14 @@ struct WireGuardQuickParserSupersetTests {
         Data((0..<32).map { _ in seed }).base64EncodedString()
     }
 
+    /// 32-byte base64 key unique per index (index > 255 included).
+    private static func distinctKey(_ index: Int) -> String {
+        var bytes = [UInt8](repeating: 0, count: 32)
+        bytes[0] = UInt8(index & 0xff)
+        bytes[1] = UInt8((index >> 8) & 0xff)
+        return Data(bytes).base64EncodedString()
+    }
+
     private static let privateKey = base64Key(0x11)
 
     private static let peerKey = base64Key(0x22)
@@ -157,9 +165,28 @@ struct WireGuardQuickParserSupersetTests {
     func givenManyPeers_whenParse_thenAllPeersParsed() throws {
         var contents = "[Interface]\nPrivateKey = \(Self.privateKey)\n\n"
         for index in 0..<500 {
-            contents += "[Peer]\nPublicKey = \(base64Key(UInt8(index % 255)))\nAllowedIPs = 10.0.\(index).0/24\n\n"
+            // Distinct keys: `index % 255` would duplicate peer 255's key
+            // with peer 0's and trip the duplicate-key guard.
+            contents += "[Peer]\nPublicKey = \(Self.distinctKey(index))\nAllowedIPs = 10.0.\(index).0/24\n\n"
         }
         let outcome = try sut.parseOutcome(fromContents: contents)
         #expect(outcome.builder.peers.count == 500)
+    }
+
+    @Test
+    func givenUnknownSection_whenParse_thenWarns() throws {
+        let contents = """
+        [Interface]
+        PrivateKey = \(Self.privateKey)
+
+        [WhatIsThis]
+        Foo = bar
+
+        [Peer]
+        PublicKey = \(Self.peerKey)
+        """
+        let outcome = try sut.parseOutcome(fromContents: contents)
+        #expect(outcome.warnings.contains { $0.contains("WhatIsThis") })
+        #expect(outcome.builder.peers.count == 1)
     }
 }

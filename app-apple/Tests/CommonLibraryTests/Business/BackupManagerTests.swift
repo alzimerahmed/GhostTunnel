@@ -75,6 +75,51 @@ struct BackupManagerTests {
         }
     }
 
+    // MARK: Stored-vs-deflated acceptance matrix (Phase 10 review, B3)
+
+    @Test
+    func givenStoredZip_whenDecode_thenAccepted() throws {
+        let coder = ZipBackupArchiveCoder()
+        let entries = [BackupEntry(name: "a.json", data: Data("hello".utf8))]
+        let decoded = try coder.decode(try coder.encode(entries))
+        #expect(decoded == entries)
+    }
+
+    @Test
+    func givenDeflatedZip_whenDecode_thenInflatesAndAccepted() throws {
+        let coder = ZipBackupArchiveCoder()
+        let entries = [BackupEntry(name: "a.json", data: Data("hello".utf8))]
+        let decoded = try coder.decode(try TunnelblickImporterTests.deflatedZip(from: entries))
+        #expect(decoded == entries)
+    }
+
+    // MARK: Decode bounds (zip-bomb guard, Phase 10 review, M2)
+
+    @Test
+    func givenTooManyEntriesForCap_whenDecode_thenThrows() throws {
+        let coder = ZipBackupArchiveCoder()
+        let entries = (0..<3).map { BackupEntry(name: "f\($0)", data: Data("x".utf8)) }
+        let encoded = try coder.encode(entries)
+        #expect(throws: BackupError.tooManyEntries) {
+            try coder.decode(encoded, maxEntries: 2)
+        }
+        #expect(try coder.decode(encoded, maxEntries: 3).count == 3)
+    }
+
+    @Test
+    func givenTotalSizeAboveCap_whenDecode_thenThrows() throws {
+        let coder = ZipBackupArchiveCoder()
+        let entries = [
+            BackupEntry(name: "a", data: Data(count: 100)),
+            BackupEntry(name: "b", data: Data(count: 100))
+        ]
+        let encoded = try coder.encode(entries)
+        #expect(throws: BackupError.tooLargeArchive) {
+            try coder.decode(encoded, maxTotalSize: 150)
+        }
+        #expect(try coder.decode(encoded, maxTotalSize: 200).count == 2)
+    }
+
     @Test
     func givenEncryptedExport_whenRoundTrip_thenPreservesProfiles() async throws {
         let sut = BackupManager()

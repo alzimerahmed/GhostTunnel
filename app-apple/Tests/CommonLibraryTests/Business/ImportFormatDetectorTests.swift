@@ -87,6 +87,17 @@ struct ImportFormatDetectorTests {
     }
 
     @Test
+    func givenBOMPrefixedText_whenDetect_thenStripsBOM() {
+        // Detection must be at least as BOM-tolerant as the wg-quick parser.
+        #expect(sut.detect(text: "\u{feff}" + Self.wgQuick) == .wireGuardQuick)
+        #expect(sut.detect(
+            data: Data(("\u{feff}" + Self.wgQuick).utf8),
+            filename: "tunnel.conf"
+        ) == .wireGuardQuick)
+        #expect(sut.detect(text: "\u{feff}" + Self.openVPN) == .openVPN)
+    }
+
+    @Test
     func givenHugeJSON_whenDetect_thenBoundedAndUnknown() {
         let huge = "{\"x\":\"" + String(repeating: "a", count: 2_000_000) + "\"}"
         #expect(sut.detect(text: huge) == .unknown)

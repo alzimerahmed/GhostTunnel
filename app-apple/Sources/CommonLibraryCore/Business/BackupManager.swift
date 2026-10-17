@@ -27,6 +27,9 @@ public enum BackupError: Error, Equatable, Sendable {
     /// Too many entries for the ZIP format limits.
     case tooManyEntries
 
+    /// Cumulative decoded size exceeds the archive limits (zip-bomb guard).
+    case tooLargeArchive
+
     /// JSON encoding/decoding of a profile failed.
     case encodingFailed
 }

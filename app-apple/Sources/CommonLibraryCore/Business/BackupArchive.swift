@@ -47,6 +47,12 @@ public struct ZipBackupArchiveCoder: BackupArchiveCoding {
 
     public static let defaultMaxEntrySize = 64 * 1_024 * 1_024
 
+    /// Default cap on the number of decoded entries (zip-bomb guard).
+    public static let defaultMaxEntries = 1_024
+
+    /// Default cap on the cumulative decoded size (zip-bomb guard).
+    public static let defaultMaxTotalSize = 256 * 1_024 * 1_024
+
     // MARK: Coding
 
     public func encode(_ entries: [BackupEntry]) throws -> Data {
@@ -120,9 +126,21 @@ public struct ZipBackupArchiveCoder: BackupArchiveCoding {
         return body + central + eocd
     }
 
-    public func decode(_ data: Data) throws -> [BackupEntry] {
+    /// Decode a ZIP archive. `maxEntries` and `maxTotalSize` bound the
+    /// decode itself (checked cumulatively during the entry loop) so a
+    /// hostile archive cannot exhaust memory before callers apply their own
+    /// limits — the Phase 7 backup/restore path uses the defaults, while
+    /// Tunnelblick import passes its tighter caps.
+    public func decode(
+        _ data: Data,
+        maxEntries: Int = Self.defaultMaxEntries,
+        maxTotalSize: Int = Self.defaultMaxTotalSize
+    ) throws -> [BackupEntry] {
         let eocdOffset = try endOfCentralDirectoryOffset(in: data)
         let count = Int(data.u16LE(at: eocdOffset + 10))
+        guard count <= maxEntries else {
+            throw BackupError.tooManyEntries
+        }
         let centralSize = Int(data.u32LE(at: eocdOffset + 12))
         let centralOffset = Int(data.u32LE(at: eocdOffset + 16))
         guard centralOffset >= 0, centralSize >= 0,
@@ -131,6 +149,7 @@ public struct ZipBackupArchiveCoder: BackupArchiveCoding {
         }
 
         var entries: [BackupEntry] = []
+        var totalSize = 0
         var cursor = centralOffset
         for _ in 0..<count {
             guard cursor + 46 <= data.count,
@@ -154,14 +173,30 @@ public struct ZipBackupArchiveCoder: BackupArchiveCoding {
                 throw BackupError.corruptedArchive
             }
 
-            let content = try entryContent(
+            let (content, method) = try entryContent(
                 in: data,
                 at: localOffset,
                 crc: crc,
                 size: compressedSize
             )
-            guard compressedSize == uncompressedSize else {
+            // Stored entries must declare matching sizes; deflated entries
+            // legitimately differ (compressed vs uncompressed) and are
+            // instead bounded by the per-entry decompression cap.
+            switch method {
+            case 0:
+                guard compressedSize == uncompressedSize else {
+                    throw BackupError.corruptedArchive
+                }
+            case 8:
+                guard uncompressedSize <= maxEntrySize else {
+                    throw BackupError.corruptedArchive
+                }
+            default:
                 throw BackupError.corruptedArchive
+            }
+            totalSize += content.count
+            guard totalSize <= maxTotalSize else {
+                throw BackupError.tooLargeArchive
             }
             entries.append(BackupEntry(name: name, data: content))
             let stride = 46 + nameLength + extraLength + commentLength
@@ -195,7 +230,7 @@ private extension ZipBackupArchiveCoder {
         at localOffset: Int,
         crc: UInt32,
         size: Int
-    ) throws -> Data {
+    ) throws -> (content: Data, method: UInt16) {
         guard localOffset >= 0, localOffset + 30 <= data.count,
               data.u32LE(at: localOffset) == 0x0403_4b50 else {
             throw BackupError.corruptedArchive
@@ -220,7 +255,7 @@ private extension ZipBackupArchiveCoder {
         guard CRC32.checksum(of: content) == crc else {
             throw BackupError.corruptedArchive
         }
-        return content
+        return (content, method)
     }
 }
 

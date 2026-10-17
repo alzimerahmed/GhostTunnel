@@ -115,6 +115,58 @@ struct TunnelblickImporterTests {
         }
     }
 
+    // MARK: Key-file content validation (config injection)
+
+    @Test
+    func givenHostileKeyFile_whenReadEntries_thenRejectedNotInlinedAsConfig() throws {
+        // A key file trying to break out of the inline block and inject
+        // directives must never end up parsed as configuration.
+        let hostileKey = """
+        -----BEGIN PRIVATE KEY-----
+        </key>
+        remote attacker.example 443
+        <key>
+        -----END PRIVATE KEY-----
+        """
+        let entries = [
+            BackupEntry(name: "client.ovpn", data: Data(Self.openVPNConfig.utf8)),
+            BackupEntry(name: "ca.crt", data: Data(Self.caCert.utf8)),
+            BackupEntry(name: "client.key", data: Data(hostileKey.utf8))
+        ]
+        let contents = try sut.contents(fromEntries: entries)
+        #expect(!contents.mainConfig.contains("attacker.example"))
+        #expect(!contents.mainConfig.contains("</key>\nremote"))
+        #expect(contents.mainConfig.contains("key client.key")) // line kept
+        #expect(contents.warnings.contains { $0.contains("client.key") })
+    }
+
+    @Test
+    func givenKeyFileWithDirectiveLine_whenReadEntries_thenRejected() throws {
+        let hostileKey = "MIIBszCCAVmgAwIBAgIUKbGw\nremote evil.example 1194\n"
+        let entries = [
+            BackupEntry(name: "client.ovpn", data: Data(Self.openVPNConfig.utf8)),
+            BackupEntry(name: "ca.crt", data: Data(Self.caCert.utf8)),
+            BackupEntry(name: "client.key", data: Data(hostileKey.utf8))
+        ]
+        let contents = try sut.contents(fromEntries: entries)
+        #expect(!contents.mainConfig.contains("evil.example"))
+        #expect(contents.warnings.contains { $0.contains("client.key") })
+    }
+
+    // MARK: Entry resolution
+
+    @Test
+    func givenSimilarBasename_whenResolveEntry_thenNoLooseSuffixMatch() throws {
+        // "ca.crt" must not match "evilca.crt" via a loose suffix.
+        let entries = [
+            BackupEntry(name: "client.ovpn", data: Data(Self.openVPNConfig.utf8)),
+            BackupEntry(name: "evilca.crt", data: Data("evil".utf8))
+        ]
+        let contents = try sut.contents(fromEntries: entries)
+        #expect(contents.mainConfig.contains("ca ca.crt")) // unresolved
+        #expect(contents.warnings.contains { $0.contains("ca.crt") })
+    }
+
     // MARK: ZIP round-trips (stored + deflate)
 
     @Test
@@ -187,7 +239,9 @@ struct TunnelblickImporterTests {
 
     /// Build a ZIP whose entries use method 8 (raw deflate via the system
     /// Compression framework), exercising the Phase 10 decode path.
-    private static func deflatedZip(from entries: [BackupEntry]) throws -> Data {
+    /// Internal so `BackupManagerTests` can reuse it for the
+    /// stored-vs-deflated decode acceptance matrix.
+    static func deflatedZip(from entries: [BackupEntry]) throws -> Data {
         var body = Data()
         var central = Data()
         var offset: UInt32 = 0

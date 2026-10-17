@@ -53,8 +53,8 @@ final class ProfileImporter {
                     pspLog(.core, .fault, "Unable to import URL: \(error)")
                     newResults.append(.init(
                         filename: url.lastPathComponent,
-                        format: .unknown,
-                        status: .failed(message: String(describing: appError))
+                        format: Self.detectedFormat(for: url),
+                        status: .failed(message: AppImportExport.failureMessage(appError))
                     ))
                 }
             }
@@ -81,6 +81,13 @@ final class ProfileImporter {
             appendResults([result])
             scheduleNextImport()
         } catch {
+            // Record the failure so the batch report never silently omits
+            // the file, then surface it through the error handler too.
+            appendResults([.init(
+                filename: url.lastPathComponent,
+                format: Self.detectedFormat(for: url),
+                status: .failed(message: AppImportExport.failureMessage(ABI.AppError(error)))
+            )])
             scheduleNextImport()
             throw error
         }
@@ -137,5 +144,20 @@ private extension ProfileImporter {
             }
         }
         return try await block(url, passphrase)
+    }
+
+    /// Best-effort format detection for a failed import, so the batch
+    /// report shows the detected format instead of a hardcoded `.unknown`.
+    private static func detectedFormat(for url: URL) -> ImportFormat {
+        let didStartAccess = url.startAccessingSecurityScopedResource()
+        defer {
+            if didStartAccess {
+                url.stopAccessingSecurityScopedResource()
+            }
+        }
+        guard let data = try? Data(contentsOf: url) else {
+            return .unknown
+        }
+        return ImportFormatDetector().detect(data: data, filename: url.lastPathComponent)
     }
 }

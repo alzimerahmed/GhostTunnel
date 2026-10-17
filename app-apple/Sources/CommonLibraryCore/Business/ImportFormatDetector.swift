@@ -33,20 +33,31 @@ public struct ImportFormatDetector: Sendable {
     public init() {
     }
 
+    /// Upper bound for JSON content sniffing: hostile JSON can be huge, so
+    /// detection bails out to `.unknown` above this size (parsers apply
+    /// their own limits afterwards). Must stay below the 2 MB regression-test
+    /// payload so oversized JSON is never parsed.
+    public static let maxJSONDetectionSize = 256 * 1_024
+
     // MARK: Detection
 
     public func detect(data: Data, filename: String) -> ImportFormat {
         if data.isZipContainer {
             return detectZip(filename: filename)
         }
-        guard let text = data.decodedText else {
+        guard let text = data.decodedUTF8Text else {
             return .unknown
         }
         return detect(text: text)
     }
 
     public func detect(text: String) -> ImportFormat {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Strip a UTF-8 BOM that may lead the first line, mirroring the
+        // wg-quick parser so detection is never weaker than parsing.
+        let trimmed = String(text
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingPrefix("\u{feff}")
+            .trimmingCharacters(in: .whitespacesAndNewlines))
         guard !trimmed.isEmpty else {
             return .unknown
         }
@@ -151,27 +162,11 @@ public struct ImportFormatDetector: Sendable {
 
 // MARK: - Shared byte/text helpers (hostile-input safe)
 
-extension Data {
-    var isZipContainer: Bool {
-        guard count >= 4 else {
-            return false
-        }
-        let signature = u32LE(at: 0)
-        return signature == 0x0403_4b50 // local file header ("PK\x03\x04")
-            || signature == 0x0605_4b50 // end of central directory (empty zip)
-            || signature == 0x0807_4b50 // spanned/empty segment
-    }
-
-    /// UTF-8 text without binary control bytes, or `nil` (mirrors the
-    /// `AppImportExport` text guard so detection agrees with the parsers).
-    var decodedUTF8Text: String? {
-        guard !hasBinaryControlBytes, let text = String(data: self, encoding: .utf8) else {
-            return nil
-        }
-        return text
-    }
-
-    private var hasBinaryControlBytes: Bool {
+public extension Data {
+    /// True when the data looks binary rather than textual: a NUL byte, or
+    /// more than half non-text control bytes. Shared by the import surface
+    /// (format detection, profile decoding) so every text guard agrees.
+    var hasBinaryControlBytes: Bool {
         guard !isEmpty else {
             return false
         }
@@ -195,4 +190,25 @@ extension Data {
     ]
 
     private static let asciiSpace: UInt8 = 0x20
+}
+
+extension Data {
+    var isZipContainer: Bool {
+        guard count >= 4 else {
+            return false
+        }
+        let signature = u32LE(at: 0)
+        return signature == 0x0403_4b50 // local file header ("PK\x03\x04")
+            || signature == 0x0605_4b50 // end of central directory (empty zip)
+            || signature == 0x0807_4b50 // spanned/empty segment
+    }
+
+    /// UTF-8 text without binary control bytes, or `nil` (mirrors the
+    /// `AppImportExport` text guard so detection agrees with the parsers).
+    var decodedUTF8Text: String? {
+        guard !hasBinaryControlBytes, let text = String(data: self, encoding: .utf8) else {
+            return nil
+        }
+        return text
+    }
 }

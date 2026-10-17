@@ -91,7 +91,24 @@ extension AppImportExport {
     /// passphrase-required errors are still rethrown so the existing
     /// passphrase flow can re-queue the file.
     public func importedFile(from input: ABI.ProfileImporterInput, passphrase: String?) throws -> FileImportResult {
-        let (name, data) = try rawData(from: input)
+        // Hold the security-scoped access across the WHOLE body: the
+        // Tunnelblick path re-reads the directory package after `rawData`
+        // would have stopped access (Phase 10 review, M1).
+        let scope: SecurityScope?
+        let name: String
+        let data: Data
+        switch input {
+        case .contents(let filename, let contents):
+            scope = nil
+            name = filename
+            data = Data(contents.utf8)
+        case .file(let url):
+            name = url.lastPathComponent
+            (scope, data) = try SecurityScope.open(url)
+        }
+        defer {
+            scope?.stop()
+        }
         let format = ImportFormatDetector().detect(data: data, filename: name)
 
         do {
@@ -111,27 +128,18 @@ extension AppImportExport {
                 let outcome = try WireGuardQuickParser().parseOutcome(
                     fromContents: String(decoding: data, as: UTF8.self)
                 )
-                let profile = try Profile(
-                    withName: name,
-                    singleModule: try WireGuardModule.Builder(
-                        configurationBuilder: outcome.builder
-                    ).build()
-                )
                 return FileImportResult(
                     filename: name,
                     format: .wireGuardQuick,
                     status: .imported(warnings: outcome.warnings),
-                    profile: profile
+                    profile: try wireGuardProfile(name: name, outcome: outcome)
                 )
 
             case .openVPN:
-                let context: ModuleImportContext?
-                if let passphrase {
-                    context = .OpenVPN(passphrase: passphrase)
-                } else {
-                    context = nil
-                }
-                let module = try importModule(String(decoding: data, as: UTF8.self), context)
+                let module = try importModule(
+                    String(decoding: data, as: UTF8.self),
+                    openVPNContext(passphrase)
+                )
                 let profile = try Profile(withName: name, singleModule: module)
                 return FileImportResult(
                     filename: name,
@@ -197,20 +205,9 @@ extension AppImportExport {
         if ImportFormatDetector().detect(text: configText) == .wireGuardQuick {
             let outcome = try WireGuardQuickParser().parseOutcome(fromContents: configText)
             warnings.append(contentsOf: outcome.warnings)
-            profile = try Profile(
-                withName: name,
-                singleModule: try WireGuardModule.Builder(
-                    configurationBuilder: outcome.builder
-                ).build()
-            )
+            profile = try wireGuardProfile(name: name, outcome: outcome)
         } else {
-            let context: ModuleImportContext?
-            if let passphrase {
-                context = .OpenVPN(passphrase: passphrase)
-            } else {
-                context = nil
-            }
-            let module = try importModule(configText, context)
+            let module = try importModule(configText, openVPNContext(passphrase))
             let profile = try Profile(withName: name, singleModule: module)
         }
         return FileImportResult(
@@ -221,18 +218,51 @@ extension AppImportExport {
         )
     }
 
-    private func rawData(from input: ABI.ProfileImporterInput) throws -> (name: String, data: Data) {
-        switch input {
-        case .contents(let filename, let data):
-            return (filename, Data(data.utf8))
-        case .file(let url):
-            let didStartAccess = url.startAccessingSecurityScopedResource()
-            defer {
-                if didStartAccess {
-                    url.stopAccessingSecurityScopedResource()
-                }
+    // MARK: Shared construction helpers (deduped per Phase 10 review)
+
+    private func wireGuardProfile(
+        name: String,
+        outcome: WireGuardQuickParser.ParseOutcome
+    ) throws -> Profile {
+        try Profile(
+            withName: name,
+            singleModule: try WireGuardModule.Builder(
+                configurationBuilder: outcome.builder
+            ).build()
+        )
+    }
+
+    private func openVPNContext(_ passphrase: String?) -> ModuleImportContext? {
+        passphrase.map { .OpenVPN(passphrase: $0) }
+    }
+
+    /// Security-scoped resource access held for the duration of an import.
+    private struct SecurityScope {
+        let url: URL
+
+        let didStart: Bool
+
+        private init(url: URL) {
+            self.url = url
+            self.didStart = url.startAccessingSecurityScopedResource()
+        }
+
+        /// Start access and read the file, stopping access on read failure
+        /// so the scope never leaks.
+        static func open(_ url: URL) throws -> (SecurityScope, Data) {
+            let scope = SecurityScope(url: url)
+            do {
+                return (scope, try Data(contentsOf: url))
+            } catch {
+                scope.stop()
+                throw error
             }
-            return (url.lastPathComponent, try Data(contentsOf: url))
+        }
+
+        func stop() {
+            if didStart {
+                url.stopAccessingSecurityScopedResource()
+            }
         }
     }
 
@@ -240,7 +270,7 @@ extension AppImportExport {
         static let backupHint = "This is a GhostTunnel backup archive — use Settings → Backup & Restore to import it"
     }
 
-    private static func failureMessage(_ appError: ABI.AppError) -> String {
+    public static func failureMessage(_ appError: ABI.AppError) -> String {
         if case .importError(let message) = appError, let message {
             return message
         }
@@ -273,13 +303,7 @@ extension AppImportExport {
 
         // Fall back to parsing a single module
         do {
-            let context: ModuleImportContext?
-            if let passphrase {
-                context = .OpenVPN(passphrase: passphrase)
-            } else {
-                context = nil
-            }
-            let importedModule = try importModule(contents, context)
+            let importedModule = try importModule(contents, openVPNContext(passphrase))
             return try Profile(withName: name, singleModule: importedModule)
         } catch {
             pspLog(.core, .error, "Unable to import profile module: \(error)")
@@ -369,31 +393,4 @@ extension Profile {
         builder.activeModulesIds = Set(builder.modules.map(\.id))
         self = try builder.build()
     }
-}
-
-private extension Data {
-    var hasBinaryControlBytes: Bool {
-        guard !isEmpty else {
-            return false
-        }
-        var controlCount = 0
-        for byte in self {
-            if byte == 0 {
-                return true
-            }
-            if byte < Self.asciiSpace && !Self.textControlBytes.contains(byte) {
-                controlCount += 1
-            }
-        }
-        return controlCount > 0 && controlCount * 100 > count
-    }
-
-    static let textControlBytes: Set<UInt8> = [
-        0x09,
-        0x0A,
-        0x0D,
-        0x0C
-    ]
-
-    static let asciiSpace: UInt8 = 0x20
 }

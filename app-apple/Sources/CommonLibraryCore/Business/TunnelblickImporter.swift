@@ -44,7 +44,13 @@ public struct TunnelblickImporter: Sendable {
     /// Read a `.tblk` ZIP archive.
     public func readArchive(data: Data) throws -> Contents {
         let coder = ZipBackupArchiveCoder(maxEntrySize: Self.maxEntrySize)
-        let entries = try coder.decode(data)
+        // Bound the decode itself (zip-bomb guard): caps are enforced
+        // during the entry loop, not only after a full decode.
+        let entries = try coder.decode(
+            data,
+            maxEntries: Self.maxEntries,
+            maxTotalSize: Self.maxTotalSize
+        )
         return try contents(fromEntries: entries)
     }
 
@@ -173,6 +179,15 @@ public struct TunnelblickImporter: Sendable {
                 output.append(rawLine)
                 continue
             }
+            // Hostile-input guard: a key file is inlined verbatim into the
+            // config, so it could otherwise break out of the inline block
+            // and inject OpenVPN directives. Reject anything that is not a
+            // plain PEM-like body (no angle brackets, no directive lines).
+            guard Self.isSafeInlineKeyFile(pem) else {
+                warnings.append(Strings.unsafeKeyFile(inlineArgument))
+                output.append(rawLine)
+                continue
+            }
             let block = Self.inlineBlocks[directive] ?? directive
             output.append("<\(block)>")
             output.append(contentsOf: pem
@@ -198,11 +213,23 @@ public struct TunnelblickImporter: Sendable {
         "crl-verify": "crl-verify"
     ]
 
+    /// Ordered directive list (dict key order is nondeterministic; the
+    /// longest-prefix-relevant directives are checked in a stable order).
+    static let fileDirectives: [String] = [
+        "ca",
+        "cert",
+        "key",
+        "dh",
+        "tls-auth",
+        "tls-crypt",
+        "crl-verify"
+    ]
+
     /// Directives whose argument is a file path, and how many extra
     /// arguments they may carry.
     static func fileDirective(in line: String) -> (directive: String, argument: String)? {
         let lowered = line.lowercased()
-        for directive in inlineBlocks.keys {
+        for directive in fileDirectives {
             guard lowered.hasPrefix("\(directive) ") else {
                 continue
             }
@@ -222,13 +249,65 @@ public struct TunnelblickImporter: Sendable {
 
     static func entry(named argument: String, in entries: [BackupEntry]) -> BackupEntry? {
         let cleaned = argument.trimmingCharacters(in: CharacterSet(charactersIn: "\"'"))
+        // 1. Exact relative-path match.
         if let exact = entries.first(where: { $0.name == cleaned }) {
             return exact
         }
-        // Relative references are resolved against the config's folder, then
-        // by basename anywhere in the set (Tunnelblick layouts vary).
+        // 2. Relative reference resolved against the package root
+        //    (e.g. "sub/ca.crt" matches "package/sub/ca.crt").
+        if let byPath = entries.first(where: { $0.name.hasSuffix("/\(cleaned)") }) {
+            return byPath
+        }
+        // 3. Basename equality anywhere in the set (Tunnelblick layouts
+        //    vary). Exact basename comparison — never a loose suffix, so
+        //    "ca.crt" cannot match "evilca.crt".
         let base = (cleaned as NSString).lastPathComponent
-        return entries.first { $0.name.hasSuffix(cleaned) || $0.name.hasSuffix("/\(base)") }
+        return entries.first { ($0.name as NSString).lastPathComponent == base }
+    }
+
+    /// Guard for content inlined into the OpenVPN config: reject anything
+    /// containing inline-block delimiters/angle brackets or a line that
+    /// looks like an OpenVPN directive, so a hostile key file cannot inject
+    /// configuration (e.g. `</key>` + `remote attacker.example 443`).
+    static func isSafeInlineKeyFile(_ text: String) -> Bool {
+        if text.contains("<") || text.contains(">") {
+            return false
+        }
+        let directives: Set<String> = [
+            "client",
+            "ca",
+            "cert",
+            "key",
+            "dh",
+            "tls-auth",
+            "tls-crypt",
+            "crl-verify",
+            "remote",
+            "proto",
+            "dev",
+            "verb",
+            "auth-user-pass",
+            "key-direction",
+            "route",
+            "ifconfig",
+            "script-security",
+            "up",
+            "down"
+        ]
+        for rawLine in text.lines {
+            let line = rawLine.trimmingCharacters(in: .whitespaces).lowercased()
+            guard !line.isEmpty else {
+                continue
+            }
+            if line.hasPrefix("-----begin ") || line.hasPrefix("-----end ") {
+                continue // PEM markers
+            }
+            let token = line.split(separator: " ").first.map(String.init) ?? line
+            if directives.contains(token) {
+                return false
+            }
+        }
+        return true
     }
 
     static func isConfigFilename(_ name: String) -> Bool {
@@ -285,6 +364,9 @@ public struct TunnelblickImporter: Sendable {
         }
         static func binaryKeyFile(_ name: String) -> String {
             "Referenced key file is not a text (PEM) file: \(name)"
+        }
+        static func unsafeKeyFile(_ name: String) -> String {
+            "Referenced key file contains unsafe content and was not inlined: \(name)"
         }
     }
 }

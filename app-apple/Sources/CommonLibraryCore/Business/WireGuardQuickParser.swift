@@ -101,6 +101,9 @@ public struct WireGuardQuickParser: Sendable {
                     section = .peer
                 default:
                     flushPendingPeer()
+                    warnings.append(Strings.unrecognizedSection(
+                        String(line.dropFirst().dropLast())
+                    ))
                     section = nil
                 }
                 continue
@@ -259,6 +262,9 @@ private extension WireGuardQuickParser {
         static let unsupportedListenPort = "ListenPort is not configurable for client profiles and was ignored"
         static func unrecognizedKey(_ key: String, section: String) -> String {
             "Unrecognized option '\(key)' in [\(section)] was ignored"
+        }
+        static func unrecognizedSection(_ name: String) -> String {
+            "Unrecognized section [\(name)] was ignored"
         }
     }
 
