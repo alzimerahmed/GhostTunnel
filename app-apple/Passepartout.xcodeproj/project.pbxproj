@@ -10,7 +10,6 @@
 		A1B2C3D4E5F60718293A4B80 /* WidgetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B87 /* WidgetsExtension.swift */; };
 		A1B2C3D4E5F60718293A4B81 /* TunnelStatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B88 /* TunnelStatusWidget.swift */; };
 		A1B2C3D4E5F60718293A4B82 /* TunnelControlWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B89 /* TunnelControlWidget.swift */; };
-		A1B2C3D4E5F60718293A4B83 /* Widgets.plist in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B8A /* Widgets.plist */; };
 		A1B2C3D4E5F60718293A4B84 /* AppIntentsLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F60718293A4B97 /* AppIntentsLibrary */; };
 		A1B2C3D4E5F60718293A4B85 /* CommonLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F60718293A4B98 /* CommonLibrary */; };
 		A1B2C3D4E5F60718293A4B86 /* AppIntentsLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F60718293A4B99 /* AppIntentsLibrary */; };
@@ -803,7 +802,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A1B2C3D4E5F60718293A4B83 /* Widgets.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1575,6 +1573,30 @@
 			};
 			name = ReleaseMac;
 		};
+		A1B2C3D4E5F60718293A4B95 /* ReleaseMac */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0ECD96172DC2738B009BD9F8 /* Config.mac.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Passepartout/Widgets/Widgets.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Passepartout/Widgets/Widgets.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(TARGET_NAME)";
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arm64;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../../../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(CFG_WIDGETS_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = ReleaseMac;
+		};
 		0EC332D42B8A1808000B9C2F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1827,6 +1849,7 @@
 			buildConfigurations = (
 				A1B2C3D4E5F60718293A4B93 /* Debug */,
 				A1B2C3D4E5F60718293A4B94 /* Release */,
+				A1B2C3D4E5F60718293A4B95 /* ReleaseMac */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

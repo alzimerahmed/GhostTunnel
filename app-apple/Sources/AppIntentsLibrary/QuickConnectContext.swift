@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import AppLibrary
+import AppResources
 import CommonLibrary
 import Foundation
 import Partout
@@ -33,6 +34,12 @@ public final class QuickConnectContext {
             distributionTarget: distributionTarget,
             buildTarget: .app
         )
+        // App preferences intentionally use `.standard`, mirroring the app
+        // target (AppContext+Production.swift), which also backs its
+        // AppPreferencesStore with `UserDefaults.standard`. Tunnel/widget
+        // state, on the other hand, is shared through the App Group suite
+        // via `makeTunnelDefaults()` (see below), so extensions and the app
+        // agree on everything that crosses process boundaries.
         let defaults: UserDefaults = .standard
         let preferences = AppPreferencesStore(
             UserDefaultsAppPreferences(defaults: defaults)

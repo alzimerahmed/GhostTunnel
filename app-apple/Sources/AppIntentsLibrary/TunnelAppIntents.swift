@@ -22,7 +22,7 @@ private func reloadWidgets() {
 /// Toggles the VPN on the last-used profile: connects when disconnected,
 /// disconnects otherwise. Used by widgets, Control Center, and Shortcuts.
 public struct ToggleTunnelIntent: AppIntent {
-    public static let title: LocalizedStringResource = "Connect VPN"
+    public static let title: LocalizedStringResource = "Toggle VPN"
 
     public static let description = IntentDescription(
         "Connects to the last-used profile, or disconnects if already connected."
@@ -39,7 +39,10 @@ public struct ToggleTunnelIntent: AppIntent {
     }
 }
 
-@available(iOS 18.0, macOS 15.0, *)
+// ControlIntent is unavailable before OS 18 on every platform, tvOS
+// included; without the tvOS clause this conformance fails to compile when
+// the package builds AppIntentsLibrary for tvOS (declared in Package.swift).
+@available(iOS 18.0, macOS 15.0, tvOS 18.0, *)
 extension ToggleTunnelIntent: ControlIntent {}
 
 // MARK: - Connect to a specific profile

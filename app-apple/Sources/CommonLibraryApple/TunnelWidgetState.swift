@@ -56,6 +56,20 @@ extension TunnelWidgetState {
     }
 }
 
+// MARK: - App Group resolution
+
+/// Resolves the App Group `UserDefaults` shared with the app. Returns `nil`
+/// for a missing/empty identifier instead of silently falling back to
+/// `.standard`, so readers (widgets, intents extension) can fail visibly.
+public enum WidgetAppGroup {
+    public static func defaults(groupId: String?) -> UserDefaults? {
+        guard let groupId, !groupId.isEmpty else {
+            return nil
+        }
+        return UserDefaults(suiteName: groupId)
+    }
+}
+
 // MARK: - Store
 
 /// App Group-backed persistence for `TunnelWidgetState`.

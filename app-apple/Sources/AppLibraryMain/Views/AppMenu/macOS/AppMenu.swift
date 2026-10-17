@@ -124,7 +124,12 @@ private extension AppMenu {
     }
 
     var quickConnectTargetId: Profile.ID? {
-        let lastUsed = userPreferences.lastUsedProfileId
+        // Read the last-used profile through the observed `activeProfiles`
+        // (TunnelObservable keeps a stub entry for it while disconnected),
+        // so the menu button updates when the last-used profile changes.
+        // `userPreferences.lastUsedProfileId` is a computed pass-through on
+        // the untracked preferences backend and would not re-render.
+        let lastUsed = tunnel.activeProfile?.id
         let headers = profileObservable.filteredHeaders
         if let lastUsed, headers.contains(where: { $0.id == lastUsed }) {
             return lastUsed

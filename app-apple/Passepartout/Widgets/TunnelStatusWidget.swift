@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import AppIntentsLibrary
+import AppStrings
 import CommonLibrary
 import SwiftUI
 import WidgetKit
@@ -10,12 +11,14 @@ import WidgetKit
 // MARK: - Defaults
 
 /// App Group defaults shared with the app (same `AppConfig.groupId` as the
-/// main app's Info.plist, resolved via xcconfig).
+/// main app's Info.plist, resolved via xcconfig). Returns `nil` when the
+/// group identifier is missing or unusable, so the widget can fail visibly
+/// instead of silently falling back to `.standard` (which the app never
+/// writes widget state to).
 private enum WidgetDefaults {
-    static var defaults: UserDefaults {
+    static var defaults: UserDefaults? {
         let config = Bundle.main.infoDictionary?["AppConfig"] as? [String: String]
-        let groupId = config?["groupId"] ?? ""
-        return UserDefaults(suiteName: groupId) ?? .standard
+        return WidgetAppGroup.defaults(groupId: config?["groupId"])
     }
 }
 
@@ -25,10 +28,16 @@ struct TunnelStatusEntry: TimelineEntry {
     let date: Date
 
     let state: TunnelWidgetState
+
+    /// `false` when the App Group defaults are unavailable (misconfigured
+    /// group identifier); the view then renders an explicit invalid state.
+    var isConfigured: Bool = true
 }
 
 struct TunnelStatusProvider: TimelineProvider {
-    private let store = TunnelWidgetStatusStore(defaults: WidgetDefaults.defaults)
+    private let store = WidgetDefaults.defaults.map {
+        TunnelWidgetStatusStore(defaults: $0)
+    }
 
     func placeholder() -> TunnelStatusEntry {
         .init(date: Date(), state: TunnelWidgetState(kind: .disconnected))
@@ -51,7 +60,15 @@ struct TunnelStatusProvider: TimelineProvider {
     }
 
     private func entry() -> TunnelStatusEntry {
-        .init(
+        guard let store else {
+            // Fail visibly: no App Group access means no trustworthy state.
+            return .init(
+                date: Date(),
+                state: TunnelWidgetState(kind: .disconnected),
+                isConfigured: false
+            )
+        }
+        return .init(
             date: Date(),
             state: store.load() ?? TunnelWidgetState(kind: .disconnected)
         )
@@ -83,6 +100,28 @@ struct TunnelStatusEntryView: View {
     let entry: TunnelStatusEntry
 
     var body: some View {
+        if !entry.isConfigured {
+            unavailableView
+        } else {
+            statusView
+        }
+    }
+
+    /// Rendered when the App Group defaults cannot be resolved, so a
+    /// misconfiguration never masquerades as "disconnected".
+    private var unavailableView: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.title2)
+                .foregroundStyle(.orange)
+            Text(verbatim: "Unavailable")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .containerBackground(.fill.quaternary, for: .widget)
+    }
+
+    private var statusView: some View {
         VStack(spacing: 8) {
             Image(systemName: entry.state.kind.systemImageName)
                 .font(.title2)

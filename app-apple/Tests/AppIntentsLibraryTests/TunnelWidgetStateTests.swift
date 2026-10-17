@@ -66,4 +66,17 @@ struct TunnelWidgetStateTests {
         }
         #expect(TunnelWidgetStatusStore(defaults: defaults).load() == nil)
     }
+
+    // MARK: App Group resolution
+
+    @Test
+    func givenEmptyGroupId_thenNoDefaults() {
+        #expect(WidgetAppGroup.defaults(groupId: nil) == nil)
+        #expect(WidgetAppGroup.defaults(groupId: "") == nil)
+    }
+
+    @Test
+    func givenValidGroupId_thenDefaultsResolve() {
+        #expect(WidgetAppGroup.defaults(groupId: "TunnelWidgetStateTests.group") != nil)
+    }
 }
