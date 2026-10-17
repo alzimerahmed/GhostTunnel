@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C0DE11A00000000000000001 /* TopShelfExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE11A00000000000000010 /* TopShelfExtension.swift */; };
+		C0DE11A00000000000000003 /* AppIntentsLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F60718293A4B99 /* AppIntentsLibrary */; };
+		C0DE11A00000000000000004 /* CommonLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F60718293A4B98 /* CommonLibrary */; };
+		C0DE11A00000000000000005 /* AppLibraryTV in Frameworks */ = {isa = PBXBuildFile; productRef = 0EE9F4A02ECF28C4008D5837 /* AppLibraryTV */; };
+		C0DE11A00000000000000006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C0DE11A00000000000000013 /* Assets.xcassets */; };
 		A1B2C3D4E5F60718293A4B80 /* WidgetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B87 /* WidgetsExtension.swift */; };
 		A1B2C3D4E5F60718293A4B81 /* TunnelStatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B88 /* TunnelStatusWidget.swift */; };
 		A1B2C3D4E5F60718293A4B82 /* TunnelControlWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B89 /* TunnelControlWidget.swift */; };
@@ -69,6 +74,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		C0DE11A00000000000000020 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0E06D1872B87629100176E1D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C0DE11A00000000000000050;
+			remoteInfo = PassepartoutTopShelf;
+		};
 		A1B2C3D4E5F60718293A4B95 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0E06D1872B87629100176E1D /* Project object */;
@@ -139,6 +151,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C0DE11A00000000000000010 /* TopShelfExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopShelfExtension.swift; sourceTree = "<group>"; };
+		C0DE11A00000000000000011 /* TopShelf.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = TopShelf.plist; sourceTree = "<group>"; };
+		C0DE11A00000000000000012 /* TopShelf.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = TopShelf.entitlements; sourceTree = "<group>"; };
+		C0DE11A00000000000000013 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C0DE11A00000000000000014 /* PassepartoutTopShelf.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PassepartoutTopShelf.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1B2C3D4E5F60718293A4B87 /* WidgetsExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WidgetsExtension.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B88 /* TunnelStatusWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TunnelStatusWidget.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B89 /* TunnelControlWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TunnelControlWidget.swift; sourceTree = "<group>"; };
@@ -279,6 +296,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C0DE11A00000000000000031 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0DE11A00000000000000003 /* AppIntentsLibrary in Frameworks */,
+				C0DE11A00000000000000004 /* CommonLibrary in Frameworks */,
+				C0DE11A00000000000000005 /* AppLibraryTV in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0EE662B12DC2BDDE00A4BB37 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -310,6 +337,7 @@
 				0EC332C82B8A1808000B9C2F /* PassepartoutTunnel.appex */,
 				0EDE56F02CABE42E0082D21C /* PassepartoutIntents.appex */,
 				A1B2C3D4E5F60718293A4B8C /* PassepartoutWidgets.appex */,
+				C0DE11A00000000000000014 /* PassepartoutTopShelf.appex */,
 				0E757F102CD0CFFC006E13E1 /* PassepartoutLoginItem.app */,
 				0E3FF4AE2CE3AF6F00BFF640 /* PassepartoutTests.xctest */,
 				0E78FE4C2CF799F400B0C5BF /* PassepartoutUITests.xctest */,
@@ -369,6 +397,7 @@
 				0E7E3D652B9345FD002BBDB4 /* Tunnel */,
 				0E7F460D2CF7F01600B1C53A /* UITests */,
 				A1B2C3D4E5F60718293A4B8D /* Widgets */,
+				C0DE11A00000000000000040 /* TopShelf */,
 			);
 			path = Passepartout;
 			sourceTree = "<group>";
@@ -498,6 +527,17 @@
 			path = Widgets;
 			sourceTree = "<group>";
 		};
+		C0DE11A00000000000000040 /* TopShelf */ = {
+			isa = PBXGroup;
+			children = (
+				C0DE11A00000000000000012 /* TopShelf.entitlements */,
+				C0DE11A00000000000000011 /* TopShelf.plist */,
+				C0DE11A00000000000000010 /* TopShelfExtension.swift */,
+				C0DE11A00000000000000013 /* Assets.xcassets */,
+			);
+			path = TopShelf;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -519,6 +559,7 @@
 				0EC332D12B8A1808000B9C2F /* PBXTargetDependency */,
 				0EE662BE2DC2BDDF00A4BB37 /* PBXTargetDependency */,
 				A1B2C3D4E5F60718293A4B96 /* PBXTargetDependency */,
+				C0DE11A00000000000000021 /* PBXTargetDependency */,
 			);
 			name = Passepartout;
 			packageProductDependencies = (
@@ -649,6 +690,28 @@
 			productReference = A1B2C3D4E5F60718293A4B8C /* PassepartoutWidgets.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		C0DE11A00000000000000050 /* PassepartoutTopShelf */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0DE11A00000000000000051 /* Build configuration list for PBXNativeTarget "PassepartoutTopShelf" */;
+			buildPhases = (
+				C0DE11A00000000000000030 /* Sources */,
+				C0DE11A00000000000000031 /* Frameworks */,
+				C0DE11A00000000000000032 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PassepartoutTopShelf;
+			packageProductDependencies = (
+				A1B2C3D4E5F60718293A4B99 /* AppIntentsLibrary */,
+				A1B2C3D4E5F60718293A4B98 /* CommonLibrary */,
+				0EE9F4A02ECF28C4008D5837 /* AppLibraryTV */,
+			);
+			productName = TopShelf;
+			productReference = C0DE11A00000000000000014 /* PassepartoutTopShelf.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		0EE662B32DC2BDDE00A4BB37 /* PassepartoutTunnelMac */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0EE662C52DC2BDDF00A4BB37 /* Build configuration list for PBXNativeTarget "PassepartoutTunnelMac" */;
@@ -745,6 +808,7 @@
 				0EE662B32DC2BDDE00A4BB37 /* PassepartoutTunnelMac */,
 				0E78FE4B2CF799F400B0C5BF /* PassepartoutUITests */,
 				A1B2C3D4E5F60718293A4B91 /* PassepartoutWidgets */,
+				C0DE11A00000000000000050 /* PassepartoutTopShelf */,
 			);
 		};
 /* End PBXProject section */
@@ -805,6 +869,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C0DE11A00000000000000032 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0DE11A00000000000000006 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0EE662B22DC2BDDE00A4BB37 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -856,6 +928,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		C0DE11A00000000000000030 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0DE11A00000000000000001 /* TopShelfExtension.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0E06D18B2B87629100176E1D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -947,6 +1027,14 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		C0DE11A00000000000000021 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilters = (
+				appletvos,
+			);
+			target = C0DE11A00000000000000050 /* PassepartoutTopShelf */;
+			targetProxy = C0DE11A00000000000000020 /* PBXContainerItemProxy */;
+		};
 		0E3FF4B32CE3AF6F00BFF640 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 0E06D18E2B87629100176E1D /* Passepartout */;
@@ -1717,6 +1805,72 @@
 			};
 			name = Release;
 		};
+		C0DE11A00000000000000052 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0E8D852F2C328CA1005493DE /* Config.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Passepartout/TopShelf/TopShelf.entitlements;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Passepartout/TopShelf/TopShelf.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(TARGET_NAME)";
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arm64;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(CFG_TOPSHELF_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Debug;
+		};
+		C0DE11A00000000000000053 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0E8D852F2C328CA1005493DE /* Config.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Passepartout/TopShelf/TopShelf.entitlements;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Passepartout/TopShelf/TopShelf.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(TARGET_NAME)";
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arm64;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(CFG_TOPSHELF_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Release;
+		};
+		C0DE11A00000000000000054 /* ReleaseMac */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0E8D852F2C328CA1005493DE /* Config.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Passepartout/TopShelf/TopShelf.entitlements;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Passepartout/TopShelf/TopShelf.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(TARGET_NAME)";
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = arm64;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(CFG_TOPSHELF_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = ReleaseMac;
+		};
 		0EE662C12DC2BDDF00A4BB37 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0ECD96172DC2738B009BD9F8 /* Config.mac.xcconfig */;
@@ -1850,6 +2004,16 @@
 				A1B2C3D4E5F60718293A4B93 /* Debug */,
 				A1B2C3D4E5F60718293A4B94 /* Release */,
 				A1B2C3D4E5F60718293A4B95 /* ReleaseMac */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C0DE11A00000000000000051 /* Build configuration list for PBXNativeTarget "PassepartoutTopShelf" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0DE11A00000000000000052 /* Debug */,
+				C0DE11A00000000000000053 /* Release */,
+				C0DE11A00000000000000054 /* ReleaseMac */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

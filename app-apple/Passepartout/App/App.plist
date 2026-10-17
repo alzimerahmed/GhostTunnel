@@ -19,6 +19,17 @@
 		<key>tunnelId</key>
 		<string>$(CFG_TUNNEL_ID)</string>
 	</dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.ghosttunnel.deeplink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>ghosttunnel</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>

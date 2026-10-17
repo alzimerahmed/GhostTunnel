@@ -73,7 +73,10 @@ let package = Package(
         ),
         .target(
             name: "AppLibraryTV",
-            dependencies: ["AppLibrary"]
+            dependencies: [
+                "AppLibrary",
+                "CommonLibrary"
+            ]
         ),
         .target(
             name: "AppLibraryTVWrapper",
@@ -116,6 +119,13 @@ let package = Package(
         .testTarget(
             name: "AppLibraryMainTests",
             dependencies: ["AppLibraryMainWrapper"]
+        ),
+        .testTarget(
+            name: "AppLibraryTVTests",
+            dependencies: [
+                "AppLibraryTV",
+                "CommonLibrary"
+            ]
         )
     ]
 )

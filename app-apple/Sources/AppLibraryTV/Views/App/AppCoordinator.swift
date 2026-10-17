@@ -59,6 +59,7 @@ public struct AppCoordinator: View, AppCoordinatorConforming {
                 }
             }
             .navigationDestination(for: AppCoordinatorRoute.self, destination: pushDestination)
+            .onOpenURL(handleOpenURL)
             .modifier(DynamicPaywallModifier(
                 paywallReason: $paywallReason,
                 paywallContinuation: paywallContinuation
@@ -90,7 +91,17 @@ private extension AppCoordinator {
     var profilesView: some View {
         ProfilesView(
             profileObservable: profileObservable,
-            webReceiverObservable: webReceiverObservable
+            tunnel: tunnel,
+            webReceiverObservable: webReceiverObservable,
+            flow: .init(
+                onConnect: {
+                    guard let profile = profileObservable.profile(withId: $0.id) else {
+                        pspLog(.profiles, .error, "Unable to find profile from header: \($0.id)")
+                        return
+                    }
+                    await onConnect(profile, force: false)
+                }
+            )
         )
     }
 
@@ -130,6 +141,23 @@ private extension AppCoordinator {
 // MARK: - Handlers
 
 extension AppCoordinator {
+
+    /// Deep link from a Top Shelf item (`ghosttunnel://connect/<uuid>`).
+    /// Foreign URLs are ignored; a known profile connects through the same
+    /// `onConnect` flow as in-app connects (paywall, interactive login).
+    public func handleOpenURL(_ url: URL) {
+        guard let profileId = TopShelfContentBuilder.profileId(fromDeepLink: url) else {
+            return
+        }
+        guard let profile = profileObservable.profile(withId: profileId) else {
+            pspLog(.core, .info, "Top Shelf deep link to unknown profile: \(profileId)")
+            return
+        }
+        Task {
+            await onConnect(profile, force: false)
+        }
+    }
+
     public func onInteractiveLogin(_ profile: Profile, _ onComplete: @escaping InteractiveObservable.CompletionBlock) {
         pspLog(.core, .info, "Present interactive login")
         interactiveObservable.present(

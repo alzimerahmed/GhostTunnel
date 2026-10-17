@@ -36,7 +36,10 @@ struct ConnectionProfilesView: View {
 
 private extension ConnectionProfilesView {
     var headers: [ABI.AppProfileHeader] {
-        profileObservable.filteredHeaders
+        // Alphabetical order gives the remote a predictable focus path.
+        profileObservable.filteredHeaders.sorted {
+            $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        }
     }
 
     var headerString: String {
