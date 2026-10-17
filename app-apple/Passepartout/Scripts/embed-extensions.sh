@@ -3,6 +3,7 @@ app_root="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app"
 login_src="${BUILT_PRODUCTS_DIR}/PassepartoutLoginItem.app"
 appex_src="${BUILT_PRODUCTS_DIR}/PassepartoutTunnel.appex"
 widgets_src="${BUILT_PRODUCTS_DIR}/PassepartoutWidgets.appex"
+topshelf_src="${BUILT_PRODUCTS_DIR}/PassepartoutTopShelf.appex"
 sysex_src="${BUILT_PRODUCTS_DIR}/${CFG_TUNNEL_ID}.systemextension"
 platform_mac="macosx"
 sysex_cfg="ReleaseMac"
@@ -32,4 +33,7 @@ $mkdir_alias "$appex_dst"
 $cp_alias "$appex_src" "$appex_dst"
 if [ -d "$widgets_src" ]; then
     $cp_alias "$widgets_src" "$appex_dst"
+fi
+if [ -d "$topshelf_src" ]; then
+    $cp_alias "$topshelf_src" "$appex_dst"
 fi

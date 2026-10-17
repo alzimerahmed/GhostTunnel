@@ -8,7 +8,13 @@ import SwiftUI
 struct ProfilesView: View {
     let profileObservable: ProfileObservable
 
+    let tunnel: TunnelObservable
+
     let webReceiverObservable: WebReceiverObservable
+
+    /// Connect flow for the detail pane (same handler as the Connection
+    /// tab, so paywall/interactive-login behavior is identical).
+    let flow: ConnectionFlow?
 
     @FocusState
     private var detail: Detail?
@@ -41,9 +47,11 @@ private extension ProfilesView {
     var detailView: some View {
         DetailView(
             detail: detail,
+            tunnel: tunnel,
             webReceiverObservable: webReceiverObservable,
             profileObservable: profileObservable,
-            errorHandler: errorHandler
+            errorHandler: errorHandler,
+            flow: flow
         )
         .frame(maxWidth: .infinity)
     }
@@ -65,7 +73,7 @@ private extension ProfilesView {
 
     func row(forHeader header: ABI.AppProfileHeader) -> some View {
         Button {
-            //
+            detail = .profile(header.id)
         } label: {
             HStack {
                 Text(header.name)
@@ -81,7 +89,8 @@ private extension ProfilesView {
                 deleteProfile(withId: header.id)
             }
         }
-        .focused($detail, equals: .profiles)
+        .focused($detail, equals: .profile(header.id))
+        .uiAccessibility(.App.ProfileList.profile)
     }
 }
 
@@ -112,14 +121,16 @@ private extension ProfilesView {
 
 // MARK: - Detail
 
-private enum Detail {
+private enum Detail: Hashable {
     case `import`
 
-    case profiles
+    case profile(Profile.ID)
 }
 
 private struct DetailView: View {
     let detail: Detail?
+
+    let tunnel: TunnelObservable
 
     let webReceiverObservable: WebReceiverObservable
 
@@ -127,16 +138,19 @@ private struct DetailView: View {
 
     let errorHandler: ErrorHandler
 
+    let flow: ConnectionFlow?
+
     var body: some View {
         VStack {
             TopSpacer()
             switch detail {
             case .import:
                 importView
-            case .profiles:
-                Text(Strings.Views.Tv.Profiles.Detail.profiles)
+            case .profile(let profileId):
+                profileView(for: profileId)
             default:
-                Text("") // take space regardless
+                Text(Strings.Views.Tv.Profiles.Detail.profiles)
+                    .themeEmptyMessage()
             }
             Spacer()
         }
@@ -151,6 +165,73 @@ private extension DetailView {
             errorHandler: errorHandler
         )
     }
+
+    @ViewBuilder
+    func profileView(for profileId: Profile.ID) -> some View {
+        if let header = profileObservable.header(withId: profileId) {
+            ProfileDetailView(
+                header: header,
+                tunnel: tunnel,
+                errorHandler: errorHandler,
+                flow: flow
+            )
+        } else {
+            Text(Strings.Views.Tv.Profiles.Detail.profiles)
+                .themeEmptyMessage()
+        }
+    }
+}
+
+/// Detail pane for the profile selected in the master list: connection
+/// status, a Connect/Disconnect action, and the profile metadata. Connects
+/// from the Profiles tab reuse the same `TunnelToggle` flow as the
+/// Connection tab, so paywall/interactive-login handling stays identical.
+private struct ProfileDetailView: View {
+    @Environment(Theme.self)
+    private var theme
+
+    let header: ABI.AppProfileHeader
+
+    let tunnel: TunnelObservable
+
+    let errorHandler: ErrorHandler
+
+    let flow: ConnectionFlow?
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text(header.name)
+                .font(.title)
+                .fontWeight(theme.relevantWeight)
+                .multilineTextAlignment(.center)
+
+            ConnectionStatusText(tunnel: tunnel, profileId: header.id)
+                .font(.title3)
+                .brightness(0.2)
+
+            TunnelToggle(
+                tunnel: tunnel,
+                header: header,
+                errorHandler: errorHandler,
+                flow: flow
+            ) { isOn, canInteract in
+                Button(!isOn.wrappedValue ? Strings.Global.Actions.connect : Strings.Global.Actions.disconnect) {
+                    isOn.wrappedValue.toggle()
+                }
+                .frame(maxWidth: 400)
+                .fontWeight(theme.relevantWeight)
+            }
+
+            if let primaryType = header.localizedDescription(optionalStyle: .primaryType) {
+                ListRowView(title: Strings.Global.Nouns.protocol) {
+                    Text(primaryType)
+                }
+                .font(.title3)
+            }
+        }
+        .padding(.horizontal, 100)
+        .uiAccessibility(.App.ProfileList.profile)
+    }
 }
 
 // MARK: - Preview
@@ -158,7 +239,9 @@ private extension DetailView {
 #Preview("Empty") {
     ProfilesView(
         profileObservable: .forPreviews,
-        webReceiverObservable: .forPreviews
+        tunnel: .forPreviews,
+        webReceiverObservable: .forPreviews,
+        flow: nil
     )
     .withMockEnvironment()
     .task {
@@ -169,7 +252,9 @@ private extension DetailView {
 #Preview("Profiles") {
     ProfilesView(
         profileObservable: .forPreviews,
-        webReceiverObservable: .forPreviews
+        tunnel: .forPreviews,
+        webReceiverObservable: .forPreviews,
+        flow: nil
     )
     .withMockEnvironment()
 }
