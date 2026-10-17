@@ -31,6 +31,10 @@ jobs:
             suite: apple-build
             runner: macos-26
             timeout_minutes: 25
+          - name: Apple build tvOS
+            suite: apple-build-tvos
+            runner: macos-26
+            timeout_minutes: 25
           - name: Partout tests
             suite: partout
             runner: macos-26
@@ -53,7 +57,7 @@ jobs:
           submodules: recursive
 
       - uses: partout-io/action-prepare-xcode-build@master
-        if: matrix.suite == 'apple' || matrix.suite == 'apple-build' || matrix.suite == 'partout'
+        if: matrix.suite == 'apple' || matrix.suite == 'apple-build' || matrix.suite == 'apple-build-tvos' || matrix.suite == 'partout'
         with:
           access-token: ${{ github.token }}
           submodules: true
@@ -137,6 +141,18 @@ jobs:
             -project Passepartout.xcodeproj \
             -scheme PassepartoutMac \
             -destination 'generic/platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO | tail -50
+
+      - name: Run Apple build (tvOS)
+        if: matrix.suite == 'apple-build-tvos'
+        run: |
+          cd app-apple
+          # Phase 11 gate: compiles the tvOS app + the appletvos-filtered
+          # PassepartoutTopShelf extension target (hand-written pbxproj).
+          xcodebuild build \
+            -project Passepartout.xcodeproj \
+            -scheme Passepartout \
+            -destination 'generic/platform=tvOS' \
             CODE_SIGNING_ALLOWED=NO | tail -50
 
       - name: Run Partout tests (Swift)

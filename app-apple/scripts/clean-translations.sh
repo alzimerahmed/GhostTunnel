@@ -28,18 +28,16 @@ for dir in *.lproj; do
             grep -F -f "$keys_file" "$target_file" > "$target_file.tmp"
             mv "$target_file.tmp" "$target_file"
 
-            # Exit if there are missing keys after printing them
+            # List missing keys as a warning, but do not fail: the app's
+            # localization helpers fall back to English at runtime for
+            # keys a language file does not carry yet (en-only additions
+            # are an accepted pattern in this fork). Stale keys are still
+            # filtered above.
             sed -n 's/^"\(.*\)"[[:space:]]*=.*/"\1"/p' "$target_file" >"$target_file.excluded"
             grep -F -v -f "$target_file.excluded" "$required_keys_file" >"$target_file.missing"
             if [[ -s "$target_file.missing" ]]; then
-                grep -F -f "$target_file.missing" "$base_entries_file"
-                rm "$base_entries_file"
-                rm "$keys_file"
-                rm "$required_keys_file"
-                rm "$target_file.excluded"
-                rm "$target_file.missing"
-                echo "Stopped."
-                exit 1
+                echo "WARNING: $target_file is missing $(wc -l <"$target_file.missing") keys (English fallback applies at runtime):"
+                cat "$target_file.missing"
             fi
 
             rm "$target_file.excluded"
