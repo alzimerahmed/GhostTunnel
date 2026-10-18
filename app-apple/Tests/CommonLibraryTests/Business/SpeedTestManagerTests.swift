@@ -70,7 +70,7 @@ struct SpeedTestManagerTests {
         let results = await scheduler.run(targets)
         #expect(results.map(\.target.id) == ["a", "b", "c"])
         #expect(try await probe.probedHosts.count == 3)
-        #expect(results.allSatisfy(\.isSuccess))
+        #expect(results.allSatisfy { $0.isSuccess })
     }
 
     @Test

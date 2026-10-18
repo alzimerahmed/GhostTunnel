@@ -279,7 +279,7 @@ extension AppImportExportTests {
         """
 
         let profile = try AppImportExport.dummy.importedProfile(
-            from: .contents(filename: "qr.txt", data: Data(contents.utf8)),
+            from: .contents(filename: "qr.txt", data: contents),
             passphrase: nil
         )
 
@@ -303,7 +303,7 @@ extension AppImportExportTests {
     @Test
     func givenWGQuickFile_whenImportedFile_thenDetectedAndImported() throws {
         let result = try AppImportExport.dummy.importedFile(
-            from: .contents(filename: "tunnel.conf", data: Data(Self.wgQuickContents.utf8)),
+            from: .contents(filename: "tunnel.conf", data: Self.wgQuickContents),
             passphrase: nil
         )
         #expect(result.format == .wireGuardQuick)
@@ -361,7 +361,7 @@ extension AppImportExportTests {
     @Test
     func givenTunnelblickWGPackage_whenImportedFile_thenImported() throws {
         let entries = [
-            BackupEntry(name: "config.tblk/tunnel.conf", data: Data(Self.wgQuickContents.utf8))
+            BackupEntry(name: "config.tblk/tunnel.conf", data: Self.wgQuickContents)
         ]
         let zipData = try ZipBackupArchiveCoder().encode(entries)
         let result = try AppImportExport.dummy.importedFile(
