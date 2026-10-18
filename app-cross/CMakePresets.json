@@ -25,6 +25,16 @@
       }
     },
     {
+      "name": "linux-gcc",
+      "displayName": "Linux GCC",
+      "inherits": "base",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
       "name": "windows-base",
       "hidden": true,
       "inherits": "base",
@@ -62,6 +72,16 @@
     {
       "name": "macos-release",
       "configurePreset": "macos-clang",
+      "configuration": "Release"
+    },
+    {
+      "name": "linux-debug",
+      "configurePreset": "linux-gcc",
+      "configuration": "Debug"
+    },
+    {
+      "name": "linux-release",
+      "configurePreset": "linux-gcc",
       "configuration": "Release"
     },
     {
