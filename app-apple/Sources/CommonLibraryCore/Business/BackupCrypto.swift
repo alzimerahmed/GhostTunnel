@@ -101,6 +101,7 @@ enum BackupCrypto {
         }
         let passphraseData = Data(passphrase.utf8)
         var keyData = Data(repeating: 0, count: keyLength)
+        let keyCount = keyLength
         let status = passphraseData.withUnsafeBytes { passPtr -> Int32 in
             salt.withUnsafeBytes { saltPtr -> Int32 in
                 keyData.withUnsafeMutableBytes { keyPtr -> Int32 in
@@ -113,7 +114,7 @@ enum BackupCrypto {
                         CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA256),
                         pbkdf2Iterations,
                         keyPtr.baseAddress?.assumingMemoryBound(to: UInt8.self),
-                        keyData.count
+                        keyCount
                     )
                 }
             }
