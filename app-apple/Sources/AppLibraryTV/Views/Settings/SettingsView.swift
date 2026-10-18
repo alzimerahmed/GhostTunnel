@@ -69,8 +69,6 @@ private extension SettingsView {
             .focused($focus, equals: .version)
             Button(Strings.Views.Settings.Credits.title) {}
                 .focused($focus, equals: .credits)
-            Button(Strings.Views.Donate.title) {}
-                .focused($focus, equals: .donate)
         }
         .themeSection(header: Strings.Views.Settings.title)
     }
@@ -97,8 +95,6 @@ private extension SettingsView {
 private enum Detail {
     case credits
 
-    case donate
-
     case other
 
     case preferences
@@ -116,9 +112,6 @@ private struct DetailView: View {
         case .credits:
             CreditsView()
                 .themeList()
-
-        case .donate:
-            DonateView(modifier: DonateViewModifier())
 
         case .purchased:
             PurchasedView()

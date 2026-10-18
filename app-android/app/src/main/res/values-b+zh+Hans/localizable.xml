@@ -47,9 +47,6 @@
     <string name="views_diagnostics_openvpn_rows_server_configuration">服务器配置</string>
     <string name="views_diagnostics_report_issue_title">报告问题</string>
     <string name="views_diagnostics_alerts_report_issue_email">设备未配置为发送电子邮件。</string>
-    <string name="views_donate_title">捐赠</string>
-    <string name="views_donate_sections_main_footer">如果您想表达对我工作的感激之情，以下是您可以立即捐赠的一些金额。每次捐赠只会扣费一次，您可以多次捐赠。</string>
-    <string name="views_donate_alerts_thank_you_message">这对我意义重大，我真心希望您继续使用和推广此应用。</string>
     <string name="views_migration_title">迁移</string>
     <string name="views_migration_no_profiles">没有可迁移的内容</string>
     <string name="views_migration_items_discard">丢弃</string>

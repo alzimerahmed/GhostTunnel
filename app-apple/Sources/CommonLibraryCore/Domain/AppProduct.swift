@@ -7,7 +7,7 @@ extension ABI {
         public let rawValue: String
 
         public init?(rawValue: String) {
-            if let range = rawValue.range(of: Self.featurePrefix) ?? rawValue.range(of: Self.providerPrefix) ?? rawValue.range(of: Self.donationPrefix) {
+            if let range = rawValue.range(of: Self.featurePrefix) ?? rawValue.range(of: Self.providerPrefix) {
                 self.rawValue = String(rawValue[range.lowerBound..<rawValue.endIndex])
             } else {
                 self.rawValue = rawValue
@@ -18,7 +18,7 @@ extension ABI {
 
 extension ABI.AppProduct {
     public static var all: [Self] {
-        Features.all + Essentials.all + Complete.all + Donations.all
+        Features.all + Essentials.all + Complete.all
     }
 }
 

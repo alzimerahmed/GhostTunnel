@@ -1035,22 +1035,6 @@ public enum Strings {
         public static let tunnel = Strings.tr("Localizable", "views.diagnostics.sections.tunnel", fallback: "Tunnel logs")
       }
     }
-    public enum Donate {
-      /// Make a donation
-      public static let title = Strings.tr("Localizable", "views.donate.title", fallback: "Make a donation")
-      public enum Alerts {
-        public enum ThankYou {
-          /// This means a lot to me and I really hope you keep using and promoting this app.
-          public static let message = Strings.tr("Localizable", "views.donate.alerts.thank_you.message", fallback: "This means a lot to me and I really hope you keep using and promoting this app.")
-        }
-      }
-      public enum Sections {
-        public enum Main {
-          /// If you want to display gratitude for my work, here are a couple of amounts you can donate instantly. You will only be charged once per donation, and you can donate multiple times.
-          public static let footer = Strings.tr("Localizable", "views.donate.sections.main.footer", fallback: "If you want to display gratitude for my work, here are a couple of amounts you can donate instantly. You will only be charged once per donation, and you can donate multiple times.")
-        }
-      }
-    }
     public enum Migration {
       /// Nothing to migrate
       public static let noProfiles = Strings.tr("Localizable", "views.migration.no_profiles", fallback: "Nothing to migrate")

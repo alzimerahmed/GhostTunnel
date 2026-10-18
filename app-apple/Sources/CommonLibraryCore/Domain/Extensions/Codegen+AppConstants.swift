@@ -10,10 +10,6 @@ extension OpenAPIAppConstantsWebsites {
         partoutURL.appending(path: "blog")
     }
 
-    public var donateURL: URL {
-        partoutURL.appending(path: "donate")
-    }
-
     public var apiURL: URL {
         partoutURL.appending(path: "passepartout-api")
     }

@@ -334,9 +334,6 @@
 "views.diagnostics.sections.live" = "Registro ao vivo";
 "views.diagnostics.sections.tunnel" = "Registros do túnel";
 "views.diagnostics.title" = "Diagnósticos";
-"views.donate.alerts.thank_you.message" = "Isso significa muito para mim e espero sinceramente que você continue usando e promovendo este app.";
-"views.donate.sections.main.footer" = "Se você deseja demonstrar gratidão pelo meu trabalho, aqui estão alguns valores que você pode doar instantaneamente. Você será cobrado apenas uma vez por doação e poderá doar várias vezes.";
-"views.donate.title" = "Faça uma doação";
 "views.migration.alerts.delete.message" = "Você deseja descartar esses perfis? Não será possível recuperá-los mais tarde.\n\n%@";
 "views.migration.items.discard" = "Descartar";
 "views.migration.items.migrate" = "Continuar";

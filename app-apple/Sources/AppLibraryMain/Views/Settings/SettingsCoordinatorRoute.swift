@@ -13,8 +13,6 @@ enum SettingsCoordinatorRoute: Hashable {
 
     case diagnostics
 
-    case donate
-
     case links
 
     case preferences

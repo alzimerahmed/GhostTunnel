@@ -36,9 +36,6 @@ private extension LinksView {
 //            if distributionTarget.supportsIAP && iapManager.isPayingUser {
 //                Link(Strings.Views.Settings.Links.Rows.writeReview, destination: appConfiguration.urlForReview)
 //            }
-            if !appConfiguration.bundle.distributionTarget.supportsIAP && !isBeta {
-                WebDonationLink()
-            }
         }
         .themeSection(header: Strings.Views.Settings.Links.Sections.support)
     }

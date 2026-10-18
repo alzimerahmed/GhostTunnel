@@ -69,9 +69,6 @@
 "views.diagnostics.debug_bundle.unavailable" = "Debug bundle export is not available on this device.";
 "views.diagnostics.alerts.export_error.title" = "Unable to export";
 
-"views.donate.title" = "Make a donation";
-"views.donate.sections.main.footer" = "If you want to display gratitude for my work, here are a couple of amounts you can donate instantly. You will only be charged once per donation, and you can donate multiple times.";
-"views.donate.alerts.thank_you.message" = "This means a lot to me and I really hope you keep using and promoting this app.";
 
 "views.migration.title" = "Migrate";
 "views.migration.no_profiles" = "Nothing to migrate";

@@ -63,9 +63,6 @@ private extension SettingsContentView {
                 linkContent(.version)
                 linkContent(.links)
                 linkContent(.credits)
-                if !isBeta && appConfiguration.bundle.distributionTarget.supportsIAP {
-                    linkContent(.donate)
-                }
             }
             .themeSection(header: Strings.Global.Nouns.about)
 

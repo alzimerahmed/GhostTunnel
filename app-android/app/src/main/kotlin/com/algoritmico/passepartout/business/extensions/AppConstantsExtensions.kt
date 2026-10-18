@@ -14,9 +14,6 @@ import com.algoritmico.passepartout.models.AppConstantsWebsites
 val AppConstantsWebsites.blogURL: String
     get() = partoutURL.appendingPath("blog")
 
-val AppConstantsWebsites.donateURL: String
-    get() = partoutURL.appendingPath("donate")
-
 // GhostTunnel-owned hosted config (GitHub raw). Replaces upstream
 // partout.io "passepartout-config" hosting (Phase 4 — config ownership).
 // Layout: v1/bundle.json (stable) / v1/bundle-beta.json (beta channel);

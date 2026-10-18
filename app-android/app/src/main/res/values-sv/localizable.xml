@@ -47,9 +47,6 @@
     <string name="views_diagnostics_openvpn_rows_server_configuration">Serverkonfiguration</string>
     <string name="views_diagnostics_report_issue_title">Rapportera problem</string>
     <string name="views_diagnostics_alerts_report_issue_email">Enheten är inte konfigurerad för att skicka e-post.</string>
-    <string name="views_donate_title">Ge en donation</string>
-    <string name="views_donate_sections_main_footer">Om du vill visa uppskattning för mitt arbete, här är några belopp du kan donera omedelbart. Du debiteras endast en gång per donation, och du kan donera flera gånger.</string>
-    <string name="views_donate_alerts_thank_you_message">Det här betyder mycket för mig, och jag hoppas verkligen att du fortsätter att använda och marknadsföra denna app.</string>
     <string name="views_migration_title">Migrera</string>
     <string name="views_migration_no_profiles">Inget att migrera</string>
     <string name="views_migration_items_discard">Kassera</string>

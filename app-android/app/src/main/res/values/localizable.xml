@@ -47,9 +47,6 @@
     <string name="views_diagnostics_openvpn_rows_server_configuration">Server configuration</string>
     <string name="views_diagnostics_report_issue_title">Report issue</string>
     <string name="views_diagnostics_alerts_report_issue_email">The device is not configured to send e-mails.</string>
-    <string name="views_donate_title">Make a donation</string>
-    <string name="views_donate_sections_main_footer">If you want to display gratitude for my work, here are a couple of amounts you can donate instantly. You will only be charged once per donation, and you can donate multiple times.</string>
-    <string name="views_donate_alerts_thank_you_message">This means a lot to me and I really hope you keep using and promoting this app.</string>
     <string name="views_migration_title">Migrate</string>
     <string name="views_migration_no_profiles">Nothing to migrate</string>
     <string name="views_migration_items_discard">Discard</string>

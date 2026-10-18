@@ -334,9 +334,6 @@
 "views.diagnostics.sections.live" = "Журнал в реальном времени";
 "views.diagnostics.sections.tunnel" = "Журналы туннеля";
 "views.diagnostics.title" = "Диагностика";
-"views.donate.alerts.thank_you.message" = "Это очень важно для меня, и я искренне надеюсь, что вы продолжите использовать и продвигать это приложение.";
-"views.donate.sections.main.footer" = "Если вы хотите выразить благодарность за мою работу, вот несколько сумм, которые вы можете пожертвовать мгновенно. С вас будет снята плата только один раз за пожертвование, и вы можете пожертвовать несколько раз.";
-"views.donate.title" = "Сделать пожертвование";
 "views.migration.alerts.delete.message" = "Вы действительно хотите удалить эти профили? Вы не сможете восстановить их позже.\n\n%@";
 "views.migration.items.discard" = "Отменить";
 "views.migration.items.migrate" = "Продолжить";

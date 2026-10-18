@@ -37,8 +37,8 @@ android {
         applicationId = "com.ghosttunnel.android.GhostTunnel"
         minSdk = 24
         targetSdk = 36
-        versionCode = 4175
-        versionName = "3.12.3"
+        versionCode = 1
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

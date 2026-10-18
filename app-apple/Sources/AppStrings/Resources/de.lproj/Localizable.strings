@@ -334,9 +334,6 @@
 "views.diagnostics.sections.live" = "Live-Protokoll";
 "views.diagnostics.sections.tunnel" = "Tunnel-Protokolle";
 "views.diagnostics.title" = "Diagnose";
-"views.donate.alerts.thank_you.message" = "Das bedeutet mir viel, und ich hoffe wirklich, dass du die App weiterhin nutzt und bewirbst.";
-"views.donate.sections.main.footer" = "Wenn du meine Arbeit schätzt, sind hier ein paar Beiträge, die du sofort spenden kannst. Du wirst nur einmal pro Spende berechnet und du kannst mehrere Spenden machen.";
-"views.donate.title" = "Spenden";
 "views.migration.alerts.delete.message" = "Möchtest du diese Profile verwerfen? Du wirst sie später nicht wiederherstellen können.\n\n%@";
 "views.migration.items.discard" = "Verwerfen";
 "views.migration.items.migrate" = "Fortfahren";

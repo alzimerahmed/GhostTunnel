@@ -47,9 +47,6 @@
     <string name="views_diagnostics_openvpn_rows_server_configuration">Конфигурация сервера</string>
     <string name="views_diagnostics_report_issue_title">Сообщить о проблеме</string>
     <string name="views_diagnostics_alerts_report_issue_email">Устройство не настроено для отправки электронной почты.</string>
-    <string name="views_donate_title">Сделать пожертвование</string>
-    <string name="views_donate_sections_main_footer">Если вы хотите выразить благодарность за мою работу, вот несколько сумм, которые вы можете пожертвовать мгновенно. С вас будет снята плата только один раз за пожертвование, и вы можете пожертвовать несколько раз.</string>
-    <string name="views_donate_alerts_thank_you_message">Это очень важно для меня, и я искренне надеюсь, что вы продолжите использовать и продвигать это приложение.</string>
     <string name="views_migration_title">Миграция</string>
     <string name="views_migration_no_profiles">Нечего мигрировать</string>
     <string name="views_migration_items_discard">Отменить</string>

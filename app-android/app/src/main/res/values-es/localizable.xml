@@ -47,9 +47,6 @@
     <string name="views_diagnostics_openvpn_rows_server_configuration">Configuración del servidor</string>
     <string name="views_diagnostics_report_issue_title">Informar problema</string>
     <string name="views_diagnostics_alerts_report_issue_email">El dispositivo no está configurado para enviar correos electrónicos.</string>
-    <string name="views_donate_title">Haz una donación</string>
-    <string name="views_donate_sections_main_footer">Si deseas mostrar gratitud por mi trabajo, aquí tienes un par de cantidades que puedes donar al instante. Solo se te cobrará una vez por cada donación, y puedes donar múltiples veces.</string>
-    <string name="views_donate_alerts_thank_you_message">Esto significa mucho para mí y realmente espero que sigas usando y promoviendo esta app.</string>
     <string name="views_migration_title">Migrar</string>
     <string name="views_migration_no_profiles">Nada que migrar</string>
     <string name="views_migration_items_discard">Descartar</string>

@@ -1,2 +1,12 @@
-* WireGuard: Enable experimental connection via feature flags (#1958)
-* OpenVPN: Restore support for inline auth-user-pass (#1959)
+1.0.0
+
+* GhostTunnel v1.0.0 — full re-engineering of the Passepartout fork under GhostTunnel branding
+* Rebrand: GhostTunnel name, com.ghosttunnel.* bundle IDs, new app icon across iOS/macOS/tvOS/Android
+* Privacy: no telemetry, no donations, self-hosted provider config (ghosttunnel-config)
+* Kill switch groundwork, DNS filtering direction, trusted Wi-Fi (staged)
+* UX: QR WireGuard import, App Lock, profile backup/restore, widgets, Control Center, menu bar quick connect
+* Diagnostics: leak test, debug bundle, in-app speed test
+* Import: wg-quick, Tunnelblick .tblk, Tailscale stubs
+* New: tvOS Top Shelf, watchOS companion, Android feature subset + CI, desktop (app-cross) MVP
+* Frontier features staged behind flags (multi-hop, PQ WireGuard, WG obfuscation, per-app split tunneling)
+* Quality gate: security, performance, accessibility, anti-vibe audits passed

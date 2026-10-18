@@ -1,5 +1,5 @@
-MARKETING_VERSION = 3.12.3
-CURRENT_PROJECT_VERSION = 4175
+MARKETING_VERSION = 1.0.0
+CURRENT_PROJECT_VERSION = 1
 
 // Tweak these based on app and team
 CFG_APP_ID = com.ghosttunnel.ios.GhostTunnel

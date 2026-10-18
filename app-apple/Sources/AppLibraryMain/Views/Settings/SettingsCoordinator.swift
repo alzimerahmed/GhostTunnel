@@ -55,8 +55,6 @@ extension SettingsCoordinator {
             Strings.Views.Settings.Credits.title
         case .diagnostics:
             Strings.Views.Diagnostics.title
-        case .donate:
-            Strings.Views.Donate.title
         case .links:
             Strings.Views.Settings.Links.title
         case .preferences:
@@ -102,10 +100,6 @@ extension SettingsCoordinator {
         case .diagnostics:
             DiagnosticsView(profileObservable: profileObservable, tunnel: tunnel)
                 .navigationTitle(title(for: .diagnostics))
-
-        case .donate:
-            DonateView(modifier: DonateViewModifier())
-                .navigationTitle(title(for: .donate))
 
         case .links:
             LinksView(isBeta: iapObservable.isBeta)

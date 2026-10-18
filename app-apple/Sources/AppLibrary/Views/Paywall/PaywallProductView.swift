@@ -78,10 +78,7 @@ private extension PaywallProductView {
     }
 
     var isRedundant: Bool {
-        guard !storeProduct.product.isDonation else {
-            return false
-        }
-        return storeProduct.product.isRedundant(forRequiredFeatures: requiredFeatures)
+        storeProduct.product.isRedundant(forRequiredFeatures: requiredFeatures)
     }
 
     var isPurchasing: Bool {

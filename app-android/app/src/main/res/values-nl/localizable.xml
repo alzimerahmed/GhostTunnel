@@ -47,9 +47,6 @@
     <string name="views_diagnostics_openvpn_rows_server_configuration">Serverconfiguratie</string>
     <string name="views_diagnostics_report_issue_title">Probleem melden</string>
     <string name="views_diagnostics_alerts_report_issue_email">Het apparaat is niet geconfigureerd om e-mails te verzenden.</string>
-    <string name="views_donate_title">Doe een donatie</string>
-    <string name="views_donate_sections_main_footer">Als je mijn werk wilt waarderen, zijn hier een paar bedragen die je direct kunt doneren. Je wordt slechts één keer per donatie in rekening gebracht en je kunt meerdere keren doneren.</string>
-    <string name="views_donate_alerts_thank_you_message">Dit betekent veel voor mij en ik hoop echt dat je deze app blijft gebruiken en promoten.</string>
     <string name="views_migration_title">Migreren</string>
     <string name="views_migration_no_profiles">Niets om te migreren</string>
     <string name="views_migration_items_discard">Verwijderen</string>

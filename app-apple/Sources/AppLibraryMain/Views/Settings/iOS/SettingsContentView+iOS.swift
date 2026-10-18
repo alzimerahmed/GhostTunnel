@@ -51,9 +51,6 @@ private extension SettingsContentView {
             Group {
                 linkContent(.links)
                 linkContent(.credits)
-                if !isBeta && appConfiguration.bundle.distributionTarget.supportsIAP {
-                    linkContent(.donate)
-                }
             }
             .themeSection(header: Strings.Global.Nouns.about)
             ExternalLink(Strings.Unlocalized.faq, url: appConfiguration.constants.websites.faqURL)

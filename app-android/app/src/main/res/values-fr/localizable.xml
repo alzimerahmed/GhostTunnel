@@ -47,9 +47,6 @@
     <string name="views_diagnostics_openvpn_rows_server_configuration">Configuration du serveur</string>
     <string name="views_diagnostics_report_issue_title">Signaler un problème</string>
     <string name="views_diagnostics_alerts_report_issue_email">L\'appareil n\'est pas configuré pour envoyer des e-mails.</string>
-    <string name="views_donate_title">Faire un don</string>
-    <string name="views_donate_sections_main_footer">Si vous souhaitez exprimer votre gratitude pour mon travail, voici quelques montants que vous pouvez donner instantanément. Vous serez facturé une seule fois pour chaque don, et vous pouvez donner plusieurs fois.</string>
-    <string name="views_donate_alerts_thank_you_message">Cela signifie beaucoup pour moi et j\'espère vraiment que vous continuerez à utiliser et promouvoir cette application.</string>
     <string name="views_migration_title">Migrer</string>
     <string name="views_migration_no_profiles">Rien à migrer</string>
     <string name="views_migration_items_discard">Abandonner</string>

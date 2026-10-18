@@ -30,7 +30,7 @@ extension IAPManagerTests {
 
         let appProducts: [ABI.AppProduct] = [
             .Essentials.iOS_macOS,
-            .Donations.huge
+            .Features.appleTV
         ]
         let storeProducts = try await sut.fetchPurchasableProducts(for: appProducts)
         #expect(storeProducts.count == appProducts.count)

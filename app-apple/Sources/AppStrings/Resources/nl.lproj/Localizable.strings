@@ -334,9 +334,6 @@
 "views.diagnostics.sections.live" = "Live log";
 "views.diagnostics.sections.tunnel" = "Tunnel logboeken";
 "views.diagnostics.title" = "Diagnostiek";
-"views.donate.alerts.thank_you.message" = "Dit betekent veel voor mij en ik hoop echt dat je deze app blijft gebruiken en promoten.";
-"views.donate.sections.main.footer" = "Als je mijn werk wilt waarderen, zijn hier een paar bedragen die je direct kunt doneren. Je wordt slechts één keer per donatie in rekening gebracht en je kunt meerdere keren doneren.";
-"views.donate.title" = "Doe een donatie";
 "views.migration.alerts.delete.message" = "Wil je deze profielen verwijderen? Je kunt ze later niet herstellen.\n\n%@";
 "views.migration.items.discard" = "Verwijderen";
 "views.migration.items.migrate" = "Doorgaan";

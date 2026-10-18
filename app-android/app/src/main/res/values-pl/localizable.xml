@@ -47,9 +47,6 @@
     <string name="views_diagnostics_openvpn_rows_server_configuration">Konfiguracja serwera</string>
     <string name="views_diagnostics_report_issue_title">Zgłoś problem</string>
     <string name="views_diagnostics_alerts_report_issue_email">Urządzenie nie jest skonfigurowane do wysyłania wiadomości e-mail.</string>
-    <string name="views_donate_title">Przekaż darowiznę</string>
-    <string name="views_donate_sections_main_footer">Jeśli chcesz wyrazić wdzięczność za moją pracę, oto kilka kwot, które możesz natychmiast przekazać. Zostaniesz obciążony tylko raz za darowiznę, a możesz przekazać ją wielokrotnie.</string>
-    <string name="views_donate_alerts_thank_you_message">To wiele dla mnie znaczy i mam szczerą nadzieję, że będziesz nadal korzystać i promować tę aplikację.</string>
     <string name="views_migration_title">Migracja</string>
     <string name="views_migration_no_profiles">Brak profili do migracji</string>
     <string name="views_migration_items_discard">Odrzuć</string>

@@ -334,9 +334,6 @@
 "views.diagnostics.sections.live" = "实时日志";
 "views.diagnostics.sections.tunnel" = "隧道日志";
 "views.diagnostics.title" = "诊断";
-"views.donate.alerts.thank_you.message" = "这对我意义重大，我真心希望您继续使用和推广此应用。";
-"views.donate.sections.main.footer" = "如果您想表达对我工作的感激之情，以下是您可以立即捐赠的一些金额。每次捐赠只会扣费一次，您可以多次捐赠。";
-"views.donate.title" = "捐赠";
 "views.migration.alerts.delete.message" = "是否丢弃这些配置文件？您以后将无法恢复它们。\n\n%@";
 "views.migration.items.discard" = "丢弃";
 "views.migration.items.migrate" = "继续";
