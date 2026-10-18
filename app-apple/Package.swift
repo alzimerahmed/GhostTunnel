@@ -106,10 +106,6 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "AppIntentsLibraryTests",
-            dependencies: ["AppIntentsLibrary"]
-        ),
-        .testTarget(
             name: "AppLibraryTests",
             dependencies: [
                 "AppLibrary",
