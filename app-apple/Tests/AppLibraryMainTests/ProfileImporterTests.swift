@@ -16,7 +16,7 @@ struct ProfileImporterTests {
 
         try await sut.tryImport(
             urls: [],
-            block: profileManager.mockImport
+            block: { url, passphrase in try await profileManager.mockImport(url: url, passphrase: passphrase) }
         )
         #expect(sut.nextURL == nil)
         #expect(!profileManager.hasProfiles)
@@ -47,7 +47,7 @@ struct ProfileImporterTests {
 
         try await sut.tryImport(
             urls: [url],
-            block: profileManager.mockImport
+            block: { url, passphrase in try await profileManager.mockImport(url: url, passphrase: passphrase) }
         )
         #expect(sut.nextURL == nil)
 
@@ -79,14 +79,14 @@ struct ProfileImporterTests {
 
         try await sut.tryImport(
             urls: [url],
-            block: profileManager.mockImport
+            block: { url, passphrase in try await profileManager.mockImport(url: url, passphrase: passphrase) }
         )
         #expect(sut.nextURL == url)
 
         sut.currentPassphrase = "passphrase"
         try await sut.reImport(
             url: url,
-            block: profileManager.mockImport
+            block: { url, passphrase in try await profileManager.mockImport(url: url, passphrase: passphrase) }
         )
         #expect(sut.nextURL == nil)
 
@@ -138,7 +138,7 @@ struct ProfileImporterTests {
 
         try await sut.tryImport(
             urls: [url, url, url],
-            block: profileManager.mockImport
+            block: { url, passphrase in try await profileManager.mockImport(url: url, passphrase: passphrase) }
         )
         #expect(sut.nextURL == url)
         #expect(sut.urlsRequiringPassphrase.count == 3)
@@ -151,7 +151,7 @@ private struct SomeModule: Module {
 }
 
 private extension ProfileManager {
-    func mockImport(url: URL, passphrase: String?) async throws {
+    func mockImport(url: URL, passphrase: String?) async throws -> AppImportExport.FileImportResult {
         let importedModule = try {
             if url.absoluteString.hasSuffix(".encrypted") {
                 guard let passphrase else {
@@ -165,6 +165,12 @@ private extension ProfileManager {
         }()
         let profile = try Profile(withName: "foobar", singleModule: importedModule)
         try await save(profile, isLocal: true)
+        return AppImportExport.FileImportResult(
+            filename: url.lastPathComponent,
+            format: .unknown,
+            status: .imported(warnings: []),
+            profile: profile
+        )
     }
 }
 
