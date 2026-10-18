@@ -45,8 +45,6 @@ public enum TopShelfContentBuilder {
     /// Top Shelf renders two rows comfortably; keep the shelf uncluttered.
     public static let maxItems = 8
 
-    private init() {}
-
     /// Builds the Top Shelf rows from the profile headers.
     public static func items(
         headers: [ABI.AppProfileHeader],
