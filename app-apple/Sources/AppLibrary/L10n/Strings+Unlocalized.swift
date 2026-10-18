@@ -80,6 +80,10 @@ extension Strings {
 
         public static let faq = "FAQ"
 
+        public static let frontierFeatures = "Frontier features"
+
+        public static let pendingUpstream = "Pending upstream"
+
         public static let http = "HTTP"
 
         public static let https = "HTTPS"

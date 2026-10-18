@@ -21,6 +21,7 @@ struct PreferencesAdvancedView: View {
     var body: some View {
         Form {
             configSection
+            frontierSection
         }
         .themeForm()
     }
@@ -78,6 +79,33 @@ private extension PreferencesAdvancedView {
             header: Strings.Global.Actions.allow,
             footer: Strings.Views.Preferences.Advanced.Remote.footer
         )
+    }
+
+    // MARK: - Frontier features (Phase 15 scaffolding)
+
+    /// Upstream-dependent features (multi-hop, post-quantum WireGuard,
+    /// WireGuard obfuscation, per-app split tunneling on macOS). The section
+    /// is entirely hidden while all flags are OFF; each row is a non-interactive
+    /// seam that lights up when the flag is enabled via UserDefaults override
+    /// (`FeatureFlags.<rawValue>` = true) AND the upstream `partout` capability
+    /// lands. When that happens, each row becomes the navigation entry point
+    /// for the feature's editor UI.
+    @ViewBuilder
+    var frontierSection: some View {
+        let flags = FeatureFlags(defaults: .standard)
+        if flags.isAnyEnabled {
+            ForEach(FeatureFlag.allCases.filter { flags.isEnabled($0) }, id: \.rawValue) { flag in
+                VStack(alignment: .leading) {
+                    Text(flag.rawValue)
+                    Text(Strings.Unlocalized.pendingUpstream)
+                        .themeSubtitle()
+                }
+            }
+            .themeSection(
+                header: Strings.Unlocalized.frontierFeatures,
+                footer: Strings.Unlocalized.pendingUpstream
+            )
+        }
     }
 
     func configPicker(for flag: ABI.ConfigFlag) -> some View {
