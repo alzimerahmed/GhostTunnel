@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import Foundation
+import Partout
 
 /// Glanceable tunnel state shared between the app (writer) and the
 /// WidgetKit widgets / Control Center control (readers).
@@ -74,7 +75,8 @@ public enum WidgetAppGroup {
 
 /// App Group-backed persistence for `TunnelWidgetState`.
 public struct TunnelWidgetStatusStore: Sendable {
-    private let defaults: UserDefaults
+    // UserDefaults is thread-safe; wrapped for strict Sendable checking.
+    private nonisolated(unsafe) let defaults: UserDefaults
 
     private static let key = "TunnelWidgetState"
 

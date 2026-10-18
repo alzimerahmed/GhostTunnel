@@ -17,3 +17,5 @@ tmp/
 docs/*.md
 docs/design/
 .switchboard/
+ci7fail.log
+*.log

@@ -99,7 +99,8 @@ extension WatchTunnelMessage {
 /// watch app writes it and the widget extension (a separate process) reads it
 /// through the App Group `UserDefaults`.
 public struct WatchStatusStore: Sendable {
-    private let defaults: UserDefaults
+    // UserDefaults is thread-safe; wrapped for strict Sendable checking.
+    private nonisolated(unsafe) let defaults: UserDefaults
 
     private static let key = "WatchTunnelStatus"
 
