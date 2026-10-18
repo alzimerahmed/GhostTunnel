@@ -2,40 +2,53 @@
 
 [![Unit Tests](https://github.com/alzimerahmed/GhostTunnel/actions/workflows/test.yml/badge.svg)](https://github.com/alzimerahmed/GhostTunnel/actions/workflows/test.yml)
 
-GhostTunnel is a VPN and privacy client for Apple platforms, built on OpenVPN and WireGuard.
+GhostTunnel is a privacy-first VPN client for Apple platforms (iOS, macOS, tvOS, watchOS), Android, and desktop — built on OpenVPN and WireGuard. No telemetry, no ads, no donations.
 
-Fork of [Passepartout](https://github.com/partout-io/passepartout) (GPLv3).
+Fork of [Passepartout](https://github.com/partout-io/passepartout) (GPLv3), fully re-engineered under the GhostTunnel identity: `com.ghosttunnel.*` bundle IDs, GhostTunnel app icon and display names across all platforms, self-hosted provider config, and donation/IAP-gratitude surfaces removed.
 
 ## Features
 
-GhostTunnel is an [OpenVPN®][openvpn] and [WireGuard®][wireguard] client for Apple platforms. The OpenVPN stack also implements the [Tunnelblick XOR patch][openvpn-xor-patch].
+GhostTunnel is an [OpenVPN®][openvpn] and [WireGuard®][wireguard] client. The OpenVPN stack also implements the [Tunnelblick XOR patch][openvpn-xor-patch].
 
-Other features:
+Core (inherited from Passepartout):
 
 - On-demand rules
 - Override DNS and HTTP proxy
 - Custom routing
 - Presets for multiple providers (virtually any)
+- iCloud sync, Shortcuts, no background activities, wise on battery
 
-Tailored for Apple platforms:
+GhostTunnel additions (v1.0.0):
 
-- iPhone, iPad, Mac, and Apple TV
-- iCloud
-- Shortcuts
-- No background activities
-- Wise on battery
+- **Quick connect surfaces** — home-screen widgets, iOS Control Center control, macOS menu-bar quick connect
+- **Import** — QR-code WireGuard import, wg-quick, Tunnelblick `.tblk`, Tailscale config stubs
+- **App Lock** — FaceID/passcode gate with privacy screen
+- **Backup** — profile export/import to portable (optionally encrypted) archives
+- **Diagnostics** — leak test, sanitized debug bundle export, in-app speed test with fastest-server pick
+- **tvOS** — Top Shelf integration, multi-profile browsing
+- **watchOS** — companion app with glanceable status and quick connect
+- **Android** — connect/disconnect, profile import, on-demand subset
+- **Desktop** — minimal connect/disconnect client (`app-cross`, CMake + wxWidgets)
+- **Frontier features staged behind flags** — multi-hop, post-quantum WireGuard, WG obfuscation, per-app split tunneling (pending upstream `partout` core support)
+
+## Privacy
+
+- **No telemetry** — the app never phones home; diagnostics go only where you send them
+- **No donations, no ads** — donation links and donation in-app products are removed entirely
+- **Self-hosted config** — provider presets/blocklists come from the GhostTunnel-owned [`ghosttunnel-config`](https://github.com/alzimerahmed84/ghosttunnel-config) repo, not upstream servers
+
+See [SECURITY.md](SECURITY.md) for the vulnerability-reporting policy and threat model notes.
 
 ## Installation
 
 ### Requirements
 
-- iOS 17+ / macOS 14+ / tvOS 17+
-- Xcode 26
-- Swift 6
+- iOS 17+ / macOS 14+ / tvOS 17+ / watchOS (companion)
+- Xcode 26, Swift 6
 - Git (preinstalled with the Xcode Command Line Tools)
 - Java (optional, for the OpenAPI Generator)
-
-It's highly recommended that you use the Git and Ruby packages provided by [Homebrew][dep-brew].
+- Android: Android SDK/NDK + CMake (Gradle build)
+- Desktop: CMake + wxWidgets (`CMakePresets.json`)
 
 ### Building from source
 
@@ -53,6 +66,12 @@ To test the app on your Mac or iOS/tvOS Simulator:
 
 - Open `Passepartout.xcodeproj` in Xcode
 - Run the `Passepartout` target
+
+Android: `./gradlew assembleDebug` in `app-android/`. Desktop: `app-cross/scripts/build.sh` (CMake presets).
+
+### CI
+
+All verification runs on GitHub Actions (`checks.yml` / `test.yml`): Apple tests + builds (macOS), Partout core tests, Cross checks, Android build, desktop build. Releases are tagged `vX.Y.Z`; unsigned/source releases until a signing identity exists.
 
 ## License
 
@@ -73,7 +92,7 @@ This is a fork of [Passepartout][upstream] by Davide De Rosa. Credits for the or
 - [Wintun][credits-wintun]
 - [WireGuard (Go)][credits-wireguard-go]
 
-The logo is taken from the awesome Circle Icons set by Nick Roach.
+The GhostTunnel app icon is an original GhostTunnel asset.
 
 ### OpenSSL
 
