@@ -71,7 +71,7 @@ jobs:
           submodules: true
 
       - uses: partout-io/setup-zig@main
-        if: matrix.suite == 'partout' || matrix.suite == 'android'
+        if: matrix.suite == 'partout' || matrix.suite == 'android' || matrix.suite == 'cross-build'
 
       - uses: actions/setup-go@v7
         if: matrix.suite == 'android'
