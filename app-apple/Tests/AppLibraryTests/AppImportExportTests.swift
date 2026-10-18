@@ -318,7 +318,7 @@ extension AppImportExportTests {
     func givenTailscaleFile_whenImportedFile_thenSkippedWithNotes() throws {
         let json = #"{"hostname": "node1", "acls": []}"#
         let result = try AppImportExport.dummy.importedFile(
-            from: .contents(filename: "tailscaled.conf", data: Data(json.utf8)),
+            from: .contents(filename: "tailscaled.conf", data: json),
             passphrase: nil
         )
         #expect(result.format == .tailscale)
@@ -333,8 +333,14 @@ extension AppImportExportTests {
     @Test
     func givenBackupArchiveFile_whenImportedFile_thenSkippedWithHint() throws {
         let zip = Data([0x50, 0x4b, 0x03, 0x04]) + Data(repeating: 0, count: 32)
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("profiles.gtbk")
+        try zip.write(to: url)
+        defer {
+            try? FileManager.default.removeItem(at: url)
+        }
         let result = try AppImportExport.dummy.importedFile(
-            from: .contents(filename: "profiles.gtbk", data: zip),
+            from: .file(url),
             passphrase: nil
         )
         #expect(result.format == .backupArchive)
@@ -348,7 +354,7 @@ extension AppImportExportTests {
     @Test
     func givenGarbageFile_whenImportedFile_thenFailedResultNotThrow() throws {
         let result = try AppImportExport.dummy.importedFile(
-            from: .contents(filename: "garbage.txt", data: Data("!!garbage!!".utf8)),
+            from: .contents(filename: "garbage.txt", data: "!!garbage!!"),
             passphrase: nil
         )
         guard case .failed = result.status else {
