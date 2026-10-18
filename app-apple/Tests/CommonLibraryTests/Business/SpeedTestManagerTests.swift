@@ -59,7 +59,7 @@ struct SpeedTestManagerTests {
     // MARK: Scheduling
 
     @Test
-    func givenTargets_whenRun_thenResultsMatchInputOrder() async {
+    func givenTargets_whenRun_thenResultsMatchInputOrder() async throws {
         let probe = MockProbe()
         let scheduler = ProbeScheduler(probe: probe, maxConcurrent: 2, timeout: 5)
         let targets = [
@@ -74,7 +74,7 @@ struct SpeedTestManagerTests {
     }
 
     @Test
-    func givenManyTargets_whenRun_thenConcurrencyIsBounded() async {
+    func givenManyTargets_whenRun_thenConcurrencyIsBounded() async throws {
         let probe = MockProbe(delay: 0.05)
         let scheduler = ProbeScheduler(probe: probe, maxConcurrent: 2, timeout: 5)
         let targets = (0..<8).map { target("t\($0)") }
@@ -83,7 +83,7 @@ struct SpeedTestManagerTests {
     }
 
     @Test
-    func givenFailingHost_whenRun_thenResultHasErrorAndNoLatency() async {
+    func givenFailingHost_whenRun_thenResultHasErrorAndNoLatency() async throws {
         let probe = MockProbe(failingHosts: ["bad"])
         let scheduler = ProbeScheduler(probe: probe)
         let results = await scheduler.run([target("ok"), target("bad", host: "bad")])
@@ -94,7 +94,7 @@ struct SpeedTestManagerTests {
     }
 
     @Test
-    func givenEmptyTargets_whenRun_thenNoResults() async {
+    func givenEmptyTargets_whenRun_thenNoResults() async throws {
         let scheduler = ProbeScheduler(probe: MockProbe())
         let results = await scheduler.run([])
         #expect(results.isEmpty)
@@ -197,7 +197,7 @@ struct SpeedTestManagerTests {
 
     @Test
     @MainActor
-    func givenRunningTest_whenTestRunsAgain_thenOnlyLatestResultsArePublished() async {
+    func givenRunningTest_whenTestRunsAgain_thenOnlyLatestResultsArePublished() async throws {
         let slowScheduler = ProbeScheduler(probe: MockProbe(delay: 0.5), maxConcurrent: 1, timeout: 5)
         let fastScheduler = ProbeScheduler(probe: MockProbe(delay: 0.01), maxConcurrent: 1, timeout: 5)
         let manager = SpeedTestManager()
@@ -216,7 +216,7 @@ struct SpeedTestManagerTests {
     // MARK: Timeout bounds the wall clock
 
     @Test
-    func givenHungProbe_whenSchedulerTimeoutElapses_thenRunReturnsBounded() async {
+    func givenHungProbe_whenSchedulerTimeoutElapses_thenRunReturnsBounded() async throws {
         // A probe that ignores cancellation (like getaddrinfo on a detached
         // task): the old task-group-based timeout would hang on it.
         struct UninterruptibleProbe: LatencyProbe {
