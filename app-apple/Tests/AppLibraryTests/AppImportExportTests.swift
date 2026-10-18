@@ -367,7 +367,7 @@ extension AppImportExportTests {
     @Test
     func givenTunnelblickWGPackage_whenImportedFile_thenImported() throws {
         let entries = [
-            BackupEntry(name: "config.tblk/tunnel.conf", data: Self.wgQuickContents)
+            BackupEntry(name: "config.tblk/tunnel.conf", data: Data(Self.wgQuickContents.utf8))
         ]
         let zipData = try ZipBackupArchiveCoder().encode(entries)
         let url = FileManager.default.temporaryDirectory
