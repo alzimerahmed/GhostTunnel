@@ -4,6 +4,7 @@
 @testable import CommonLibraryCore
 import Partout
 import Testing
+import Foundation
 
 struct WireGuardQuickParserTests {
     private static let privateKey = base64Key(0x11)

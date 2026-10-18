@@ -4,6 +4,7 @@
 
 import CommonLibrary
 import Testing
+import Foundation
 
 struct TunnelWidgetStateTests {
     @Test

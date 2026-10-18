@@ -5,6 +5,7 @@
 @testable import CommonLibraryCore
 import Partout
 import Testing
+import Foundation
 
 struct WebReceiverManagerTests {
 }

@@ -4,6 +4,7 @@
 
 import Partout
 import Testing
+import Foundation
 
 @BusinessActor
 struct VersionCheckerTests {
