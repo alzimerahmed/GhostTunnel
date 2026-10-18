@@ -124,6 +124,7 @@ public final class SpeedTestManager {
 
     private var runId = UUID()
 
+    private var task: Task<[ProbeResult], Never>?
 
     public init() {
     }
@@ -136,7 +137,11 @@ public final class SpeedTestManager {
         let id = UUID()
         runId = id
         isRunning = true
-        let results = await effectiveScheduler.run(targets)
+        let task = Task<[ProbeResult], Never> {
+            await effectiveScheduler.run(targets)
+        }
+        self.task = task
+        let results = await task.value
         // Run identity check: only the latest run may publish results or
         // clear `isRunning` (a superseded run must not clobber the newer one).
         guard runId == id else {

@@ -131,6 +131,10 @@ public struct ZipBackupArchiveCoder: BackupArchiveCoding {
     /// hostile archive cannot exhaust memory before callers apply their own
     /// limits — the Phase 7 backup/restore path uses the defaults, while
     /// Tunnelblick import passes its tighter caps.
+    public func decode(_ data: Data) throws -> [BackupEntry] {
+        try decode(data, maxEntries: Self.defaultMaxEntries, maxTotalSize: Self.defaultMaxTotalSize)
+    }
+
     public func decode(
         _ data: Data,
         maxEntries: Int = Self.defaultMaxEntries,
