@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0
 
-import CommonLibrary
+import Partout
 import Foundation
 
 /// Value model for one Top Shelf row. Built by `TopShelfContentBuilder`

@@ -5,7 +5,7 @@
 import CommonLibrary
 import Foundation
 import Testing
-@testable import AppLibraryTV
+@testable import CommonLibraryCore
 
 struct TopShelfContentBuilderTests {
 

@@ -69,7 +69,7 @@ struct SpeedTestManagerTests {
         ]
         let results = await scheduler.run(targets)
         #expect(results.map(\.target.id) == ["a", "b", "c"])
-        #expect(await probe.probedHosts.count == 3)
+        #expect(try await probe.probedHosts.count == 3)
         #expect(results.allSatisfy(\.isSuccess))
     }
 
@@ -79,7 +79,7 @@ struct SpeedTestManagerTests {
         let scheduler = ProbeScheduler(probe: probe, maxConcurrent: 2, timeout: 5)
         let targets = (0..<8).map { target("t\($0)") }
         _ = await scheduler.run(targets)
-        #expect(await probe.maxInFlight <= 2)
+        #expect(try await probe.maxInFlight <= 2)
     }
 
     @Test

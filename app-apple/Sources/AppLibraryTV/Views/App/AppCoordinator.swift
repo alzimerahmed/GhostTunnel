@@ -59,7 +59,7 @@ public struct AppCoordinator: View, AppCoordinatorConforming {
                 }
             }
             .navigationDestination(for: AppCoordinatorRoute.self, destination: pushDestination)
-            .onOpenURL(handleOpenURL)
+            .onOpenURL(perform: handleOpenURL)
             .modifier(DynamicPaywallModifier(
                 paywallReason: $paywallReason,
                 paywallContinuation: paywallContinuation
