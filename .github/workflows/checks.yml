@@ -35,6 +35,10 @@ jobs:
             suite: apple-build-tvos
             runner: macos-26
             timeout_minutes: 25
+          - name: Apple build watchOS
+            suite: apple-build-watchos
+            runner: macos-26
+            timeout_minutes: 25
           - name: Partout tests
             suite: partout
             runner: macos-26
@@ -61,7 +65,7 @@ jobs:
           submodules: recursive
 
       - uses: partout-io/action-prepare-xcode-build@master
-        if: matrix.suite == 'apple' || matrix.suite == 'apple-build' || matrix.suite == 'apple-build-tvos' || matrix.suite == 'partout'
+        if: matrix.suite == 'apple' || matrix.suite == 'apple-build' || matrix.suite == 'apple-build-tvos' || matrix.suite == 'apple-build-watchos' || matrix.suite == 'partout'
         with:
           access-token: ${{ github.token }}
           submodules: true
@@ -179,6 +183,24 @@ jobs:
             -project Passepartout.xcodeproj \
             -scheme Passepartout \
             -destination 'generic/platform=tvOS' \
+            CODE_SIGNING_ALLOWED=NO | tail -50
+
+      # Phase 14 gate: compiles the hand-written watchOS companion targets
+      # (app + complication widget extension). The iOS build leg above also
+      # builds PassepartoutWatch via its ios-filtered target dependency.
+      - name: Run Apple build (watchOS)
+        if: matrix.suite == 'apple-build-watchos'
+        run: |
+          cd app-apple
+          xcodebuild build \
+            -project Passepartout.xcodeproj \
+            -target PassepartoutWatch \
+            -sdk watchos \
+            CODE_SIGNING_ALLOWED=NO | tail -50
+          xcodebuild build \
+            -project Passepartout.xcodeproj \
+            -target PassepartoutWatchWidgets \
+            -sdk watchos \
             CODE_SIGNING_ALLOWED=NO | tail -50
 
       - name: Run Partout tests (Swift)
