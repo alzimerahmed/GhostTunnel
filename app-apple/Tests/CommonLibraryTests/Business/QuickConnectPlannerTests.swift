@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0
 
-import AppIntentsLibrary
+@testable import CommonLibraryApple
 import Foundation
 import CommonLibrary
 import Testing
