@@ -208,7 +208,7 @@ extension AppImportExport {
             profile = try wireGuardProfile(name: name, outcome: outcome)
         } else {
             let module = try importModule(configText, openVPNContext(passphrase))
-            let profile = try Profile(withName: name, singleModule: module)
+            profile = try Profile(withName: name, singleModule: module)
         }
         return FileImportResult(
             filename: name,

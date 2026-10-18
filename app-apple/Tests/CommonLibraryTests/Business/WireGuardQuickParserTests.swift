@@ -164,7 +164,7 @@ struct WireGuardQuickParserTests {
 
     @Test
     func givenMultiplePeersWithTrailingFields_whenParse_thenFieldsAttachToCorrectPeer() throws {
-        let otherKey = base64Key(0x44)
+        let otherKey = Self.base64Key(0x44)
         let contents = """
         [Interface]
         PrivateKey = \(Self.privateKey)

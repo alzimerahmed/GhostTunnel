@@ -25,8 +25,8 @@ struct GitHubConfigStrategyTests {
             configTTL: 3600,
             betaTTLFactor: 0.1
         )
-        #expect(constants.configURL.absoluteString == "\(configBase)/main/v1/bundle.json")
-        #expect(constants.betaConfigURL.absoluteString == "\(configBase)/main/v1/bundle-beta.json")
+        #expect(constants.configURL.absoluteString == "\(Self.configBase)/main/v1/bundle.json")
+        #expect(constants.betaConfigURL.absoluteString == "\(Self.configBase)/main/v1/bundle-beta.json")
     }
 
     @Test
@@ -67,8 +67,8 @@ struct GitHubConfigStrategyTests {
 
     @Test
     func givenStrategy_whenFetching_thenUsesStableOrBetaURLAndParses() async throws {
-        let stableURL = URL(string: "\(configBase)/main/v1/bundle.json")!
-        let betaURL = URL(string: "\(configBase)/main/v1/bundle-beta.json")!
+        let stableURL = URL(string: "\(Self.configBase)/main/v1/bundle.json")!
+        let betaURL = URL(string: "\(Self.configBase)/main/v1/bundle-beta.json")!
         let bundleJSON = #"{"appNotWorking":{"rate":100}}"#
         let recorder = FetchRecorder(responses: [
             stableURL: Data(bundleJSON.utf8),
