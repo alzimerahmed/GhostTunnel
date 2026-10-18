@@ -66,6 +66,8 @@ public actor ProbeScheduler {
     }
 
     public func run(_ targets: [ProbeTarget]) async -> [ProbeResult] {
+        let probe = self.probe
+        let timeout = self.timeout
         var iterator = targets.enumerated().makeIterator()
         return await withTaskGroup(of: (Int, ProbeResult).self) { group in
             // Prime the group with up to `maxConcurrent` probes, then add a
@@ -120,7 +122,7 @@ public final class SpeedTestManager {
 
     public private(set) var isRunning = false
 
-    private var task: Task<Void, Never>?
+    private var task: Task<[ProbeResult], Never>?
 
     public init() {
     }
@@ -130,7 +132,7 @@ public final class SpeedTestManager {
     public func test(_ targets: [ProbeTarget], scheduler: ProbeScheduler? = nil) async {
         task?.cancel()
         let effectiveScheduler = scheduler ?? ProbeScheduler(probe: NWLatencyProbe())
-        let task = Task {
+        let task = Task<[ProbeResult], Never> {
             await effectiveScheduler.run(targets)
         }
         self.task = task
@@ -150,7 +152,7 @@ public final class SpeedTestManager {
     }
 
     /// The fastest successful probe, if any.
-    public static func fastest(in results: [ProbeResult]) -> ProbeResult? {
+    public nonisolated static func fastest(in results: [ProbeResult]) -> ProbeResult? {
         let successes = results.filter(\.isSuccess)
         guard !successes.isEmpty else {
             return nil
@@ -165,7 +167,7 @@ public final class SpeedTestManager {
     /// results keyed by `ProbeTarget.id`, returns the keys sorted by latency
     /// (fastest first). Failed and unprobed keys keep their original relative
     /// order at the end. Testable without Partout types.
-    public static func orderedKeys(_ keys: [String], by results: [ProbeResult]) -> [String] {
+    public nonisolated static func orderedKeys(_ keys: [String], by results: [ProbeResult]) -> [String] {
         let latencies = Dictionary(
             results.map {
                 ($0.target.id, $0.latency)
@@ -178,19 +180,12 @@ public final class SpeedTestManager {
                 (index: $0.offset, key: $0.element, latency: latencies[$0.element])
             }
             .sorted {
-                switch ($0.latency, $1.latency) {
-                case (.some(let a), .some(let b)):
-                    if a != b {
-                        return a < b
-                    }
-                    return $0.index < $1.index
-                case (.some, .none):
-                    return true
-                case (.none, .some):
-                    return false
-                case (.none, .none):
-                    return $0.index < $1.index
+                let a = $0.latency ?? .infinity
+                let b = $1.latency ?? .infinity
+                if a != b {
+                    return a < b
                 }
+                return $0.index < $1.index
             }
             .map(\.key)
     }

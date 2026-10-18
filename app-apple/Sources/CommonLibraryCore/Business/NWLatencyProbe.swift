@@ -39,17 +39,7 @@ public struct NWLatencyProbe: LatencyProbe {
         )
         return try await withTaskCancellationHandler {
             try await withCheckedThrowingContinuation { continuation in
-                var finished = false
-                let lock = NSLock()
-                let finish: (Result<TimeInterval, Error>) -> Void = { result in
-                    lock.lock()
-                    defer {
-                        lock.unlock()
-                    }
-                    guard !finished else {
-                        return
-                    }
-                    finished = true
+                let finisher = Finisher { result in
                     connection.cancel()
                     continuation.resume(with: result)
                 }
@@ -57,11 +47,11 @@ public struct NWLatencyProbe: LatencyProbe {
                 connection.stateUpdateHandler = { state in
                     switch state {
                     case .ready:
-                        finish(.success(Date().timeIntervalSince(start)))
+                        finisher.finish(.success(Date().timeIntervalSince(start)))
                     case .failed(let error):
-                        finish(.failure(error))
+                        finisher.finish(.failure(error))
                     case .cancelled:
-                        finish(.failure(CancellationError()))
+                        finisher.finish(.failure(CancellationError()))
                     default:
                         break
                     }
@@ -124,4 +114,27 @@ public enum LatencyProbeError: Error {
     case emptyHost
     case invalidPort
     case resolutionFailed(Int32)
+}
+
+/// Once-only result gate, safe to call from any queue/actor.
+private final class Finisher: @unchecked Sendable {
+    private let lock = NSLock()
+    private var finished = false
+    private let handler: @Sendable (Result<TimeInterval, Error>) -> Void
+
+    init(handler: @escaping @Sendable (Result<TimeInterval, Error>) -> Void) {
+        self.handler = handler
+    }
+
+    func finish(_ result: Result<TimeInterval, Error>) {
+        lock.lock()
+        defer {
+            lock.unlock()
+        }
+        guard !finished else {
+            return
+        }
+        finished = true
+        handler(result)
+    }
 }

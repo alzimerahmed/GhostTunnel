@@ -641,7 +641,7 @@
 				A2C0FFEE0000000000000009 /* WatchConnectivityMessages.swift */,
 			);
 			name = "WatchShared (CommonLibraryApple)";
-			path = Sources/CommonLibraryApple;
+			path = ../Sources/CommonLibraryApple;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

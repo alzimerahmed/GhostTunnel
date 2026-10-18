@@ -270,7 +270,7 @@ enum DeflateDecoder {
         guard !input.isEmpty, maxOutputSize > 0 else {
             throw BackupError.corruptedArchive
         }
-        var stream = compression_stream(dst_size: 0, dst_ptr: nil, src_size: 0, src_ptr: nil, state: nil)
+        var stream = compression_stream(dst_ptr: nil, dst_size: 0, src_ptr: nil, src_size: 0, state: nil)
         let status = compression_stream_init(
             &stream,
             COMPRESSION_STREAM_DECODE,

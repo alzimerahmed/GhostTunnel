@@ -140,7 +140,7 @@ public struct TunnelblickImporter: Sendable {
 
         let resolved = Self.isWireGuardConfig(configText)
             ? configText
-            : inlineFileReferences(in: configText, entries: entries, warnings: &warnings)
+            : Self.inlineFileReferences(in: configText, entries: entries, warnings: &warnings)
         return Contents(mainConfig: resolved, warnings: warnings)
     }
 
@@ -152,7 +152,7 @@ public struct TunnelblickImporter: Sendable {
         warnings: inout [String]
     ) -> String {
         var output: [String] = []
-        for rawLine in config.lines {
+        for rawLine in config.split(omittingEmptySubsequences: false, whereSeparator: .isNewline) {
             let line = rawLine.trimmingCharacters(in: .whitespaces)
             guard let (directive, argument) = Self.fileDirective(in: line) else {
                 output.append(rawLine)
@@ -192,7 +192,8 @@ public struct TunnelblickImporter: Sendable {
             output.append("<\(block)>")
             output.append(contentsOf: pem
                 .trimmingCharacters(in: .whitespacesAndNewlines)
-                .lines.map(String.init))
+                .split(omittingEmptySubsequences: true, whereSeparator: \.isNewline)
+                .map(String.init))
             output.append("</\(block)>")
             if let extraLine {
                 output.append(extraLine)
@@ -294,7 +295,7 @@ public struct TunnelblickImporter: Sendable {
             "up",
             "down"
         ]
-        for rawLine in text.lines {
+        for rawLine in text.split(omittingEmptySubsequences: false, whereSeparator: .isNewline) {
             let line = rawLine.trimmingCharacters(in: .whitespaces).lowercased()
             guard !line.isEmpty else {
                 continue
@@ -316,7 +317,7 @@ public struct TunnelblickImporter: Sendable {
     }
 
     static func isWireGuardConfig(_ text: String) -> Bool {
-        text.lowercased().lines.contains {
+        text.lowercased().split(omittingEmptySubsequences: true, whereSeparator: .isNewline).contains {
             $0.trimmingCharacters(in: .whitespaces) == "[interface]"
         }
     }

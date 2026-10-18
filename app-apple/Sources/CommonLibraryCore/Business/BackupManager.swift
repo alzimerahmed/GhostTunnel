@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import Foundation
+import Partout
 
 /// Errors surfaced by `BackupManager`.
 public enum BackupError: Error, Equatable, Sendable {

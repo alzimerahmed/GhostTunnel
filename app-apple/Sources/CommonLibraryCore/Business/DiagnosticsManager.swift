@@ -14,17 +14,17 @@ public enum LogSanitizer {
     private static let pemEnd = "-----END"
 
     /// `key = value` / `key: value` where the key names a secret.
-    private static let secretAssignment = /(?i)\b(private[_-]?key|public[_-]?key|password|passphrase|secret|authorization|auth[-_]?token|auth[-_]?user[-_]?pass|token|psk|pre[-_]?shared[_-]?key|static[_-]?key|cookie)\b\s*([=:])\s*\S+/
+    private nonisolated(unsafe) static let secretAssignment = /(?i)\b(private[_-]?key|public[_-]?key|password|passphrase|secret|authorization|auth[-_]?token|auth[-_]?user[-_]?pass|token|psk|pre[-_]?shared[_-]?key|static[_-]?key|cookie)\b\s*([=:])\s*\S+/
 
     /// An `auth-user-pass` directive line: the credentials follow on the
     /// next line (inline credentials block).
-    private static let authUserPassMarker = /(?i)\bauth[-_]?user[-_]?pass\b/
+    private nonisolated(unsafe) static let authUserPassMarker = /(?i)\bauth[-_]?user[-_]?pass\b/
 
     /// Base64-encoded 256-bit keys (WireGuard format: 44 chars ending in `=`).
-    private static let base64Key = /[A-Za-z0-9+/]{43}=/
+    private nonisolated(unsafe) static let base64Key = /[A-Za-z0-9+\/]{43}=/
 
     /// Hex-encoded 256-bit keys.
-    private static let hexKey = /\b[0-9a-fA-F]{64}\b/
+    private nonisolated(unsafe) static let hexKey = /\b[0-9a-fA-F]{64}\b/
 
     public static func sanitize(_ lines: [String]) -> [String] {
         var isInsidePEM = false
@@ -201,7 +201,7 @@ public final class LeakTestManager {
         var checks: [LeakTestCheck] = []
         do {
             let ip = try await withTimeout(checkTimeout) {
-                try await checker.publicIP()
+                try await self.checker.publicIP()
             }
             checks.append(LeakTestCheck(
                 kind: .publicIP,
@@ -219,7 +219,7 @@ public final class LeakTestManager {
         for host in Self.dnsCheckHosts {
             do {
                 let addresses = try await withTimeout(checkTimeout) {
-                    try await checker.resolve(host: host)
+                    try await self.checker.resolve(host: host)
                 }
                 checks.append(LeakTestCheck(
                     kind: .dnsResolution,

@@ -127,7 +127,7 @@ enum BackupCrypto {
     static func randomBytes(_ count: Int) -> Data {
         var data = Data(count: count)
         let status = data.withUnsafeMutableBytes {
-            SecRandomCopyBytes(kSecRandomDefault, count, $0.baseAddress)
+            SecRandomCopyBytes(kSecRandomDefault, count, $0.baseAddress!)
         }
         if status != errSecSuccess {
             // Fall back to the Swift RNG, which is cryptographically secure too.

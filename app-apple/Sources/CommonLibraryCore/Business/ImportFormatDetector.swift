@@ -122,7 +122,7 @@ public struct ImportFormatDetector: Sendable {
     private func containsWGQuickSection(_ text: String) -> Bool {
         // Match `[Interface]` case-insensitively on any line; wg-quick
         // requires it, so this is a strong signal.
-        for line in text.lowercased().lines {
+        for line in text.lowercased().split(omittingEmptySubsequences: true, whereSeparator: .isNewline) {
             let trimmedLine = line.trimmingCharacters(in: .whitespaces)
             if trimmedLine == "[interface]" {
                 return true
@@ -133,7 +133,7 @@ public struct ImportFormatDetector: Sendable {
 
     private func isOpenVPNConfig(_ text: String) -> Bool {
         var markerCount = 0
-        for rawLine in text.lines {
+        for rawLine in text.split(omittingEmptySubsequences: false, whereSeparator: .isNewline) {
             let line = rawLine.trimmingCharacters(in: .whitespaces).lowercased()
             if line.isEmpty || line.hasPrefix("#") || line.hasPrefix(";") {
                 continue

@@ -79,7 +79,7 @@ public struct WireGuardQuickParser: Sendable {
             peerSeenInCurrentSection = false
         }
 
-        for rawLine in contents.lines {
+        for rawLine in contents.split(omittingEmptySubsequences: false, whereSeparator: .isNewline) {
             // Strip a UTF-8 BOM that may lead the first line.
             let line = rawLine.trimmingCharacters(in: .whitespaces)
                 .trimmingPrefix("\u{feff}")
