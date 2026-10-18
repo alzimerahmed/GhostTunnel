@@ -17,8 +17,6 @@ public enum QuickConnectPlanner {
         case none
     }
 
-    private init() {}
-
     public static func action(
         current: TunnelWidgetState?,
         profiles: [ABI.AppProfileHeader],
