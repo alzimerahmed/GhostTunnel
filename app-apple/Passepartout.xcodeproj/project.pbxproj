@@ -71,6 +71,17 @@
 		A1B2C3D4E5F60718293A4B6D /* TunnelContext+Production.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B6C /* TunnelContext+Production.swift */; };
 		A1B2C3D4E5F60718293A4B6E /* TunnelContext+Production.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B6C /* TunnelContext+Production.swift */; };
 		CE1AB4932F8A1CF70055BB33 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = CE1AB4922F8A1CF70055BB33 /* AppIcon.icon */; };
+		A2C0FFEE0000000000000010 /* GhostTunnelWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C0FFEE0000000000000005 /* GhostTunnelWatchApp.swift */; };
+		A2C0FFEE0000000000000011 /* WatchSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C0FFEE0000000000000006 /* WatchSessionManager.swift */; };
+		A2C0FFEE0000000000000012 /* WatchStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C0FFEE0000000000000007 /* WatchStatusView.swift */; };
+		A2C0FFEE0000000000000013 /* WatchAppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C0FFEE0000000000000008 /* WatchAppGroup.swift */; };
+		A2C0FFEE0000000000000014 /* WatchConnectivityMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C0FFEE0000000000000009 /* WatchConnectivityMessages.swift */; };
+		A2C0FFEE0000000000000015 /* WatchWidgetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C0FFEE000000000000000C /* WatchWidgetsExtension.swift */; };
+		A2C0FFEE0000000000000016 /* TunnelComplicationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C0FFEE000000000000000D /* TunnelComplicationWidget.swift */; };
+		A2C0FFEE0000000000000017 /* WatchConnectivityMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C0FFEE0000000000000009 /* WatchConnectivityMessages.swift */; };
+		A2C0FFEE0000000000000018 /* WatchAppGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C0FFEE0000000000000008 /* WatchAppGroup.swift */; };
+		A2C0FFEE0000000000000031 /* PassepartoutWatchWidgets.appex in Embed Watch Widgets */ = {isa = PBXBuildFile; fileRef = A2C0FFEE000000000000000F /* PassepartoutWatchWidgets.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A2C0FFEE0000000000000032 /* WatchBridge+iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C0FFEE0000000000000033 /* WatchBridge+iOS.swift */; platformFilter = ios; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,6 +134,20 @@
 			remoteGlobalIDString = 0EE662B32DC2BDDE00A4BB37;
 			remoteInfo = Tunnel;
 		};
+		A2C0FFEE000000000000002A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0E06D1872B87629100176E1D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2C0FFEE0000000000000020;
+			remoteInfo = PassepartoutWatch;
+		};
+		A2C0FFEE000000000000002B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0E06D1872B87629100176E1D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A2C0FFEE0000000000000025;
+			remoteInfo = PassepartoutWatchWidgets;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -146,6 +171,17 @@
 				0E6D805D303C8700002C0DD8 /* PartoutNative.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2C0FFEE000000000000001C /* Embed Watch Widgets */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A2C0FFEE0000000000000031 /* PassepartoutWatchWidgets.appex in Embed Watch Widgets */,
+			);
+			name = "Embed Watch Widgets";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -230,6 +266,20 @@
 		A1B2C3D4E5F60718293A4B5C /* AppContext+Production.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AppContext+Production.swift"; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B6C /* TunnelContext+Production.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TunnelContext+Production.swift"; sourceTree = "<group>"; };
 		CE1AB4922F8A1CF70055BB33 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
+		A2C0FFEE0000000000000033 /* WatchBridge+iOS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WatchBridge+iOS.swift"; sourceTree = "<group>"; };
+		A2C0FFEE0000000000000003 /* Watch.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Watch.plist; sourceTree = "<group>"; };
+		A2C0FFEE0000000000000004 /* Watch.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Watch.entitlements; sourceTree = "<group>"; };
+		A2C0FFEE0000000000000005 /* GhostTunnelWatchApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GhostTunnelWatchApp.swift; sourceTree = "<group>"; };
+		A2C0FFEE0000000000000006 /* WatchSessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchSessionManager.swift; sourceTree = "<group>"; };
+		A2C0FFEE0000000000000007 /* WatchStatusView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchStatusView.swift; sourceTree = "<group>"; };
+		A2C0FFEE0000000000000008 /* WatchAppGroup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchAppGroup.swift; sourceTree = "<group>"; };
+		A2C0FFEE0000000000000009 /* WatchConnectivityMessages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchConnectivityMessages.swift; sourceTree = "<group>"; };
+		A2C0FFEE000000000000000A /* WatchWidgets.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = WatchWidgets.plist; sourceTree = "<group>"; };
+		A2C0FFEE000000000000000B /* WatchWidgets.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = WatchWidgets.entitlements; sourceTree = "<group>"; };
+		A2C0FFEE000000000000000C /* WatchWidgetsExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatchWidgetsExtension.swift; sourceTree = "<group>"; };
+		A2C0FFEE000000000000000D /* TunnelComplicationWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TunnelComplicationWidget.swift; sourceTree = "<group>"; };
+		A2C0FFEE000000000000000E /* PassepartoutWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PassepartoutWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2C0FFEE000000000000000F /* PassepartoutWatchWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PassepartoutWatchWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -318,6 +368,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A2C0FFEE000000000000001A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2C0FFEE000000000000001E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -339,6 +403,8 @@
 				A1B2C3D4E5F60718293A4B8C /* PassepartoutWidgets.appex */,
 				C0DE11A00000000000000014 /* PassepartoutTopShelf.appex */,
 				0E757F102CD0CFFC006E13E1 /* PassepartoutLoginItem.app */,
+				A2C0FFEE000000000000000E /* PassepartoutWatch.app */,
+				A2C0FFEE000000000000000F /* PassepartoutWatchWidgets.appex */,
 				0E3FF4AE2CE3AF6F00BFF640 /* PassepartoutTests.xctest */,
 				0E78FE4C2CF799F400B0C5BF /* PassepartoutUITests.xctest */,
 				0EE662B42DC2BDDE00A4BB37 /* com.ghosttunnel.mac.GhostTunnel.Tunnel.systemextension */,
@@ -398,6 +464,9 @@
 				0E7F460D2CF7F01600B1C53A /* UITests */,
 				A1B2C3D4E5F60718293A4B8D /* Widgets */,
 				C0DE11A00000000000000040 /* TopShelf */,
+				A2C0FFEE0000000000000001 /* Watch */,
+				A2C0FFEE0000000000000030 /* WatchWidgets */,
+				A2C0FFEE0000000000000002 /* WatchShared (CommonLibraryApple) */,
 			);
 			path = Passepartout;
 			sourceTree = "<group>";
@@ -501,6 +570,7 @@
 				0ED61CF92CD04192008FE259 /* App+iOS.swift */,
 				0ED61CF72CD0418C008FE259 /* App+macOS.swift */,
 				0EE8D7E02CD112C200F6600C /* App+tvOS.swift */,
+				A2C0FFEE0000000000000033 /* WatchBridge+iOS.swift */,
 			);
 			path = Platforms;
 			sourceTree = "<group>";
@@ -538,6 +608,42 @@
 			path = TopShelf;
 			sourceTree = "<group>";
 		};
+		A2C0FFEE0000000000000001 /* Watch */ = {
+			isa = PBXGroup;
+			children = (
+				A2C0FFEE0000000000000004 /* Watch.entitlements */,
+				A2C0FFEE0000000000000003 /* Watch.plist */,
+				A2C0FFEE0000000000000005 /* GhostTunnelWatchApp.swift */,
+				A2C0FFEE0000000000000006 /* WatchSessionManager.swift */,
+				A2C0FFEE0000000000000007 /* WatchStatusView.swift */,
+				A2C0FFEE0000000000000008 /* WatchAppGroup.swift */,
+			);
+			path = Watch;
+			sourceTree = "<group>";
+		};
+		A2C0FFEE0000000000000030 /* WatchWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				A2C0FFEE000000000000000B /* WatchWidgets.entitlements */,
+				A2C0FFEE000000000000000A /* WatchWidgets.plist */,
+				A2C0FFEE000000000000000C /* WatchWidgetsExtension.swift */,
+				A2C0FFEE000000000000000D /* TunnelComplicationWidget.swift */,
+			);
+			path = WatchWidgets;
+			sourceTree = "<group>";
+		};
+		A2C0FFEE0000000000000002 /* WatchShared */ = {
+			// Shared watch↔phone wire format, compiled directly into both
+			// watchOS targets. Lives in the SwiftPM sources tree so
+			// CommonLibraryApple and the watch targets stay in sync.
+			isa = PBXGroup;
+			children = (
+				A2C0FFEE0000000000000009 /* WatchConnectivityMessages.swift */,
+			);
+			name = "WatchShared (CommonLibraryApple)";
+			path = Sources/CommonLibraryApple;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -560,6 +666,7 @@
 				0EE662BE2DC2BDDF00A4BB37 /* PBXTargetDependency */,
 				A1B2C3D4E5F60718293A4B96 /* PBXTargetDependency */,
 				C0DE11A00000000000000021 /* PBXTargetDependency */,
+				A2C0FFEE000000000000002C /* PBXTargetDependency */,
 			);
 			name = Passepartout;
 			packageProductDependencies = (
@@ -712,6 +819,42 @@
 			productReference = C0DE11A00000000000000014 /* PassepartoutTopShelf.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		A2C0FFEE0000000000000020 /* PassepartoutWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2C0FFEE0000000000000021 /* Build configuration list for PBXNativeTarget "PassepartoutWatch" */;
+			buildPhases = (
+				A2C0FFEE0000000000000019 /* Sources */,
+				A2C0FFEE000000000000001A /* Frameworks */,
+				A2C0FFEE000000000000001C /* Embed Watch Widgets */,
+				A2C0FFEE000000000000001B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A2C0FFEE000000000000002D /* PBXTargetDependency */,
+			);
+			name = PassepartoutWatch;
+			productName = PassepartoutWatch;
+			productReference = A2C0FFEE000000000000000E /* PassepartoutWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A2C0FFEE0000000000000025 /* PassepartoutWatchWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A2C0FFEE0000000000000026 /* Build configuration list for PBXNativeTarget "PassepartoutWatchWidgets" */;
+			buildPhases = (
+				A2C0FFEE000000000000001D /* Sources */,
+				A2C0FFEE000000000000001E /* Frameworks */,
+				A2C0FFEE000000000000001F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PassepartoutWatchWidgets;
+			productName = PassepartoutWatchWidgets;
+			productReference = A2C0FFEE000000000000000F /* PassepartoutWatchWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		0EE662B32DC2BDDE00A4BB37 /* PassepartoutTunnelMac */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0EE662C52DC2BDDF00A4BB37 /* Build configuration list for PBXNativeTarget "PassepartoutTunnelMac" */;
@@ -770,6 +913,12 @@
 					A1B2C3D4E5F60718293A4B91 = {
 						CreatedOnToolsVersion = 16.4;
 					};
+					A2C0FFEE0000000000000020 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					A2C0FFEE0000000000000025 = {
+						CreatedOnToolsVersion = 16.4;
+					};
 				};
 			};
 			buildConfigurationList = 0E06D18A2B87629100176E1D /* Build configuration list for PBXProject "Passepartout" */;
@@ -809,6 +958,8 @@
 				0E78FE4B2CF799F400B0C5BF /* PassepartoutUITests */,
 				A1B2C3D4E5F60718293A4B91 /* PassepartoutWidgets */,
 				C0DE11A00000000000000050 /* PassepartoutTopShelf */,
+				A2C0FFEE0000000000000020 /* PassepartoutWatch */,
+				A2C0FFEE0000000000000025 /* PassepartoutWatchWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -884,6 +1035,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A2C0FFEE000000000000001B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2C0FFEE000000000000001F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -948,6 +1113,7 @@
 				0EE8D7E12CD112C200F6600C /* App+tvOS.swift in Sources */,
 				0E6EEEE32CF8CABA0076E2B0 /* AppContext+Testing.swift in Sources */,
 				0E6EEEE42CF8CABA0076E2B0 /* ProfileManager+Testing.swift in Sources */,
+				A2C0FFEE0000000000000032 /* WatchBridge+iOS.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1014,6 +1180,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A2C0FFEE0000000000000019 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2C0FFEE0000000000000010 /* GhostTunnelWatchApp.swift in Sources */,
+				A2C0FFEE0000000000000011 /* WatchSessionManager.swift in Sources */,
+				A2C0FFEE0000000000000012 /* WatchStatusView.swift in Sources */,
+				A2C0FFEE0000000000000013 /* WatchAppGroup.swift in Sources */,
+				A2C0FFEE0000000000000014 /* WatchConnectivityMessages.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2C0FFEE000000000000001D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A2C0FFEE0000000000000015 /* WatchWidgetsExtension.swift in Sources */,
+				A2C0FFEE0000000000000016 /* TunnelComplicationWidget.swift in Sources */,
+				A2C0FFEE0000000000000017 /* WatchConnectivityMessages.swift in Sources */,
+				A2C0FFEE0000000000000018 /* WatchAppGroup.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0EE662B02DC2BDDE00A4BB37 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1073,6 +1262,22 @@
 			);
 			target = A1B2C3D4E5F60718293A4B91 /* PassepartoutWidgets */;
 			targetProxy = A1B2C3D4E5F60718293A4B95 /* PBXContainerItemProxy */;
+		};
+		A2C0FFEE000000000000002C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilters = (
+				ios,
+			);
+			target = A2C0FFEE0000000000000020 /* PassepartoutWatch */;
+			targetProxy = A2C0FFEE000000000000002A /* PBXContainerItemProxy */;
+		};
+		A2C0FFEE000000000000002D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilters = (
+				watchos,
+			);
+			target = A2C0FFEE0000000000000025 /* PassepartoutWatchWidgets */;
+			targetProxy = A2C0FFEE000000000000002B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1661,7 +1866,7 @@
 			};
 			name = ReleaseMac;
 		};
-		A1B2C3D4E5F60718293A4B95 /* ReleaseMac */ = {
+		A1B2C3D4E5F60718293A4BA0 /* ReleaseMac */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 0ECD96172DC2738B009BD9F8 /* Config.mac.xcconfig */;
 			buildSettings = {
@@ -1925,6 +2130,138 @@
 			};
 			name = Release;
 		};
+		A2C0FFEE0000000000000022 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0E8D852F2C328CA1005493DE /* Config.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Passepartout/Watch/Watch.entitlements;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Passepartout/Watch/Watch.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(CFG_DISPLAY_NAME)";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(CFG_WATCH_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		A2C0FFEE0000000000000023 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0E8D852F2C328CA1005493DE /* Config.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Passepartout/Watch/Watch.entitlements;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Passepartout/Watch/Watch.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(CFG_DISPLAY_NAME)";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(CFG_WATCH_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		A2C0FFEE0000000000000024 /* ReleaseMac */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0E8D852F2C328CA1005493DE /* Config.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Passepartout/Watch/Watch.entitlements;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Passepartout/Watch/Watch.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(CFG_DISPLAY_NAME)";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(CFG_WATCH_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = ReleaseMac;
+		};
+		A2C0FFEE0000000000000027 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0E8D852F2C328CA1005493DE /* Config.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Passepartout/WatchWidgets/WatchWidgets.entitlements;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Passepartout/WatchWidgets/WatchWidgets.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(TARGET_NAME)";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(CFG_WATCH_WIDGETS_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		A2C0FFEE0000000000000028 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0E8D852F2C328CA1005493DE /* Config.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Passepartout/WatchWidgets/WatchWidgets.entitlements;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Passepartout/WatchWidgets/WatchWidgets.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(TARGET_NAME)";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(CFG_WATCH_WIDGETS_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		A2C0FFEE0000000000000029 /* ReleaseMac */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0E8D852F2C328CA1005493DE /* Config.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Passepartout/WatchWidgets/WatchWidgets.entitlements;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Passepartout/WatchWidgets/WatchWidgets.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(TARGET_NAME)";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(CFG_WATCH_WIDGETS_ID)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = ReleaseMac;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2003,7 +2340,7 @@
 			buildConfigurations = (
 				A1B2C3D4E5F60718293A4B93 /* Debug */,
 				A1B2C3D4E5F60718293A4B94 /* Release */,
-				A1B2C3D4E5F60718293A4B95 /* ReleaseMac */,
+				A1B2C3D4E5F60718293A4BA0 /* ReleaseMac */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2024,6 +2361,26 @@
 				0EE662C12DC2BDDF00A4BB37 /* Debug */,
 				0EE662C22DC2BDDF00A4BB37 /* Release */,
 				0EAD6A6C2DC3A7E600419346 /* ReleaseMac */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2C0FFEE0000000000000021 /* Build configuration list for PBXNativeTarget "PassepartoutWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2C0FFEE0000000000000022 /* Debug */,
+				A2C0FFEE0000000000000023 /* Release */,
+				A2C0FFEE0000000000000024 /* ReleaseMac */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2C0FFEE0000000000000026 /* Build configuration list for PBXNativeTarget "PassepartoutWatchWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2C0FFEE0000000000000027 /* Debug */,
+				A2C0FFEE0000000000000028 /* Release */,
+				A2C0FFEE0000000000000029 /* ReleaseMac */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -20,6 +20,11 @@ final class AppDelegate: NSObject {
         return AppContext.forProduction(bundleIdentifier: bundleIdentifier)
     }()
 
+#if os(iOS)
+    // Phase 14: watch companion bridge (WatchConnectivity).
+    lazy var watchBridge = WatchConnectivityManager(context: context)
+#endif
+
 #if os(macOS)
     lazy var macSettings = MacSettings(
         loginItemId: context.appConfiguration.bundle.bundleString(for: .loginItemId)

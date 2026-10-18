@@ -23,6 +23,8 @@ CFG_TUNNEL_ENTITLEMENT_BASE = packet-tunnel-provider
 CFG_TUNNEL_ID = $(CFG_APP_ID).Tunnel
 CFG_WIDGETS_ID = $(CFG_APP_ID).Widgets
 CFG_TOPSHELF_ID = $(CFG_APP_ID).TopShelf
+CFG_WATCH_ID = $(CFG_APP_ID).watchkitapp
+CFG_WATCH_WIDGETS_ID = $(CFG_WATCH_ID).Widgets
 
 // Keychain
 CFG_KEYCHAIN_GROUP_ID = $(CFG_TEAM_ID).$(CFG_RAW_GROUP_ID)
@@ -33,6 +35,8 @@ CFG_GROUP_ID[sdk=appletvsimulator*] = $(CFG_RAW_GROUP_ID)
 CFG_GROUP_ID[sdk=iphoneos*] = $(CFG_RAW_GROUP_ID)
 CFG_GROUP_ID[sdk=iphonesimulator*] = $(CFG_RAW_GROUP_ID)
 CFG_GROUP_ID[sdk=macosx*] = $(CFG_TEAM_ID).$(CFG_RAW_GROUP_ID)
+CFG_GROUP_ID[sdk=watchos*] = $(CFG_RAW_GROUP_ID)
+CFG_GROUP_ID[sdk=watchsimulator*] = $(CFG_RAW_GROUP_ID)
 
 // CloudKit
 CFG_CLOUDKIT_ID = $(CFG_CLOUDKIT_ROOT).v3
