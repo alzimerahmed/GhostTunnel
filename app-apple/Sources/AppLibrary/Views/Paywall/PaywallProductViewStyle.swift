@@ -3,7 +3,5 @@
 // SPDX-License-Identifier: GPL-3.0
 
 public enum PaywallProductViewStyle {
-    case donation
-
     case paywall(primary: Bool = true)
 }

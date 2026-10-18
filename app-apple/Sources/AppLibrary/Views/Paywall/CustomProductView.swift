@@ -83,8 +83,6 @@ private extension CustomProductView {
 
     var isPrimary: Bool {
         switch style {
-        case .donation:
-            false
         case .paywall(let primary):
             primary
         }
@@ -92,8 +90,6 @@ private extension CustomProductView {
 
     var withDescription: Bool {
         switch style {
-        case .donation:
-            false
         case .paywall(let primary):
             primary
         }
@@ -101,8 +97,6 @@ private extension CustomProductView {
 
     var withFooter: Bool {
         switch style {
-        case .donation:
-            false
         case .paywall(let primary):
 #if os(tvOS)
             primary
@@ -114,8 +108,6 @@ private extension CustomProductView {
 
     var withPadding: Bool {
         switch style {
-        case .donation:
-            true
         case .paywall:
             false
         }

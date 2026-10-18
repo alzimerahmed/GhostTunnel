@@ -65,12 +65,7 @@ struct PaywallProductView: View {
 
 private extension PaywallProductView {
     var shouldUseStoreKit: Bool {
-#if os(tvOS)
-        if case .donation = style {
-            return true
-        }
-#endif
-        return false
+        false
     }
 
     var shouldDisable: Bool {

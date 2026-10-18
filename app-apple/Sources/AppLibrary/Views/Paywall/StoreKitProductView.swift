@@ -42,15 +42,9 @@ private extension ProductView {
     @ViewBuilder
     func withPaywallStyle(_ paywallStyle: PaywallProductViewStyle) -> some View {
 #if os(tvOS)
-        switch paywallStyle {
-        case .donation:
-            productViewStyle(.compact)
-                .padding()
-        case .paywall:
-            productViewStyle(.regular)
-                .listRowBackground(Color.clear)
-                .listRowInsets(.init())
-        }
+        productViewStyle(.regular)
+            .listRowBackground(Color.clear)
+            .listRowInsets(.init())
 #else
         productViewStyle(.compact)
 #endif
