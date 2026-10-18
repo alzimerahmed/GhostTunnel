@@ -10,8 +10,7 @@ struct SpeedTestManagerTests {
     // MARK: Mock probe
 
     /// Records concurrency and per-host latency/failure behavior.
-    private final class MockProbe: LatencyProbe, @unchecked Sendable {
-        private let lock = NSLock()
+    private actor MockProbe: LatencyProbe {
         private var inFlight = 0
         private var _maxInFlight = 0
         private var _probedHosts: [String] = []
@@ -31,35 +30,21 @@ struct SpeedTestManagerTests {
         }
 
         var maxInFlight: Int {
-            lock.lock()
-            defer {
-                lock.unlock()
-            }
-            return _maxInFlight
+            _maxInFlight
         }
 
         var probedHosts: [String] {
-            lock.lock()
-            defer {
-                lock.unlock()
-            }
-            return _probedHosts
+            _probedHosts
         }
 
         func probe(host: String, port: UInt16, usesTCP: Bool) async throws -> TimeInterval {
-            lock.lock()
             inFlight += 1
             _maxInFlight = max(_maxInFlight, inFlight)
-            lock.unlock()
             defer {
-                lock.lock()
                 inFlight -= 1
-                lock.unlock()
             }
             try await Task.sleep(for: .seconds(delay))
-            lock.lock()
             _probedHosts.append(host)
-            lock.unlock()
             if failingHosts.contains(host) {
                 throw LatencyProbeError.resolutionFailed(-1)
             }
@@ -84,7 +69,7 @@ struct SpeedTestManagerTests {
         ]
         let results = await scheduler.run(targets)
         #expect(results.map(\.target.id) == ["a", "b", "c"])
-        #expect(probe.probedHosts.count == 3)
+        #expect(await probe.probedHosts.count == 3)
         #expect(results.allSatisfy(\.isSuccess))
     }
 
@@ -94,7 +79,7 @@ struct SpeedTestManagerTests {
         let scheduler = ProbeScheduler(probe: probe, maxConcurrent: 2, timeout: 5)
         let targets = (0..<8).map { target("t\($0)") }
         _ = await scheduler.run(targets)
-        #expect(probe.maxInFlight <= 2)
+        #expect(await probe.maxInFlight <= 2)
     }
 
     @Test

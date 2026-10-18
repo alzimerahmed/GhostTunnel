@@ -174,7 +174,7 @@ struct BackupManagerTests {
         let imported = try await sut.importArchive(archive, passphrase: nil)
         #expect(imported.count == 1)
         let wgModule = try #require(imported[0].modules.first as? WireGuardModule)
-        #expect(wgModule.configuration?.builder()?.interface.privateKey == BackupManager.redactedKey)
+        #expect(wgModule.configuration?.builder().interface.privateKey == BackupManager.redactedKey)
     }
 
     @Test
