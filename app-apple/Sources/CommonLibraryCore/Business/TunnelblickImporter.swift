@@ -152,7 +152,7 @@ public struct TunnelblickImporter: Sendable {
         warnings: inout [String]
     ) -> String {
         var output: [String] = []
-        for rawLine in config.split(omittingEmptySubsequences: false, whereSeparator: .isNewline) {
+        for rawLine in config.split(omittingEmptySubsequences: false, whereSeparator: { $0.isNewline }) {
             let line = rawLine.trimmingCharacters(in: .whitespaces)
             guard let (directive, argument) = Self.fileDirective(in: line) else {
                 output.append(rawLine)
@@ -295,7 +295,7 @@ public struct TunnelblickImporter: Sendable {
             "up",
             "down"
         ]
-        for rawLine in text.split(omittingEmptySubsequences: false, whereSeparator: .isNewline) {
+        for rawLine in text.split(omittingEmptySubsequences: false, whereSeparator: { $0.isNewline }) {
             let line = rawLine.trimmingCharacters(in: .whitespaces).lowercased()
             guard !line.isEmpty else {
                 continue
@@ -317,7 +317,7 @@ public struct TunnelblickImporter: Sendable {
     }
 
     static func isWireGuardConfig(_ text: String) -> Bool {
-        text.lowercased().split(omittingEmptySubsequences: true, whereSeparator: .isNewline).contains {
+        text.lowercased().split(omittingEmptySubsequences: true, whereSeparator: { $0.isNewline }).contains {
             $0.trimmingCharacters(in: .whitespaces) == "[interface]"
         }
     }

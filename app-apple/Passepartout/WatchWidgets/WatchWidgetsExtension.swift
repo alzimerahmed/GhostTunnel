@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import WidgetKit
+import SwiftUI
 
 @main
 struct WatchWidgetsExtension: WidgetBundle {

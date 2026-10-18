@@ -270,32 +270,35 @@ enum DeflateDecoder {
         guard !input.isEmpty, maxOutputSize > 0 else {
             throw BackupError.corruptedArchive
         }
-        var stream = compression_stream(dst_ptr: nil, dst_size: 0, src_ptr: nil, src_size: 0, state: nil)
-        let status = compression_stream_init(
-            &stream,
-            COMPRESSION_STREAM_DECODE,
-            COMPRESSION_ZLIB
-        )
-        guard status.rawValue == COMPRESSION_STATUS_OK.rawValue else {
-            throw BackupError.corruptedArchive
-        }
-        defer {
-            compression_stream_destroy(&stream)
-        }
-
-        var output = Data()
         let chunkSize = 64 * 1_024
         let dstBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: chunkSize)
         defer {
             dstBuffer.deallocate()
         }
 
+        var output = Data()
         try input.withUnsafeBytes { (srcRaw: UnsafeRawBufferPointer) in
             guard let srcBase = srcRaw.baseAddress else {
                 throw BackupError.corruptedArchive
             }
-            stream.src_ptr = srcBase.assumingMemoryBound(to: UInt8.self)
-            stream.src_size = input.count
+            var stream = compression_stream(
+                dst_ptr: dstBuffer,
+                dst_size: chunkSize,
+                src_ptr: srcBase.assumingMemoryBound(to: UInt8.self),
+                src_size: input.count,
+                state: nil
+            )
+            let status = compression_stream_init(
+                &stream,
+                COMPRESSION_STREAM_DECODE,
+                COMPRESSION_ZLIB
+            )
+            guard status.rawValue == COMPRESSION_STATUS_OK.rawValue else {
+                throw BackupError.corruptedArchive
+            }
+            defer {
+                compression_stream_destroy(&stream)
+            }
 
             var reachedEnd = false
             while !reachedEnd {

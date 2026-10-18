@@ -122,7 +122,8 @@ public final class SpeedTestManager {
 
     public private(set) var isRunning = false
 
-    private var task: Task<[ProbeResult], Never>?
+    private var runId = UUID()
+
 
     public init() {
     }
@@ -132,15 +133,13 @@ public final class SpeedTestManager {
     public func test(_ targets: [ProbeTarget], scheduler: ProbeScheduler? = nil) async {
         task?.cancel()
         let effectiveScheduler = scheduler ?? ProbeScheduler(probe: NWLatencyProbe())
-        let task = Task<[ProbeResult], Never> {
-            await effectiveScheduler.run(targets)
-        }
-        self.task = task
+        let id = UUID()
+        runId = id
         isRunning = true
-        let results = await task.value
-        // Task identity check: only the latest run may publish results or
+        let results = await effectiveScheduler.run(targets)
+        // Run identity check: only the latest run may publish results or
         // clear `isRunning` (a superseded run must not clobber the newer one).
-        guard self.task === task else {
+        guard runId == id else {
             return
         }
         self.results = results
@@ -148,6 +147,7 @@ public final class SpeedTestManager {
     }
 
     public func cancel() {
+        runId = UUID()
         task?.cancel()
     }
 
@@ -180,8 +180,8 @@ public final class SpeedTestManager {
                 (index: $0.offset, key: $0.element, latency: latencies[$0.element])
             }
             .sorted {
-                let a = $0.latency ?? .infinity
-                let b = $1.latency ?? .infinity
+                let a = $0.latency ?? Double.infinity
+                let b = $1.latency ?? Double.infinity
                 if a != b {
                     return a < b
                 }

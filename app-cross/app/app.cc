@@ -244,7 +244,8 @@ void MyFrame::StartTunnel(const wxString &profilePath)
     const wxString cmd = QuoteArg(tunnelExe) + " " + QuoteArg(profilePath);
 
     m_disconnectRequested = false;
-    m_tunnelProcess = new wxProcess(this, wxID_ANY, true);
+    m_tunnelProcess = new wxProcess(this, wxID_ANY);
+    m_tunnelProcess->Redirect();
     const long pid = wxExecute(cmd, wxEXEC_ASYNC, m_tunnelProcess);
     if (pid <= 0) {
         wxLogError("Unable to launch tunnel binary: %s", tunnelExe);
@@ -278,8 +279,8 @@ void MyFrame::OnEndProcess(wxProcessEvent &)
     // We process wxEVT_END_PROCESS, so per wxProcess docs we own the object.
     if (m_tunnelProcess) {
         // Drain whatever the tunnel printed before it exited.
-        AppendStreamOutput(m_logView, m_tunnelProcess->GetInputStream());
-        AppendStreamOutput(m_logView, m_tunnelProcess->GetErrorStream());
+        ::AppendStreamOutput(m_logView, m_tunnelProcess->GetInputStream());
+        ::AppendStreamOutput(m_logView, m_tunnelProcess->GetErrorStream());
         delete m_tunnelProcess;
         m_tunnelProcess = nullptr;
     }
@@ -298,8 +299,8 @@ void MyFrame::OnEndProcess(wxProcessEvent &)
 void MyFrame::OnLogTimer(wxTimerEvent &)
 {
     if (!m_tunnelProcess) return;
-    AppendStreamOutput(m_logView, m_tunnelProcess->GetInputStream());
-    AppendStreamOutput(m_logView, m_tunnelProcess->GetErrorStream());
+    ::AppendStreamOutput(m_logView, m_tunnelProcess->GetInputStream());
+    ::AppendStreamOutput(m_logView, m_tunnelProcess->GetErrorStream());
 }
 
 void MyFrame::OnAbout(wxCommandEvent &)

@@ -1,0 +1,863 @@
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* main Tests · 39117132999
+Triggered via push about 2 minutes ago
+
+JOBS
+X Run checks / Apple build watchOS in 1m31s (ID 117645091804)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  ✓ Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+✓ Run checks / Apple build tvOS in 50s (ID 117645091982)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  ✓ Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+X Run checks / Cross build in 1m34s (ID 117645091985)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  - Run partout-io/action-prepare-xcode-build@master
+  ✓ Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  ✓ Install desktop toolchain deps
+  X Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/setup-zig@main
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+X Run checks / Apple tests in 1m33s (ID 117645091995)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  ✓ Validate translations
+  X Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+✓ Run checks / Cross checks in 11s (ID 117645092001)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  - Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  ✓ Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+✓ Run checks / Apple build in 1m17s (ID 117645092008)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  ✓ Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+✓ Run checks / Config checks in 8s (ID 117645092017)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  - Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  ✓ Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+* Run checks / Android checks (ID 117645092024)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  - Run partout-io/action-prepare-xcode-build@master
+  ✓ Run partout-io/setup-zig@main
+  ✓ Run actions/setup-go@v7
+  ✓ Run actions/setup-java@v6
+  ✓ Run android-actions/setup-android@v4
+  ✓ Install Android SDK components
+  * Run Android checks
+  * Run actions/setup-node@v6
+  * Verify CMake file lists
+  * Install desktop toolchain deps
+  * Build desktop app
+  * Upload desktop binary
+  * Validate hosted config
+  * Validate translations
+  * Run Apple tests
+  * Run Apple build
+  * Run Apple build (tvOS)
+  * Run Apple build (watchOS)
+  * Run Partout tests (Swift)
+  * Run Partout tests
+  * Run API tests
+  * Post Run actions/setup-java@v6
+  * Post Run actions/setup-go@v7
+  * Post Run partout-io/setup-zig@main
+  * Post Run actions/checkout@v6
+✓ Run checks / Partout tests in 1m23s (ID 117645092072)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  ✓ Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  ✓ Run Partout tests (Swift)
+  ✓ Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/setup-zig@main
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+- Run checks / Checks skipped in 0s (ID 117645092515)
+
+ANNOTATIONS
+X The strategy configuration was canceled because "checks.run_tests.Cross_build_cross-build_u" failed
+Run checks / Apple build watchOS: .github#1
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Apple build watchOS: .github#1
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Apple build tvOS: .github#1
+
+X Process completed with exit code 1.
+Run checks / Cross build: .github#92
+
+- "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748"
+Run checks / Cross build: .github#1
+
+X The strategy configuration was canceled because "checks.run_tests.Cross_build_cross-build_u" failed
+Run checks / Apple tests: .github#1
+
+X Process completed with exit code 1.
+Run checks / Apple tests: .github#5957
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Apple tests: .github#1
+
+- "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748"
+Run checks / Cross checks: .github#1
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Apple build: .github#1
+
+- "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748"
+Run checks / Config checks: .github#1
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Partout tests: .github#1
+
+Refreshing run status every 20 seconds. Press Ctrl+C to quit.
+
+* main Tests · 39117132999
+Triggered via push about 2 minutes ago
+
+JOBS
+X Run checks / Apple build watchOS in 1m31s (ID 117645091804)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  ✓ Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+✓ Run checks / Apple build tvOS in 50s (ID 117645091982)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  ✓ Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+X Run checks / Cross build in 1m34s (ID 117645091985)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  - Run partout-io/action-prepare-xcode-build@master
+  ✓ Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  ✓ Install desktop toolchain deps
+  X Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/setup-zig@main
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+X Run checks / Apple tests in 1m33s (ID 117645091995)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  ✓ Validate translations
+  X Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+✓ Run checks / Cross checks in 11s (ID 117645092001)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  - Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  ✓ Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+✓ Run checks / Apple build in 1m17s (ID 117645092008)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  ✓ Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+✓ Run checks / Config checks in 8s (ID 117645092017)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  - Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  ✓ Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+* Run checks / Android checks (ID 117645092024)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  - Run partout-io/action-prepare-xcode-build@master
+  ✓ Run partout-io/setup-zig@main
+  ✓ Run actions/setup-go@v7
+  ✓ Run actions/setup-java@v6
+  ✓ Run android-actions/setup-android@v4
+  ✓ Install Android SDK components
+  * Run Android checks
+  * Run actions/setup-node@v6
+  * Verify CMake file lists
+  * Install desktop toolchain deps
+  * Build desktop app
+  * Upload desktop binary
+  * Validate hosted config
+  * Validate translations
+  * Run Apple tests
+  * Run Apple build
+  * Run Apple build (tvOS)
+  * Run Apple build (watchOS)
+  * Run Partout tests (Swift)
+  * Run Partout tests
+  * Run API tests
+  * Post Run actions/setup-java@v6
+  * Post Run actions/setup-go@v7
+  * Post Run partout-io/setup-zig@main
+  * Post Run actions/checkout@v6
+✓ Run checks / Partout tests in 1m23s (ID 117645092072)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  ✓ Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  ✓ Run Partout tests (Swift)
+  ✓ Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/setup-zig@main
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+- Run checks / Checks skipped in 0s (ID 117645092515)
+
+ANNOTATIONS
+X The strategy configuration was canceled because "checks.run_tests.Cross_build_cross-build_u" failed
+Run checks / Apple build watchOS: .github#1
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Apple build watchOS: .github#1
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Apple build tvOS: .github#1
+
+X Process completed with exit code 1.
+Run checks / Cross build: .github#92
+
+- "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748"
+Run checks / Cross build: .github#1
+
+X The strategy configuration was canceled because "checks.run_tests.Cross_build_cross-build_u" failed
+Run checks / Apple tests: .github#1
+
+X Process completed with exit code 1.
+Run checks / Apple tests: .github#5957
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Apple tests: .github#1
+
+- "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748"
+Run checks / Cross checks: .github#1
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Apple build: .github#1
+
+- "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748"
+Run checks / Config checks: .github#1
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Partout tests: .github#1
+
+X main Tests · 39117132999
+Triggered via push about 3 minutes ago
+
+JOBS
+X Run checks / Apple build watchOS in 1m31s (ID 117645091804)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  ✓ Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+✓ Run checks / Apple build tvOS in 50s (ID 117645091982)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  ✓ Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+X Run checks / Cross build in 1m34s (ID 117645091985)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  - Run partout-io/action-prepare-xcode-build@master
+  ✓ Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  ✓ Install desktop toolchain deps
+  X Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/setup-zig@main
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+X Run checks / Apple tests in 1m33s (ID 117645091995)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  ✓ Validate translations
+  X Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+✓ Run checks / Cross checks in 11s (ID 117645092001)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  - Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  ✓ Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+✓ Run checks / Apple build in 1m17s (ID 117645092008)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  ✓ Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+✓ Run checks / Config checks in 8s (ID 117645092017)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  - Run partout-io/action-prepare-xcode-build@master
+  - Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  ✓ Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+X Run checks / Android checks in 2m50s (ID 117645092024)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  - Run partout-io/action-prepare-xcode-build@master
+  ✓ Run partout-io/setup-zig@main
+  ✓ Run actions/setup-go@v7
+  ✓ Run actions/setup-java@v6
+  ✓ Run android-actions/setup-android@v4
+  ✓ Install Android SDK components
+  X Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  - Run Partout tests (Swift)
+  - Run Partout tests
+  - Run API tests
+  ✓ Post Run actions/setup-java@v6
+  - Post Run actions/setup-go@v7
+  ✓ Post Run partout-io/setup-zig@main
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+✓ Run checks / Partout tests in 1m23s (ID 117645092072)
+  ✓ Set up job
+  ✓ Run actions/checkout@v6
+  ✓ Run partout-io/action-prepare-xcode-build@master
+  ✓ Run partout-io/setup-zig@main
+  - Run actions/setup-go@v7
+  - Run actions/setup-java@v6
+  - Run android-actions/setup-android@v4
+  - Install Android SDK components
+  - Run Android checks
+  - Run actions/setup-node@v6
+  - Verify CMake file lists
+  - Install desktop toolchain deps
+  - Build desktop app
+  - Upload desktop binary
+  - Validate hosted config
+  - Validate translations
+  - Run Apple tests
+  - Run Apple build
+  - Run Apple build (tvOS)
+  - Run Apple build (watchOS)
+  ✓ Run Partout tests (Swift)
+  ✓ Run Partout tests
+  - Run API tests
+  ✓ Post Run partout-io/setup-zig@main
+  ✓ Post Run partout-io/action-prepare-xcode-build@master
+  ✓ Post Run actions/checkout@v6
+  ✓ Complete job
+- Run checks / Checks skipped in 0s (ID 117645092515)
+
+ANNOTATIONS
+X The strategy configuration was canceled because "checks.run_tests.Cross_build_cross-build_u" failed
+Run checks / Apple build watchOS: .github#1
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Apple build watchOS: .github#1
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Apple build tvOS: .github#1
+
+X Process completed with exit code 1.
+Run checks / Cross build: .github#92
+
+- "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748"
+Run checks / Cross build: .github#1
+
+X The strategy configuration was canceled because "checks.run_tests.Cross_build_cross-build_u" failed
+Run checks / Apple tests: .github#1
+
+X Process completed with exit code 1.
+Run checks / Apple tests: .github#5957
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Apple tests: .github#1
+
+- "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748"
+Run checks / Cross checks: .github#1
+
+- Due to capacity constraints, jobs targeting macOS arm64 runners may experience longer queue times.
+Run checks / Apple build: .github#1
+
+- "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748"
+Run checks / Config checks: .github#1
+
+X The strategy configuration was canceled because "checks.run_tests.Cross_build_cross-build_u" failed
+Run checks / Android checks: .github#1
+
