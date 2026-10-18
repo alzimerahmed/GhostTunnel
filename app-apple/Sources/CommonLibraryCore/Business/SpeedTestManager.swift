@@ -184,13 +184,13 @@ public final class SpeedTestManager {
             .map {
                 (index: $0.offset, key: $0.element, latency: latencies[$0.element])
             }
-            .sorted {
-                let a = $0.latency ?? Double.infinity
-                let b = $1.latency ?? Double.infinity
+            .sorted { x, y in
+                let a = x.latency ?? Double.infinity
+                let b = y.latency ?? Double.infinity
                 if a != b {
                     return a < b
                 }
-                return $0.index < $1.index
+                return x.index < y.index
             }
             .map(\.key)
     }

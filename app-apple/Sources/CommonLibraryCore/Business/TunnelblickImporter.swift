@@ -155,7 +155,7 @@ public struct TunnelblickImporter: Sendable {
         for rawLine in config.split(omittingEmptySubsequences: false, whereSeparator: { $0.isNewline }) {
             let line = rawLine.trimmingCharacters(in: .whitespaces)
             guard let (directive, argument) = Self.fileDirective(in: line) else {
-                output.append(rawLine)
+                output.append(String(rawLine))
                 continue
             }
             var inlineArgument = argument
@@ -171,12 +171,12 @@ public struct TunnelblickImporter: Sendable {
             }
             guard let entry = Self.entry(named: inlineArgument, in: entries) else {
                 warnings.append(Strings.missingKeyFile(inlineArgument))
-                output.append(rawLine)
+                output.append(String(rawLine))
                 continue
             }
             guard let pem = entry.data.decodedUTF8Text else {
                 warnings.append(Strings.binaryKeyFile(inlineArgument))
-                output.append(rawLine)
+                output.append(String(rawLine))
                 continue
             }
             // Hostile-input guard: a key file is inlined verbatim into the
@@ -185,7 +185,7 @@ public struct TunnelblickImporter: Sendable {
             // plain PEM-like body (no angle brackets, no directive lines).
             guard Self.isSafeInlineKeyFile(pem) else {
                 warnings.append(Strings.unsafeKeyFile(inlineArgument))
-                output.append(rawLine)
+                output.append(String(rawLine))
                 continue
             }
             let block = Self.inlineBlocks[directive] ?? directive
