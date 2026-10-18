@@ -35,7 +35,7 @@ public protocol BackupArchiveCoding: Sendable {
 /// Decoding also accepts "deflate" (method 8) entries via the system
 /// Compression framework — Phase 10 needs this to read real-world Tunnelblick
 /// `.tblk` packages, which are deflated ZIPs. Decompression is bounded
-/// (incremental, capped at `maxEntrySize`) so a hostile archive cannot
+/// (declared size capped at `maxEntrySize`) so a hostile archive cannot
 /// trigger an unbounded allocation (zip bomb).
 public struct ZipBackupArchiveCoder: BackupArchiveCoding {
     /// Upper bound for a single decoded entry, also the decompression cap.
@@ -177,15 +177,13 @@ public struct ZipBackupArchiveCoder: BackupArchiveCoding {
                 throw BackupError.corruptedArchive
             }
 
-            let (content, method) = try entryContent(
-                in: data,
-                at: localOffset,
-                crc: crc,
-                size: compressedSize
-            )
+            guard localOffset >= 0, localOffset + 30 <= data.count else {
+                throw BackupError.corruptedArchive
+            }
             // Stored entries must declare matching sizes; deflated entries
             // legitimately differ (compressed vs uncompressed) and are
             // instead bounded by the per-entry decompression cap.
+            let method = data.u16LE(at: localOffset + 8)
             switch method {
             case 0:
                 guard compressedSize == uncompressedSize else {
@@ -198,6 +196,13 @@ public struct ZipBackupArchiveCoder: BackupArchiveCoding {
             default:
                 throw BackupError.corruptedArchive
             }
+            let content = try entryContent(
+                in: data,
+                at: localOffset,
+                crc: crc,
+                size: compressedSize,
+                uncompressedSize: uncompressedSize
+            )
             totalSize += content.count
             guard totalSize <= maxTotalSize else {
                 throw BackupError.tooLargeArchive
@@ -233,8 +238,9 @@ private extension ZipBackupArchiveCoder {
         in data: Data,
         at localOffset: Int,
         crc: UInt32,
-        size: Int
-    ) throws -> (content: Data, method: UInt16) {
+        size: Int,
+        uncompressedSize: Int
+    ) throws -> Data {
         guard localOffset >= 0, localOffset + 30 <= data.count,
               data.u32LE(at: localOffset) == 0x0403_4b50 else {
             throw BackupError.corruptedArchive
@@ -252,90 +258,51 @@ private extension ZipBackupArchiveCoder {
         case 0:
             content = raw
         case 8:
-            content = try DeflateDecoder.inflate(raw, maxOutputSize: maxEntrySize)
+            content = try DeflateDecoder.inflate(raw, expectedSize: uncompressedSize)
         default:
             throw BackupError.corruptedArchive
         }
         guard CRC32.checksum(of: content) == crc else {
             throw BackupError.corruptedArchive
         }
-        return (content, method)
+        return content
     }
 }
 
 // MARK: - Raw-deflate decoding (ZIP method 8) via the Compression framework
 
-/// Incremental raw-deflate decoder. ZIP "deflate" entries are raw DEFLATE
+/// One-shot raw-deflate decoder. ZIP "deflate" entries are raw DEFLATE
 /// streams (no zlib header), which is exactly Apple's `COMPRESSION_ZLIB`.
-/// Output is produced in bounded chunks and capped, so a lying header or a
-/// decompression bomb cannot exhaust memory.
+/// The central directory declares the uncompressed size and callers bound
+/// it, so decoding into an exactly-sized buffer is both safe and simple:
+/// a lying header cannot exhaust memory, and a truncated stream yields a
+/// short write, which fails the caller's CRC check.
 enum DeflateDecoder {
-    static func inflate(_ input: Data, maxOutputSize: Int) throws -> Data {
-        guard !input.isEmpty, maxOutputSize > 0 else {
+    static func inflate(_ input: Data, expectedSize: Int) throws -> Data {
+        guard !input.isEmpty, expectedSize > 0 else {
+            if expectedSize == 0 {
+                return Data()
+            }
             throw BackupError.corruptedArchive
         }
-        let chunkSize = 64 * 1_024
-        let dstBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: chunkSize)
-        defer {
-            dstBuffer.deallocate()
-        }
-
-        var output = Data()
-        try input.withUnsafeBytes { (srcRaw: UnsafeRawBufferPointer) in
-            guard let srcBase = srcRaw.baseAddress else {
-                throw BackupError.corruptedArchive
-            }
-            var stream = compression_stream(
-                dst_ptr: dstBuffer,
-                dst_size: chunkSize,
-                src_ptr: srcBase.assumingMemoryBound(to: UInt8.self),
-                src_size: input.count,
-                state: nil
-            )
-            let status = compression_stream_init(
-                &stream,
-                COMPRESSION_STREAM_DECODE,
-                COMPRESSION_ZLIB
-            )
-            guard status.rawValue == COMPRESSION_STATUS_OK.rawValue else {
-                throw BackupError.corruptedArchive
-            }
-            defer {
-                compression_stream_destroy(&stream)
-            }
-
-            var reachedEnd = false
-            while !reachedEnd {
-                stream.dst_ptr = dstBuffer
-                stream.dst_size = chunkSize
-                let flags = Int32(COMPRESSION_STREAM_FINALIZE.rawValue)
-                let result = compression_stream_process(&stream, flags)
-                switch result.rawValue {
-                case COMPRESSION_STATUS_OK.rawValue, COMPRESSION_STATUS_END.rawValue:
-                    let produced = chunkSize - stream.dst_size
-                    let isEnd = result.rawValue == COMPRESSION_STATUS_END.rawValue
-                    guard produced > 0 || isEnd else {
-                        // No forward progress without end-of-stream.
-                        throw BackupError.corruptedArchive
-                    }
-                    if produced > 0 {
-                        guard output.count + produced <= maxOutputSize else {
-                            throw BackupError.corruptedArchive
-                        }
-                        output.append(dstBuffer, count: produced)
-                    }
-                    if isEnd {
-                        reachedEnd = true
-                    }
-                    if stream.src_size == 0 && !isEnd && produced < chunkSize {
-                        // Input exhausted but stream not finalized: with
-                        // FINALIZE this means a truncated stream.
-                        throw BackupError.corruptedArchive
-                    }
-                default:
-                    throw BackupError.corruptedArchive
+        var output = Data(count: expectedSize)
+        let written = output.withUnsafeMutableBytes { (dst: UnsafeMutableRawBufferPointer) in
+            input.withUnsafeBytes { (src: UnsafeRawBufferPointer) in
+                guard let dstBase = dst.baseAddress, let srcBase = src.baseAddress else {
+                    return -1
                 }
+                return compression_decode_buffer(
+                    dstBase.assumingMemoryBound(to: UInt8.self),
+                    expectedSize,
+                    srcBase.assumingMemoryBound(to: UInt8.self),
+                    input.count,
+                    nil,
+                    COMPRESSION_ZLIB
+                )
             }
+        }
+        guard written == expectedSize else {
+            throw BackupError.corruptedArchive
         }
         return output
     }

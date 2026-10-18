@@ -177,7 +177,10 @@ package.targets.append(contentsOf: [
     ),
     .testTarget(
         name: "CommonLibraryTests",
-        dependencies: ["CommonLibrary"],
+        dependencies: [
+            "CommonLibrary",
+            .target(name: "CommonLibraryApple", condition: .when(platforms: [.iOS, .macOS, .tvOS]))
+        ],
         resources: [
             .process("Resources")
         ]
