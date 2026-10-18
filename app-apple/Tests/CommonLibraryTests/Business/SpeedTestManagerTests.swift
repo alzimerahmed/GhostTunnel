@@ -196,6 +196,7 @@ struct SpeedTestManagerTests {
     // MARK: Re-entrancy
 
     @Test
+    @MainActor
     func givenRunningTest_whenTestRunsAgain_thenOnlyLatestResultsArePublished() async {
         let slowScheduler = ProbeScheduler(probe: MockProbe(delay: 0.5), maxConcurrent: 1, timeout: 5)
         let fastScheduler = ProbeScheduler(probe: MockProbe(delay: 0.01), maxConcurrent: 1, timeout: 5)
