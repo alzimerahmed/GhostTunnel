@@ -208,7 +208,7 @@ extension ExtendedEndpoint {
         "\(address.rawValue):\(proto.port):\(proto.socketType.rawValue)"
     }
 
-    var probeTarget: ProbeTarget {
+    public var probeTarget: ProbeTarget {
         ProbeTarget(
             id: probeKey,
             host: address.rawValue,

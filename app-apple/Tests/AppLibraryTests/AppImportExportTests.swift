@@ -370,8 +370,14 @@ extension AppImportExportTests {
             BackupEntry(name: "config.tblk/tunnel.conf", data: Self.wgQuickContents)
         ]
         let zipData = try ZipBackupArchiveCoder().encode(entries)
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("config.tblk")
+        try zipData.write(to: url)
+        defer {
+            try? FileManager.default.removeItem(at: url)
+        }
         let result = try AppImportExport.dummy.importedFile(
-            from: .contents(filename: "config.tblk", data: zipData),
+            from: .file(url),
             passphrase: nil
         )
         #expect(result.format == .tunnelblick)
@@ -389,8 +395,14 @@ extension AppImportExportTests {
             BackupEntry(name: "../evil.conf", data: Data("client\ndev tun\n".utf8))
         ]
         let zipData = try ZipBackupArchiveCoder().encode(entries)
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("evil.tblk")
+        try zipData.write(to: url)
+        defer {
+            try? FileManager.default.removeItem(at: url)
+        }
         let result = try AppImportExport.dummy.importedFile(
-            from: .contents(filename: "evil.tblk", data: zipData),
+            from: .file(url),
             passphrase: nil
         )
         #expect(result.format == .tunnelblick)
