@@ -14,7 +14,6 @@ class MyApp : public wxApp
 {
 public:
     bool OnInit() override;
-    void OnActivateApp(wxActivateEvent &event);
 };
 
 class MyFrame : public wxFrame

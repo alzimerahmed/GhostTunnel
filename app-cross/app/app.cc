@@ -55,6 +55,13 @@ void AppendStreamOutput(wxTextCtrl *log, wxInputStream *stream) {
         if (n == 0) break;
         log->AppendText(wxString::FromUTF8(buf, n));
     }
+    // Bound the log view: a long-running tunnel would otherwise grow the
+    // control without limit. Trim the oldest half once past the cap.
+    const wxTextPos cap = 512 * 1024;
+    const wxTextPos len = log->GetLastPosition();
+    if (len > cap) {
+        log->Remove(0, len - cap / 2);
+    }
 }
 
 } // namespace
@@ -66,14 +73,9 @@ bool MyApp::OnInit()
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 #endif
 
-    Bind(wxEVT_ACTIVATE_APP, &MyApp::OnActivateApp, this);
-
     MyFrame* frame = new MyFrame();
     frame->Show(true);
     return true;
-}
-
-void MyApp::OnActivateApp(wxActivateEvent &) {
 }
 
 MyFrame::MyFrame()
