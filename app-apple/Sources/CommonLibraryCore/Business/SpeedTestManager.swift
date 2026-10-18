@@ -174,8 +174,11 @@ public final class SpeedTestManager {
     /// order at the end. Testable without Partout types.
     public nonisolated static func orderedKeys(_ keys: [String], by results: [ProbeResult]) -> [String] {
         let latencies = Dictionary(
-            results.map {
-                ($0.target.id, $0.latency)
+            results.compactMap { result -> (String, TimeInterval)? in
+                guard let latency = result.latency else {
+                    return nil
+                }
+                return (result.target.id, latency)
             },
             uniquingKeysWith: { first, _ in first }
         )
