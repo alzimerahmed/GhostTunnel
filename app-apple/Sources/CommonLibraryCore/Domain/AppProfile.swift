@@ -36,7 +36,12 @@ extension ABI {
         }
 
         public static func < (lhs: Self, rhs: Self) -> Bool {
-            lhs.name.lowercased() < rhs.name.lowercased()
+            let lhsName = lhs.name.lowercased()
+            let rhsName = rhs.name.lowercased()
+            guard lhsName != rhsName else {
+                return lhs.id.uuidString < rhs.id.uuidString
+            }
+            return lhsName < rhsName
         }
     }
 

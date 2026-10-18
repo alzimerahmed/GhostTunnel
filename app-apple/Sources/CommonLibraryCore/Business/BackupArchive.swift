@@ -141,6 +141,12 @@ public struct ZipBackupArchiveCoder: BackupArchiveCoding {
         maxTotalSize: Int = Self.defaultMaxTotalSize
     ) throws -> [BackupEntry] {
         let eocdOffset = try endOfCentralDirectoryOffset(in: data)
+        // The EOCD record (plus its declared comment) must terminate the
+        // file: trailing garbage means a corrupt or hand-crafted archive.
+        let eocdCommentLength = Int(data.u16LE(at: eocdOffset + 20))
+        guard eocdOffset + 22 + eocdCommentLength == data.count else {
+            throw BackupError.corruptedArchive
+        }
         let count = Int(data.u16LE(at: eocdOffset + 10))
         guard count <= maxEntries else {
             throw BackupError.tooManyEntries

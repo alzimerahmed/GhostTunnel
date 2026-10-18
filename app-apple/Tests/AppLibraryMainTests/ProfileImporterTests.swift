@@ -109,25 +109,23 @@ struct ProfileImporterTests {
     }
 
     @Test
-    func givenUnsupportedCompression_whenImport_thenThrowsWithoutPrompting() async {
+    func givenUnsupportedCompression_whenImport_thenFailsResultWithoutPrompting() async throws {
         let sut = ProfileImporter()
         let url = URL(string: "file:///filename.ovpn")!
 
-        do {
-            try await sut.tryImport(urls: [url]) { _, _ in
-                throw try openVPNParseError(.unsupportedCompression)
-            }
-            Issue.record("Expected unsupported compression error")
-        } catch {
-            guard case .partout(let wrapped) = error as? ABI.AppError else {
-                Issue.record("Expected PartoutError, got \(error)")
-                return
-            }
-            #expect(wrapped.code == .parsing)
-            #expect(wrapped.parseErrorInfo?.subCode == OpenVPNErrorCode.unsupportedCompression.rawValue)
+        // Per-file failure model (Phase 10): a parse error lands in the
+        // results report as a failed entry rather than aborting the batch
+        // or prompting for a passphrase.
+        try await sut.tryImport(urls: [url]) { _, _ in
+            throw try openVPNParseError(.unsupportedCompression)
         }
         #expect(sut.urlsRequiringPassphrase.isEmpty)
         #expect(!sut.isPresentingPassphrase)
+        let result = try #require(sut.results.first)
+        guard case .failed = result.status else {
+            Issue.record("Expected a failed result, got \(result.status)")
+            return
+        }
     }
 
     @Test

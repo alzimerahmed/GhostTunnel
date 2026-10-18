@@ -158,9 +158,15 @@ extension BackupManager {
                     ?? WireGuard.Configuration.Builder(privateKey: Self.redactedKey)
                 configuration.interface.privateKey = Self.redactedKey
                 configuration.peers = configuration.peers.map { peer in
-                    var peer = peer
-                    peer.preSharedKey = nil
-                    return peer
+                    // publicKey is `let` on the builder: rebuild the peer so
+                    // that no key material (public or preshared) survives.
+                    var redacted = WireGuard.RemoteInterface.Builder(
+                        publicKey: Self.redactedKey
+                    )
+                    redacted.endpoint = peer.endpoint
+                    redacted.allowedIPs = peer.allowedIPs
+                    redacted.keepAlive = peer.keepAlive
+                    return redacted
                 }
                 return try WireGuardModule.Builder(
                     id: wg.id,

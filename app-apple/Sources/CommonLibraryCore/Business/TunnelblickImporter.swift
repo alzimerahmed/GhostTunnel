@@ -374,10 +374,13 @@ public struct TunnelblickImporter: Sendable {
 
 private extension URL {
     func path(relativeTo base: URL) -> String {
-        var path = absoluteString
-        let baseString = base.absoluteString
-        if path.hasPrefix(baseString) {
-            path.removeFirst(baseString.count)
+        // Compare filesystem paths (not URL strings): directory enumerators
+        // resolve symlinks like /var -> /private/var, so string prefixes on
+        // `absoluteString` can mismatch the caller's unsolved base URL.
+        let basePath = base.resolvingSymlinksInPath().path(percentEncoded: false)
+        var path = resolvingSymlinksInPath().path(percentEncoded: false)
+        if path.hasPrefix(basePath) {
+            path.removeFirst(basePath.count)
         }
         return path.hasPrefix("/") ? String(path.dropFirst()) : path
     }

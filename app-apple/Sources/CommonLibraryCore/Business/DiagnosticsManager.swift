@@ -14,7 +14,7 @@ public enum LogSanitizer {
     private static let pemEnd = "-----END"
 
     /// `key = value` / `key: value` where the key names a secret.
-    private nonisolated(unsafe) static let secretAssignment = /(?i)\b(private[_-]?key|public[_-]?key|password|passphrase|secret|authorization|auth[-_]?token|auth[-_]?user[-_]?pass|token|psk|pre[-_]?shared[_-]?key|static[_-]?key|cookie)\b\s*([=:])\s*\S+/
+    private nonisolated(unsafe) static let secretAssignment = /(?i)\b(private[_-]?key|public[_-]?key|password|passphrase|secret|authorization|auth[-_]?token|auth[-_]?user[-_]?pass|token|psk|pre[-_]?shared[_-]?key|static[_-]?key|cookie)\b\s*([=:])\s*\S.*/
 
     /// An `auth-user-pass` directive line: the credentials follow on the
     /// next line (inline credentials block).

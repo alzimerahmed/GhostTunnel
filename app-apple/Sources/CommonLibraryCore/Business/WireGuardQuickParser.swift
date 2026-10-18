@@ -113,9 +113,9 @@ public struct WireGuardQuickParser: Sendable {
                   let separator = line.firstIndex(of: "=") else {
                 continue
             }
-            let key = line[..<separator]
+            let rawKey = line[..<separator]
                 .trimmingCharacters(in: .whitespaces)
-                .lowercased()
+            let key = rawKey.lowercased()
             let value = line[line.index(after: separator)...]
                 .trimmingCharacters(in: .whitespaces)
 
@@ -159,7 +159,7 @@ public struct WireGuardQuickParser: Sendable {
                     // Client profiles bind an ephemeral local port.
                     warnings.append(Strings.unsupportedListenPort)
                 default:
-                    warnings.append(Strings.unrecognizedKey(key, section: "Interface"))
+                    warnings.append(Strings.unrecognizedKey(String(rawKey), section: "Interface"))
                     break
                 }
 
@@ -197,7 +197,7 @@ public struct WireGuardQuickParser: Sendable {
                     }
 
                 default:
-                    warnings.append(Strings.unrecognizedKey(key, section: "Peer"))
+                    warnings.append(Strings.unrecognizedKey(String(rawKey), section: "Peer"))
                     break
                 }
             }
@@ -300,9 +300,17 @@ private extension WireGuardQuickParser {
 
 private extension WireGuard.RemoteInterface.Builder {
     mutating func merge(_ pending: WireGuardQuickParser.PendingPeer) {
-        preSharedKey = pending.preSharedKey
-        endpoint = pending.endpoint
-        allowedIPs = pending.allowedIPs
-        keepAlive = pending.keepAlive
+        if let preSharedKey = pending.preSharedKey {
+            self.preSharedKey = preSharedKey
+        }
+        if let endpoint = pending.endpoint {
+            self.endpoint = endpoint
+        }
+        if !pending.allowedIPs.isEmpty {
+            allowedIPs = pending.allowedIPs
+        }
+        if let keepAlive = pending.keepAlive {
+            self.keepAlive = keepAlive
+        }
     }
 }
