@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import SwiftUI
+import Foundation
 
 // https://www.ralfebert.com/swiftui/generic-error-handling/
 

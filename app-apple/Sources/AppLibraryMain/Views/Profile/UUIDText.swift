@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import SwiftUI
+import Foundation
 
 struct UUIDText: View {
     let uuid: UUID

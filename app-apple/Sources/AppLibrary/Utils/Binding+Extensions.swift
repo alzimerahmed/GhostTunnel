@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import SwiftUI
+import Foundation
 
 public func ?? <T>(lhs: Binding<T?>, rhs: T) -> Binding<T> where T: Sendable {
     Binding {

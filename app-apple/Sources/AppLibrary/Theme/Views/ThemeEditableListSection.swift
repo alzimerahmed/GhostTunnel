@@ -5,6 +5,7 @@
 #if !os(tvOS)
 
 import SwiftUI
+import Foundation
 
 public enum ThemeEditableListSection {
     public struct RemoveLabel: View {

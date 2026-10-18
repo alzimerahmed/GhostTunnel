@@ -5,6 +5,7 @@
 #if os(macOS)
 
 import AppKit
+import Foundation
 
 @MainActor
 public final class AppWindow {

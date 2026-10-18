@@ -5,6 +5,7 @@
 #if os(iOS)
 
 import SwiftUI
+import Foundation
 
 public struct PasscodeInputView: UIViewRepresentable {
     private let length: Int

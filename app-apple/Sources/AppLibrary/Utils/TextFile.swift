@@ -6,6 +6,7 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+import Foundation
 
 public struct TextFile: FileDocument {
     public static let readableContentTypes: [UTType] = [.json, .plainText, .text]
