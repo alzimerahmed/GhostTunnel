@@ -213,7 +213,7 @@ extension ExtendedEndpoint {
             id: probeKey,
             host: address.rawValue,
             port: proto.port,
-            usesTCP: proto.socketType.rawValue.hasPrefix("tcp")
+            usesTCP: proto.socketType == .tcp
         )
     }
 

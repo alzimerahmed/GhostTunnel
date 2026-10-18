@@ -31,6 +31,12 @@ public struct TailscaleConfigParser: Sendable {
 
     public static let maxConfigSize = 4 * 1_024 * 1_024
 
+    /// Maximum accepted JSON nesting depth. `JSONSerialization` descends
+    /// recursively on Darwin and overflows the stack (SIGBUS) on inputs
+    /// nested deeper than a few hundred levels, so the depth is checked
+    /// iteratively here before Foundation ever sees the bytes.
+    public static let maxNestingDepth = 256
+
     // MARK: API
 
     /// Throws on malformed JSON; returns notes on a well-formed Tailscale
@@ -38,6 +44,9 @@ public struct TailscaleConfigParser: Sendable {
     public func parse(data: Data) throws -> Result {
         guard !data.isEmpty, data.count <= Self.maxConfigSize else {
             throw ABI.AppError.importError(message: Strings.invalidConfig)
+        }
+        guard Self.jsonNestingDepth(in: data) <= Self.maxNestingDepth else {
+            throw ABI.AppError.importError(message: "Invalid JSON: nesting too deep")
         }
         guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             // JSONSerialization throws its own error on malformed JSON;
@@ -75,6 +84,44 @@ public struct TailscaleConfigParser: Sendable {
         }
         notes.append(Strings.migrationPath)
         return Result(suggestedName: object["hostname"] as? String, notes: notes)
+    }
+
+    /// Iteratively computes the maximum `{`/`[` nesting depth, skipping
+    /// braces inside string literals and `\` escapes.
+    private static func jsonNestingDepth(in data: Data) -> Int {
+        var depth = 0
+        var maxDepth = 0
+        var inString = false
+        var escaped = false
+        for byte in data {
+            if inString {
+                if escaped {
+                    escaped = false
+                } else if byte == UInt8(ascii: "\\") {
+                    escaped = true
+                } else if byte == UInt8(ascii: "\"") {
+                    inString = false
+                }
+                continue
+            }
+            switch byte {
+            case UInt8(ascii: "\""):
+                inString = true
+            case UInt8(ascii: "{"), UInt8(ascii: "["):
+                depth += 1
+                if depth > maxDepth {
+                    maxDepth = depth
+                    if maxDepth > Self.maxNestingDepth {
+                        return maxDepth
+                    }
+                }
+            case UInt8(ascii: "}"), UInt8(ascii: "]"):
+                depth = max(0, depth - 1)
+            default:
+                break
+            }
+        }
+        return maxDepth
     }
 
     enum Strings {
