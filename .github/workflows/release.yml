@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to build artifacts for (e.g. v1.0.0)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apple-artifacts:
+    name: Build unsigned Apple artifacts
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          submodules: recursive
+
+      - uses: partout-io/action-prepare-xcode-build@master
+        with:
+          access-token: ${{ github.token }}
+          submodules: true
+
+      - name: Build iOS app (unsigned)
+        run: |
+          cd app-apple
+          xcodebuild build \
+            -project Passepartout.xcodeproj \
+            -scheme Passepartout \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath DerivedData/iOS \
+            CODE_SIGNING_ALLOWED=NO | tail -30
+
+      - name: Build macOS app (unsigned)
+        run: |
+          cd app-apple
+          xcodebuild build \
+            -project Passepartout.xcodeproj \
+            -scheme PassepartoutMac \
+            -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath DerivedData/macOS \
+            CODE_SIGNING_ALLOWED=NO | tail -30
+
+      - name: Package artifacts
+        run: |
+          cd app-apple
+          mkdir -p ../artifacts
+          ios_app=$(find DerivedData/iOS/Build/Products -name '*.app' -maxdepth 2 | head -1)
+          mac_app=$(find DerivedData/macOS/Build/Products -name '*.app' -maxdepth 2 | head -1)
+          test -n "$ios_app"
+          test -n "$mac_app"
+          mkdir -p ipa/Payload
+          cp -R "$ios_app" ipa/Payload/
+          (cd ipa && zip -qr "../../artifacts/GhostTunnel-iOS-$(git describe --tags).ipa" Payload)
+          ditto -c -k --keepParent "$mac_app" "../artifacts/GhostTunnel-macOS-$(git describe --tags).zip"
+          ls -la ../artifacts
+
+      - name: Attach artifacts to release
+        run: |
+          tag="${{ inputs.tag || github.ref_name }}"
+          for f in artifacts/*; do
+            shasum -a 256 "$f" > "$f.sha256"
+          done
+          gh release upload "$tag" artifacts/* --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
