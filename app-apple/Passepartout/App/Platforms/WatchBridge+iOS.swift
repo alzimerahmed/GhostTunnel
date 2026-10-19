@@ -121,9 +121,15 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
             replyHandler(WatchTunnelMessage.failure("Unrecognized message").encodedDictionary() ?? [:])
             return
         }
-        Task { @MainActor [handler] in
-            let response = await handler.handle(incoming)
-            replyHandler(response.encodedDictionary() ?? [:])
+        // WCSession reply closures are invoked once on the session's queue and
+        // are safe to hop actors with; they are just not declared Sendable.
+        struct Reply: @unchecked Sendable {
+            let block: ([String: Any]) -> Void
+        }
+        let reply = Reply(block: replyHandler)
+        Task { @MainActor [reply] in
+            let response = await self.handler.handle(incoming)
+            reply.block(response.encodedDictionary() ?? [:])
         }
     }
 }
