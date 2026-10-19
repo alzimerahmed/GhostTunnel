@@ -129,3 +129,68 @@ jobs:
           gh release upload "$tag" artifacts/* --clobber
         env:
           GH_TOKEN: ${{ github.token }}
+
+  android-artifacts:
+    name: Build signed Android APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          submodules: recursive
+
+      - uses: partout-io/setup-zig@main
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: 1.24
+          cache: false
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager \
+            "platforms;android-36" \
+            "build-tools;36.0.0" \
+            "cmake;4.1.2" \
+            "ndk;29.0.14206865"
+
+      - name: Decode release keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > "$RUNNER_TEMP/ghosttunnel-release.jks"
+          ls -la "$RUNNER_TEMP/ghosttunnel-release.jks"
+
+      - name: Build signed release APK
+        working-directory: app-android
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/ghosttunnel-release.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon --stacktrace :app:assembleRelease
+          find app/build/outputs/apk -name '*.apk'
+
+      - name: Attach APK to release
+        run: |
+          tag="${{ inputs.tag || github.ref_name }}"
+          apk=$(find app-android/app/build/outputs/apk/release -name '*.apk' | head -1)
+          test -n "$apk"
+          out="GhostTunnel-Android-$(git describe --tags).apk"
+          cp "$apk" "$out"
+          sha256sum "$out" > "$out.sha256"
+          gh release upload "$tag" "$out" "$out.sha256" --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
