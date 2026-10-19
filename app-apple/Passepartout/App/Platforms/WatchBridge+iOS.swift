@@ -80,6 +80,7 @@ final class WatchMessageHandler {
 
 /// `WCSession` bridge on the iPhone. Delegate callbacks arrive on the
 /// session's private queue; every app-state access hops to `@MainActor`.
+@MainActor
 final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     private let handler: WatchMessageHandler
 
