@@ -14,9 +14,54 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  partout_xcframework:
+    name: Partout XCFramework
+    if: inputs.run_checks
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: partout-io/action-prepare-xcode-build@master
+        with:
+          access-token: ${{ github.token }}
+          submodules: true
+
+      - uses: partout-io/setup-zig@main
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: 1.24
+          cache-dependency-path: partout/src/**/go.sum
+
+      - id: partout-sha
+        run: echo "sha=$(git -C partout rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v4
+        id: xcframework-cache
+        with:
+          path: app-apple/PartoutNative.xcframework
+          key: partout-xcf-${{ steps.partout-sha.outputs.sha }}-${{ hashFiles('.prebuilts-version') }}
+
+      - name: Build Partout XCFramework
+        if: steps.xcframework-cache.outputs.cache-hit != 'true'
+        run: |
+          cd app-apple
+          prebuilts_version=$(tr -d '\r\n' < ../.prebuilts-version)
+          ../partout/scripts/build-xcframework.sh \
+            "$prebuilts_version" \
+            --out "$PWD/PartoutNative.xcframework" \
+            --prebuilts-out "$RUNNER_TEMP/partout-prebuilts" \
+            --full
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: partout-native
+          path: app-apple/PartoutNative.xcframework
+          if-no-files-found: error
+
   run_tests:
     name: ${{ matrix.name }}
     if: inputs.run_checks
+    needs: partout_xcframework
     runs-on: ${{ matrix.runner }}
     timeout-minutes: ${{ matrix.timeout_minutes }}
     strategy:
@@ -158,20 +203,28 @@ jobs:
         if: matrix.suite == 'apple'
         run: ci/run-apple-tests.sh
 
+      - name: Download Partout XCFramework
+        if: startsWith(matrix.suite, 'apple-build')
+        uses: actions/download-artifact@v4
+        with:
+          name: partout-native
+          path: app-apple/PartoutNative.xcframework
+
       - name: Run Apple build
         if: matrix.suite == 'apple-build'
         run: |
           cd app-apple
+          set -o pipefail
           xcodebuild build \
             -project Passepartout.xcodeproj \
             -scheme Passepartout \
             -destination 'generic/platform=iOS' \
-            CODE_SIGNING_ALLOWED=NO | tail -50
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50
           xcodebuild build \
             -project Passepartout.xcodeproj \
             -scheme PassepartoutMac \
             -destination 'generic/platform=macOS' \
-            CODE_SIGNING_ALLOWED=NO | tail -50
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50
 
       - name: Run Apple build (tvOS)
         if: matrix.suite == 'apple-build-tvos'
@@ -179,11 +232,12 @@ jobs:
           cd app-apple
           # Phase 11 gate: compiles the tvOS app + the appletvos-filtered
           # PassepartoutTopShelf extension target (hand-written pbxproj).
+          set -o pipefail
           xcodebuild build \
             -project Passepartout.xcodeproj \
             -scheme Passepartout \
             -destination 'generic/platform=tvOS' \
-            CODE_SIGNING_ALLOWED=NO | tail -50
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50
 
       # Phase 14 gate: compiles the hand-written watchOS companion targets
       # (app + complication widget extension). The iOS build leg above also
@@ -192,16 +246,17 @@ jobs:
         if: matrix.suite == 'apple-build-watchos'
         run: |
           cd app-apple
+          set -o pipefail
           xcodebuild build \
             -project Passepartout.xcodeproj \
             -target PassepartoutWatch \
             -sdk watchos \
-            CODE_SIGNING_ALLOWED=NO | tail -50
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50
           xcodebuild build \
             -project Passepartout.xcodeproj \
             -target PassepartoutWatchWidgets \
             -sdk watchos \
-            CODE_SIGNING_ALLOWED=NO | tail -50
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50
 
       - name: Run Partout tests (Swift)
         if: matrix.suite == 'partout'
