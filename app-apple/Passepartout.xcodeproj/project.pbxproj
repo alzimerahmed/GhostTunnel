@@ -15,6 +15,9 @@
 		A1B2C3D4E5F60718293A4B80 /* WidgetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B87 /* WidgetsExtension.swift */; };
 		A1B2C3D4E5F60718293A4B81 /* TunnelStatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B88 /* TunnelStatusWidget.swift */; };
 		A1B2C3D4E5F60718293A4B82 /* TunnelControlWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B89 /* TunnelControlWidget.swift */; };
+		A1B2C3D4E5F60718293A4B9B /* PartoutNative.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E6D805B303C8700002C0DD8 /* PartoutNative.xcframework */; };
+		A1B2C3D4E5F60718293A4B9C /* PartoutNative.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E6D805B303C8700002C0DD8 /* PartoutNative.xcframework */; };
+		A1B2C3D4E5F60718293A4B9D /* PartoutNative.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E6D805B303C8700002C0DD8 /* PartoutNative.xcframework */; };
 		A1B2C3D4E5F60718293A4B84 /* AppIntentsLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F60718293A4B97 /* AppIntentsLibrary */; };
 		A1B2C3D4E5F60718293A4B85 /* CommonLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F60718293A4B98 /* CommonLibrary */; };
 		A1B2C3D4E5F60718293A4B86 /* AppIntentsLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F60718293A4B99 /* AppIntentsLibrary */; };
@@ -334,6 +337,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1B2C3D4E5F60718293A4B86 /* AppIntentsLibrary in Frameworks */,
+				A1B2C3D4E5F60718293A4B9C /* PartoutNative.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,6 +347,7 @@
 			files = (
 				A1B2C3D4E5F60718293A4B84 /* AppIntentsLibrary in Frameworks */,
 				A1B2C3D4E5F60718293A4B85 /* CommonLibrary in Frameworks */,
+				A1B2C3D4E5F60718293A4B9B /* PartoutNative.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,6 +358,7 @@
 				C0DE11A00000000000000003 /* AppIntentsLibrary in Frameworks */,
 				C0DE11A00000000000000004 /* CommonLibrary in Frameworks */,
 				C0DE11A00000000000000005 /* AppLibraryTV in Frameworks */,
+				A1B2C3D4E5F60718293A4B9D /* PartoutNative.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
