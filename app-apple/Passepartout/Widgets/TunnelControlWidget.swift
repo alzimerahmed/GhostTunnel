@@ -13,9 +13,7 @@ import WidgetKit
 struct TunnelControlWidget: ControlWidget {
     var body: some ControlWidgetConfiguration {
         StaticControlConfiguration(kind: "com.ghosttunnel.TunnelControl") {
-            ControlWidgetButton {
-                ToggleTunnelIntent()
-            } label: {
+            ControlWidgetButton(action: ToggleTunnelIntent()) {
                 Label(
                     "Toggle VPN",
                     systemImage: "globe"

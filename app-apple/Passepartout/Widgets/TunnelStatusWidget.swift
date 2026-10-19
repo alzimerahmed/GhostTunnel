@@ -39,7 +39,7 @@ struct TunnelStatusProvider: TimelineProvider {
         TunnelWidgetStatusStore(defaults: $0)
     }
 
-    func placeholder() -> TunnelStatusEntry {
+    func placeholder(in context: Context) -> TunnelStatusEntry {
         .init(date: Date(), state: TunnelWidgetState(kind: .disconnected))
     }
 
