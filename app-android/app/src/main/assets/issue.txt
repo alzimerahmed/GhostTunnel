@@ -1,1 +1,14 @@
-../../../../../app-apple/Sources/AppResources/Resources/issue.txt
+Hi,
+
+$comment
+
+--
+
+App: $appLine
+OS: $osLine
+Device: $deviceLine
+Purchased: $purchasedProducts
+
+--
+
+Regards

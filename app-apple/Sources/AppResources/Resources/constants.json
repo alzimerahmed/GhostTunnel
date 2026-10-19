@@ -8,10 +8,10 @@
     },
     "websites": {
         "partoutURL": "https://partout.io",
-        "homeURL": "https://partout.io/passepartout",
+        "homeURL": "https://github.com/alzimerahmed/GhostTunnel",
         "eulaURL": "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
-        "appStoreDownloadURL": "https://apps.apple.com/us/app/passepartout-vpn-client/id1433648537?mt=8",
-        "macDownloadURL": "https://partout.io/passepartout/#app-mac",
+        "appStoreDownloadURL": "https://github.com/alzimerahmed/GhostTunnel/releases/latest",
+        "macDownloadURL": "https://github.com/alzimerahmed/GhostTunnel/releases/latest",
         "configTTL": 3600.0,
         "betaTTLFactor": 0.1
     },

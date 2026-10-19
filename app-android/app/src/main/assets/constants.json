@@ -1,1 +1,89 @@
-../../../../../app-apple/Sources/AppResources/Resources/constants.json
+{
+    "deviceIdLength": 64,
+    "containers": {
+        "local": "Local",
+        "remote": "Remote",
+        "backup": "Backup",
+        "preferences": "Preferences-v3"
+    },
+    "websites": {
+        "partoutURL": "https://partout.io",
+        "homeURL": "https://github.com/alzimerahmed/GhostTunnel",
+        "eulaURL": "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+        "appStoreDownloadURL": "https://github.com/alzimerahmed/GhostTunnel/releases/latest",
+        "macDownloadURL": "https://github.com/alzimerahmed/GhostTunnel/releases/latest",
+        "configTTL": 3600.0,
+        "betaTTLFactor": 0.1
+    },
+    "github": {
+        "discussionsURL": "https://github.com/alzimerahmed/GhostTunnel/discussions",
+        "issuesURL": "https://github.com/alzimerahmed/GhostTunnel/issues",
+        "rawURL": "https://raw.githubusercontent.com/alzimerahmed/GhostTunnel",
+        "latestReleaseURL": "https://api.github.com/repos/alzimerahmed/GhostTunnel/releases/latest"
+    },
+    "emails": {
+        "domain": "passepartoutvpn.app",
+        "recipients": {
+            "issues": "issues",
+            "beta": "beta"
+        }
+    },
+    "formats": {
+        "timestamp": "yyyy-MM-dd HH:mm:ss"
+    },
+    "tunnel": {
+        "profileTitleFormat": "GhostTunnel: %@",
+        "refreshInterval": 1.0,
+        "dnsFallbackServers": [
+            "1.1.1.1",
+            "1.0.0.1"
+        ],
+        "minDataCountDelta": 1024,
+        "verification": {
+            "production": {
+                "defaultDelay": 240.0,
+                "tvDelay": 900.0,
+                "interval": 21600.0,
+                "attempts": 3,
+                "retryInterval": 300.0
+            },
+            "beta": {
+                "defaultDelay": 1800.0,
+                "interval": 1800.0,
+                "attempts": 6,
+                "retryInterval": 10.0
+            }
+        }
+    },
+    "url": {
+        "timeoutInterval": 5.0,
+        "versionRateLimit": 86400.0,
+        "refreshInfrastructureRateLimit": 86400.0
+    },
+    "iap": {
+        "productsTimeoutInterval": 10.0,
+        "receiptInvalidationInterval": 600.0
+    },
+    "webReceiver": {
+        "port": 10000,
+        "passcodeLength": 6
+    },
+    "log": {
+        "tag": "GhostTunnelABI",
+        "sinceLast": 86400.0,
+        "options": {
+            "maxLevel": 3,
+            "maxSize": 500000,
+            "maxBufferedLines": 5000,
+            "maxAge": 86400.0
+        },
+        "formatter": {
+            "timestamp": "HH:mm:ss",
+            "message": "%@ - %@"
+        },
+        "filenames": {
+            "app": "app.txt",
+            "tunnel": "tunnel.txt"
+        }
+    }
+}
