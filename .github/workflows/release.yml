@@ -105,8 +105,13 @@ jobs:
         run: |
           cd app-apple
           mkdir -p ../artifacts
-          ios_app=$(find DerivedData/iOS/Build/Products -name 'Passepartout.app' -maxdepth 2 | head -1)
-          mac_app=$(find DerivedData/macOS/Build/Products -name 'Passepartout.app' -maxdepth 2 | head -1)
+          find DerivedData -name '*.app' -maxdepth 4
+          ios_app=$(find DerivedData/iOS/Build/Products -name '*.app' -maxdepth 2 \
+            | grep -vE 'Watch|LoginItem|Tests' | head -1)
+          mac_app=$(find DerivedData/macOS/Build/Products -name '*.app' -maxdepth 2 \
+            | grep -vE 'Watch|LoginItem|Tests' | head -1)
+          echo "ios_app=$ios_app"
+          echo "mac_app=$mac_app"
           test -n "$ios_app"
           test -n "$mac_app"
           mkdir -p ipa/Payload
