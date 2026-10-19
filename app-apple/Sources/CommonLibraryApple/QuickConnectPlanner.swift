@@ -36,7 +36,7 @@ public enum QuickConnectPlanner {
         if let lastUsedProfileId, profileIds.contains(lastUsedProfileId) {
             targetId = lastUsedProfileId
         } else {
-            targetId = profiles.sorted().first?.id
+            targetId = profiles.sorted().last?.id
         }
         guard let targetId else {
             return .none
