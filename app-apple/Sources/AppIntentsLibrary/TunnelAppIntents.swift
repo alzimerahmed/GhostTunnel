@@ -39,13 +39,14 @@ public struct ToggleTunnelIntent: AppIntent {
     }
 }
 
-// ControlIntent is unavailable before OS 18 on every platform, tvOS
-// included; without the tvOS clause this conformance fails to compile when
-// the package builds AppIntentsLibrary for tvOS (declared in Package.swift).
-// macOS has no ControlIntent at all (Control Center is iOS/tvOS only).
+// ControlConfigurationIntent is unavailable before OS 18 on every platform,
+// tvOS included; without the tvOS clause this conformance fails to compile
+// when the package builds AppIntentsLibrary for tvOS (declared in
+// Package.swift). macOS has no ControlConfigurationIntent conformance here
+// (Control Center controls are iOS/tvOS only).
 #if os(iOS) || os(tvOS)
 @available(iOS 18.0, tvOS 18.0, *)
-extension ToggleTunnelIntent: ControlIntent {}
+extension ToggleTunnelIntent: ControlConfigurationIntent {}
 #endif
 
 // MARK: - Connect to a specific profile
