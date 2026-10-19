@@ -215,16 +215,21 @@ jobs:
         run: |
           cd app-apple
           set -o pipefail
-          xcodebuild build \
-            -project Passepartout.xcodeproj \
-            -scheme Passepartout \
-            -destination 'generic/platform=iOS' \
-            CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50
-          xcodebuild build \
-            -project Passepartout.xcodeproj \
-            -scheme PassepartoutMac \
-            -destination 'generic/platform=macOS' \
-            CODE_SIGNING_ALLOWED=NO 2>&1 | tail -50
+          for spec in "Passepartout|generic/platform=iOS" "PassepartoutMac|generic/platform=macOS"; do
+            scheme="${spec%%|*}"
+            dest="${spec##*|}"
+            log="/tmp/build-$(echo "$scheme" | tr -dc '[:alnum:]').log"
+            if ! xcodebuild build \
+              -project Passepartout.xcodeproj \
+              -scheme "$scheme" \
+              -destination "$dest" \
+              CODE_SIGNING_ALLOWED=NO > "$log" 2>&1; then
+              grep -E "error:|warning:.*never used|Undefined symbols" "$log" | head -40
+              tail -20 "$log"
+              exit 1
+            fi
+            tail -5 "$log"
+          done
 
       - name: Run Apple build (tvOS)
         if: matrix.suite == 'apple-build-tvos'
